@@ -3,14 +3,19 @@ package channels;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import server.Server;
 
-abstract class Channel {
+abstract class Channel implements Runnable {
+    final int MAX_PACKET_SIZE = 64000;
 
     protected MulticastSocket socket;
     protected InetAddress address;
     protected int port;
+    protected Server server;
 
-    public Channel(String addressStr,String portVar){
+    public Channel(Server server, String addressStr, String portVar) {
+
+        this.server = server;
 
         try {
             this.address = InetAddress.getByName(addressStr);
@@ -24,8 +29,15 @@ abstract class Channel {
 
     }
 
-    abstract void start();
-
     abstract void handler();
 
+
+    protected static class FieldIndex {
+        public static final int MessageType = 0;
+        public static final int Version = 1;
+        public static final int SenderId = 2;
+        public static final int FileId = 3;
+        public static final int ChunkNo = 4;
+        public static final int ReplicationDeg = 5;
+    }
 }

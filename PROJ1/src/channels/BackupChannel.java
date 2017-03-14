@@ -1,17 +1,14 @@
 package channels;
 
+import server.Server;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 
 public class BackupChannel extends Channel{
 
-    public BackupChannel(String addressStr, String portVar){
-        super(addressStr,portVar);
-    }
-
-    @Override
-    void start(){
-
+    public BackupChannel(Server server, String addressStr, String portVar){
+        super(server, addressStr,portVar);
     }
 
     @Override
@@ -20,4 +17,8 @@ public class BackupChannel extends Channel{
     }
 
 
+    @Override
+    public void run() {
+
+    }
 }

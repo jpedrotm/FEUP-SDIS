@@ -1,14 +1,17 @@
 package channels;
 
+import server.Server;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 
 public class DataChannel extends Channel{
 
-    public DataChannel(String addressStr, String portVar){
-        super(addressStr,portVar);
+    public DataChannel(Server server, String addressStr, String portVar){
+        super(server, addressStr,portVar);
     }
 
+    /*
     @Override
     void start() {
 
@@ -29,6 +32,7 @@ public class DataChannel extends Channel{
         }
 
     }
+    */
 
     @Override
     void handler() {
@@ -42,6 +46,11 @@ public class DataChannel extends Channel{
         }
 
         System.out.println(new String(packet.getData(), 0, packet.getLength()));
+
+    }
+
+    @Override
+    public void run() {
 
     }
 }

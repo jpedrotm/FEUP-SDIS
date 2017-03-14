@@ -1,7 +1,9 @@
+package server;
+
 import channels.ControlChannel;
 
 public class Server {
-
+    private String serverID;
     private ControlChannel mc;
     //private BackupChannel mdr;
     //private DataChannel mdb;
@@ -12,12 +14,16 @@ public class Server {
     }
 
     public Server(String[] commands) {
-        this.mc=new ControlChannel(commands[0],commands[1]);
+        this.mc = new ControlChannel(this, commands[0], commands[1]);
         //this.mdr=new BackupChannel(commands[0],commands[1]);
         //this.mdb=new DataChannel(commands[0],commands[1]);
     }
 
     public void start() {
+        new Thread(mc).start();
+    }
 
+    public String getServerID() {
+        return serverID;
     }
 }
