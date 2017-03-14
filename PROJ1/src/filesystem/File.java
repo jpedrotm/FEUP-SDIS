@@ -1,18 +1,20 @@
 package filesystem;
 
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 public class File {
-    private ArrayList<Chunk> chunks;
+    private String id;
+    private HashMap<Integer, Chunk> chunks;
 
-    public File() {
-        chunks = new ArrayList<>();
+    public File(String id) {
+        this.id = id;
+        this.chunks = new HashMap<>();
+        FileManager.instance().addFile(id, this);
     }
 
     public void addChunk(Chunk chunk) {
-        chunks.add(chunk);
-        chunks.sort(Chunk::compareTo);
+        chunks.put(chunk.getNumber(), chunk);
     }
 
     public Chunk getChunk(int chunkNo) {
@@ -20,13 +22,7 @@ public class File {
     }
 
     public boolean hasChunk(int chunkNo) {
-        try {
-            chunks.get(chunkNo);
-            return true;
-        }
-        catch (IndexOutOfBoundsException e) {
-            return false;
-        }
+        return chunks.containsKey(chunkNo);
     }
 
     public void updateChunk(int chunkNo) {

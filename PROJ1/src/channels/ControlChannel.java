@@ -24,7 +24,6 @@ public class ControlChannel extends Channel {
     public void run() {
 
         while (true) {
-            /*
             String msg = "qwrqwrqwrq hehe \r\n\r\nasdddsa";
             DatagramPacket packet1 = new DatagramPacket(msg.getBytes(), msg.length(), address, port);
             try {
@@ -38,8 +37,6 @@ public class ControlChannel extends Channel {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            */
-
 
             DatagramPacket packet = new DatagramPacket(new byte[MAX_PACKET_SIZE], MAX_PACKET_SIZE);
             try {
@@ -50,6 +47,9 @@ public class ControlChannel extends Channel {
 
             Message message = new Message(packet);
             String[] headerFields = message.getHeaderFields();
+
+            System.out.println(message.getHeader());
+            System.out.println(message.getBody());
 
             switch (headerFields[FieldIndex.MessageType]) {
                 case "STORED":

@@ -1,16 +1,23 @@
 package filesystem;
 
 
-public class Chunk implements Comparable<Chunk> {
+import utils.PathHelper;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+public class Chunk {
     private int number;
-    private byte[] content;
     private int replicationDegree;
+    private byte[] content;
     private int actualReplicationDegree;
 
-    public Chunk(int number, byte[] content, int replicationDegree) {
+    public Chunk(int number, int replicationDegree, byte[] content) {
         this.number = number;
-        this.content = content;
         this.replicationDegree = replicationDegree;
+        this.content = content;
         this.actualReplicationDegree = 0;
     }
 
@@ -26,19 +33,20 @@ public class Chunk implements Comparable<Chunk> {
         return replicationDegree;
     }
 
+    public int getActualReplicationDegree() {
+        return actualReplicationDegree;
+    }
+
     public void addReplication() { actualReplicationDegree++; }
 
     public void subReplication() { actualReplicationDegree--; }
 
-    @Override
-    public int compareTo(Chunk chunk) {
-        if (this.number < chunk.number)
-            return -1;
+    public void resetReplication() { actualReplicationDegree = 0; }
 
-        if (this.number > chunk.number) {
-            return 1;
-        }
-
-        return 0;
-    }
+    public void storeContent(String fileId) throws IOException {
+        Path pathToFile = Paths.get(PathHelper.buildPath(fileId, number));
+        Files.createDirectories(pathToFile.getParent());
+        Files.write(pathToFile, content);
+        content = null;     // free space when content is saved
+    };
 }
