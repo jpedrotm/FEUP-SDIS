@@ -1,12 +1,16 @@
 package channels;
 
 import java.io.IOException;
+import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.nio.charset.StandardCharsets;
+
 import server.Server;
+import utils.Message;
 
 abstract class Channel implements Runnable {
-    final int MAX_PACKET_SIZE = 64000;
+    final int MAX_PACKET_SIZE = 64 * 1024;
 
     protected MulticastSocket socket;
     protected InetAddress address;
@@ -39,5 +43,10 @@ abstract class Channel implements Runnable {
         public static final int FileId = 3;
         public static final int ChunkNo = 4;
         public static final int ReplicationDeg = 5;
+    }
+
+    public void send(Message msg) {
+        byte[] sendMsg = msg.getMessage().getBytes(StandardCharsets.US_ASCII);
+        DatagramPacket packet = new DatagramPacket(sendMsg, sendMsg.length, address, port);
     }
 }
