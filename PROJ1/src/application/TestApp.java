@@ -1,11 +1,25 @@
 package application;
 
+import server.PeerInterface;
+
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
 public class TestApp {
 
     private int peerAp; //peer access point (não sei bem para que usar)
     private String subProtocol; //sub protocol usado
     private String filePath; //path do ficheiro para faze backup
     private int nRep; //número de replicações para fazer do ficheiro (apenas em caso do sub protocolo backup)
+
+    public static void main(String[] args){
+
+        TestApp application=new TestApp(args);
+        application.start();
+
+    }
 
     public TestApp(String[] args){
 
@@ -44,6 +58,20 @@ public class TestApp {
         }
 
         return 0;
+
+    }
+
+    public void start(){
+
+        try {
+
+            Registry registry= LocateRegistry.getRegistry("localhost");
+            PeerInterface stub=(PeerInterface) registry.lookup(Integer.toString(peerAp));
+            stub.writeID();
+
+        } catch (RemoteException | NotBoundException e) {
+            e.printStackTrace();
+        }
 
     }
 }
