@@ -24,6 +24,7 @@ public class ControlChannel extends Channel {
     public void run() {
 
         while (true) {
+            /*
             String msg = "qwrqwrqwrq hehe \r\n\r\nasdddsa";
             DatagramPacket packet1 = new DatagramPacket(msg.getBytes(), msg.length(), address, port);
             try {
@@ -37,8 +38,9 @@ public class ControlChannel extends Channel {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            */
 
-            DatagramPacket packet = new DatagramPacket(new byte[MAX_PACKET_SIZE], MAX_PACKET_SIZE);
+            DatagramPacket packet = new DatagramPacket(new byte[Message.MAX_CHUNK_SIZE], Message.MAX_CHUNK_SIZE);
             try {
                 this.socket.receive(packet);
             } catch (IOException e) {

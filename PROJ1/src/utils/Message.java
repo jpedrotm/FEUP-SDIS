@@ -2,10 +2,10 @@ package utils;
 
 import java.net.DatagramPacket;
 
-/**
- * Created by joaobarbosa on 14-03-2017.
- */
+
 public class Message {
+    public static final int MAX_CHUNK_SIZE = 64 * 1024;
+
     private String message;
     private String header;
     private String body;

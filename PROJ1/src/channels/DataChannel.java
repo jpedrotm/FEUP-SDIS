@@ -34,7 +34,7 @@ public class DataChannel extends Channel {
     @Override
     public void run() {
         while (true) {
-            DatagramPacket packet = new DatagramPacket(new byte[MAX_PACKET_SIZE], MAX_PACKET_SIZE);
+            DatagramPacket packet = new DatagramPacket(new byte[Message.MAX_CHUNK_SIZE], Message.MAX_CHUNK_SIZE);
             try {
                 this.socket.receive(packet);
             } catch (IOException e) {
