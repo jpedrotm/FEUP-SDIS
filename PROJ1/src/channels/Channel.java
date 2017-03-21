@@ -10,8 +10,6 @@ import server.Server;
 import utils.Message;
 
 abstract class Channel implements Runnable {
-    final int MAX_PACKET_SIZE = 64 * 1024;
-
     protected MulticastSocket socket;
     protected InetAddress address;
     protected int port;

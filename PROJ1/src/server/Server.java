@@ -6,6 +6,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import protocols.BackupProtocol;
 
 public class Server implements PeerInterface {
     private String serverID;
@@ -34,6 +35,12 @@ public class Server implements PeerInterface {
         this.mc = new ControlChannel(this, commands[0], commands[1]);
         //this.mdr=new BackupChannel(commands[0],commands[1]);
         //this.mdb=new DataChannel(commands[0],commands[1]);
+
+        try {
+            BackupProtocol.sendFileChunks(mc, "storage/asdas.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         this.serverID=commands[2]; //temporario só para testar o RMI
     }
 
@@ -47,5 +54,9 @@ public class Server implements PeerInterface {
 
     public String getServerID() {
         return serverID;
+    }
+
+    public void readFile() {
+
     }
 }
