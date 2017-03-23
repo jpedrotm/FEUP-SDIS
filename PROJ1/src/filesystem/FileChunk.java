@@ -3,11 +3,11 @@ package filesystem;
 
 import java.util.HashMap;
 
-public class File {
+public class FileChunk {
     private String id;
     private HashMap<Integer, Chunk> chunks;
 
-    public File(String id) {
+    public FileChunk(String id) {
         this.id = id;
         this.chunks = new HashMap<>();
         FileManager.instance().addFile(id, this);

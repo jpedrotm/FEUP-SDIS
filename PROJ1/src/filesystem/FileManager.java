@@ -4,7 +4,7 @@ package filesystem;
 import java.util.HashMap;
 
 public class FileManager {
-    private HashMap<String,File> files;
+    private HashMap<String, FileChunk> files;
 
 
     private static FileManager instance = null;
@@ -28,7 +28,7 @@ public class FileManager {
 
 
 
-    public void addFile(String fileId, File file) {
+    public void addFile(String fileId, FileChunk file) {
         files.put(fileId, file);
     }
 
@@ -36,7 +36,7 @@ public class FileManager {
         return files.containsKey(fileId);
     }
 
-    public File getFile(String fileId) {
+    public FileChunk getFile(String fileId) {
         return files.get(fileId);
     }
 }

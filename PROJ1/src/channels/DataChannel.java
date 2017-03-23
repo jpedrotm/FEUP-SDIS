@@ -1,7 +1,7 @@
 package channels;
 
 import filesystem.Chunk;
-import filesystem.File;
+import filesystem.FileChunk;
 import filesystem.FileManager;
 import server.Server;
 import utils.Message;
@@ -63,11 +63,11 @@ public class DataChannel extends Channel {
         if (senderID == server.getServerID())
             return;
 
-        File file;
+        FileChunk file;
         if (FileManager.instance().hasFile(fileID))
             file = FileManager.instance().getFile(fileID);
         else
-            file = new File(fileID);
+            file = new FileChunk(fileID);
 
 
         if (file.hasChunk(chunkNo)) {

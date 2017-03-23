@@ -1,13 +1,12 @@
 package channels;
 
-import filesystem.File;
+import filesystem.FileChunk;
 import filesystem.FileManager;
 import server.Server;
 import utils.Message;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.nio.charset.StandardCharsets;
 
 public class ControlChannel extends Channel {
 
@@ -85,7 +84,7 @@ public class ControlChannel extends Channel {
             return;
 
         if (FileManager.instance().hasFile(fileID)) {
-            File file = FileManager.instance().getFile(fileID);
+            FileChunk file = FileManager.instance().getFile(fileID);
             int chunkNo = Integer.parseInt(chunkNumber);
             file.updateChunk(chunkNo);
         }
