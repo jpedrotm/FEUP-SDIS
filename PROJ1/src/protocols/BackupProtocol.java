@@ -28,12 +28,12 @@ public class BackupProtocol extends Protocol {
         String lastModified = String.valueOf(attr.lastModifiedTime());
         String owner = String.valueOf(Files.getOwner(filePath));
         String fileId=filename+owner+lastModified;
-        byte[] content = new byte[Message.MAX_CHUNK_SIZE];
 
         String hashFileId=Message.buildHash(fileId);
 
         int i=0;
         while (true) {
+            byte[] content = new byte[Message.MAX_CHUNK_SIZE];
             String header = Message.buildHeader(MessageType.Putchunk, version, senderId,hashFileId,Integer.toString(i), replicationDeg);
             int bytesRead = is.read(content, 0, Message.MAX_CHUNK_SIZE - header.length() - 5);
             if (bytesRead == -1) {
@@ -42,6 +42,7 @@ public class BackupProtocol extends Protocol {
 
             byte[] body = Arrays.copyOf(content, bytesRead);
             Message msg = new Message(header, new String(body, StandardCharsets.US_ASCII));
+            System.out.println(msg.getMessage());
             mc.send(msg);
             i++;
         }

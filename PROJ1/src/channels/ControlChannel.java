@@ -24,6 +24,9 @@ public class ControlChannel extends Channel {
     public void run() {
 
         while (true) {
+
+            System.out.println("ESTOU A DAR");
+
             /*
             String msg = "qwrqwrqwrq hehe \r\n\r\nasdddsa";
             DatagramPacket packet1 = new DatagramPacket(msg.getBytes(), msg.length(), address, port);
@@ -50,8 +53,8 @@ public class ControlChannel extends Channel {
             Message message = new Message(packet);
             String[] headerFields = message.getHeaderFields();
 
-            System.out.println(message.getHeader());
-            System.out.println(message.getBody());
+            //System.out.println(message.getHeader());
+            //System.out.println(message.getBody());
 
             switch (headerFields[FieldIndex.MessageType]) {
                 case "STORED":

@@ -20,34 +20,40 @@ public class Server implements PeerInterface {
 
         try {
             Server server = new Server(args);
-            PeerInterface stub=(PeerInterface) UnicastRemoteObject.exportObject(server,0);
+            System.out.println("ID: "+server.getServerID());
+            PeerInterface stub = (PeerInterface) UnicastRemoteObject.exportObject(server,0);
             Registry registry= LocateRegistry.getRegistry();
-            registry.bind(server.getServerID(),stub);
+            registry.rebind(server.getServerID(), stub);
+            server.start();
+
+
 
             System.err.println("Server is ready.");
 
-        } catch (RemoteException | AlreadyBoundException e) {
+        } catch (RemoteException e) {
             e.printStackTrace();
         }
-
-        //server.start();
     }
 
     public Server(String[] commands) {
+
         this.mc = new ControlChannel(this, commands[0], commands[1]);
         //this.mdr=new BackupChannel(commands[0],commands[1]);
         //this.mdb=new DataChannel(commands[0],commands[1]);
 
-        try {
-            BackupProtocol.sendFileChunks(mc, "storage/asdas.txt","1.0",serverID,"3");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
         this.serverID=commands[2]; //temporario só para testar o RMI
+
     }
 
     public void start() {
         new Thread(mc).start();
+
+        try {
+            BackupProtocol.sendFileChunks(mc, "storage/a3_prototipo_da_interface_com_o_utilizador.pdf","1.0",serverID,"3");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void writeID(){

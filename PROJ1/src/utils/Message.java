@@ -2,21 +2,22 @@ package utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 
 public class Message {
-    public static final int MAX_CHUNK_SIZE = 64 * 1024;
+    public static final int MAX_CHUNK_SIZE = 65507;
 
     private String message;
     private String header;
     private String body;
 
     public Message(DatagramPacket packet) {
-        message = new String(packet.getData(), packet.getOffset(), packet.getLength());
+        message = new String(packet.getData(), packet.getOffset(), packet.getLength(), StandardCharsets.US_ASCII);
 
-        String[] tokens = message.split("[\\r\\n]+");
+        String[] tokens = message.split("(\\r\\n){2}");
         header = tokens[0];
         body = tokens[1];
     }

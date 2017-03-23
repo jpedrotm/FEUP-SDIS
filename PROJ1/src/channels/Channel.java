@@ -46,6 +46,7 @@ abstract class Channel implements Runnable {
     public void send(Message msg) throws IOException {
         byte[] sendMsg = msg.getMessage().getBytes(StandardCharsets.US_ASCII);
         DatagramPacket packet = new DatagramPacket(sendMsg, sendMsg.length, address, port);
+        System.out.println(sendMsg.length);
         socket.send(packet);
     }
 }
