@@ -27,30 +27,14 @@ public class BackupProtocol extends Protocol {
         BasicFileAttributes attr = Files.readAttributes(filePath, BasicFileAttributes.class);
         String lastModified = String.valueOf(attr.lastModifiedTime());
         String owner = String.valueOf(Files.getOwner(filePath));
-
+        String fileId=filename+owner+lastModified;
         byte[] content = new byte[Message.MAX_CHUNK_SIZE];
-        byte[] hash;
-        String fileId;
-        StringBuffer hexString;
-        MessageDigest hashAlgorithm=null;
-        try {
-            hashAlgorithm = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+
+        String hashFileId=Message.buildHash(fileId);
+
         int i=0;
         while (true) {
-            fileId=filename+owner+i;
-            hash=hashAlgorithm.digest(fileId.getBytes("UTF-8"));
-
-             hexString=new StringBuffer();
-            for (int j = 0; i < hash.length; j++) { //verificar fiabilidade e eficiências
-                String hex = Integer.toHexString(0xff & hash[j]);
-                if(hex.length() == 1) hexString.append('0');
-                hexString.append(hex);
-            }
-
-            String header = Message.buildHeader(MessageType.Putchunk, "1.0", senderId,hexString.toString(),Integer.toString(i), replicationDeg);
+            String header = Message.buildHeader(MessageType.Putchunk, version, senderId,hashFileId,Integer.toString(i), replicationDeg);
             int bytesRead = is.read(content, 0, Message.MAX_CHUNK_SIZE - header.length() - 5);
             if (bytesRead == -1) {
                 break;
@@ -64,4 +48,5 @@ public class BackupProtocol extends Protocol {
 
         return true;
     }
+
 }

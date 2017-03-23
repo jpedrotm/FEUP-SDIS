@@ -39,7 +39,7 @@ public class Server implements PeerInterface {
         //this.mdb=new DataChannel(commands[0],commands[1]);
 
         try {
-            BackupProtocol.sendFileChunks(mc, "storage/asdas.txt");
+            BackupProtocol.sendFileChunks(mc, "storage/asdas.txt","1.0",serverID,"3");
         } catch (IOException e) {
             e.printStackTrace();
         }
