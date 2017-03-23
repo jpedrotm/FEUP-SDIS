@@ -1,6 +1,8 @@
 package server;
 
 import channels.ControlChannel;
+
+import java.io.IOException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
