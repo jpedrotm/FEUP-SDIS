@@ -43,8 +43,9 @@ abstract class Channel implements Runnable {
         public static final int ReplicationDeg = 5;
     }
 
-    public void send(Message msg) {
+    public void send(Message msg) throws IOException {
         byte[] sendMsg = msg.getMessage().getBytes(StandardCharsets.US_ASCII);
         DatagramPacket packet = new DatagramPacket(sendMsg, sendMsg.length, address, port);
+        socket.send(packet);
     }
 }
