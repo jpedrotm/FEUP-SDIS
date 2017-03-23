@@ -9,7 +9,6 @@ public class Message {
     private String message;
     private String header;
     private String body;
-    private String[] headerFields;
 
     public Message(DatagramPacket packet) {
         message = new String(packet.getData(), packet.getOffset(), packet.getLength());
@@ -17,7 +16,12 @@ public class Message {
         String[] tokens = message.split("[\\r\\n]+");
         header = tokens[0];
         body = tokens[1];
-        headerFields = tokens[0].split("\\s");
+    }
+
+    public Message(String header, String body) {
+        this.header = header;
+        this.body = body;
+        this.message = this.header + " \r\n\r\n" + this.body;
     }
 
     public String getMessage() {
@@ -33,6 +37,10 @@ public class Message {
     }
 
     public String[] getHeaderFields() {
-        return headerFields;
+        return header.split("\\s");
+    }
+
+    public static String buildHeader(String messageType, String version, String senderId, String fileId, String chunkNo, String replicationDeg) {
+        return messageType + " " + version + " " + senderId + " " + fileId + " " + chunkNo + " " + replicationDeg;
     }
 }
