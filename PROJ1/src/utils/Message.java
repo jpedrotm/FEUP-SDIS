@@ -19,7 +19,13 @@ public class Message {
 
         String[] tokens = message.split("(\\r\\n){2}");
         header = tokens[0];
-        body = tokens[1];
+
+        try {
+            body = tokens[1];
+        }
+        catch (ArrayIndexOutOfBoundsException e) {
+            body = null;
+        }
     }
 
     public Message(String header, String body) {

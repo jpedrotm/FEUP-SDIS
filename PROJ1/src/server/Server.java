@@ -1,36 +1,34 @@
 package server;
 
 import channels.*;
-import protocols.*;
-
-import java.awt.*;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import channels.DataChannel;
 import protocols.BackupProtocol;
-import utils.Message;
+import utils.GoodGuy;
 
 public class Server implements PeerInterface {
     private String serverID;
     private ControlChannel mc;
     private BackupChannel mdr;
     private DataChannel mdb;
+    private Thread controlThread;
+    private Thread dataThread;
 
     public static void main(String[] args) {
 
         try {
             Server server = new Server(args);
-            System.out.println("ID: "+server.getServerID());
             PeerInterface stub = (PeerInterface) UnicastRemoteObject.exportObject(server,0);
             Registry registry= LocateRegistry.getRegistry();
             registry.rebind(server.getServerID(), stub);
             server.start();
-
-            System.err.println("Server is ready.");
 
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -45,14 +43,31 @@ public class Server implements PeerInterface {
         this.mdb = new DataChannel(this, commands[3], commands[4]);
         //this.mdr=new BackupChannel(commands[0],commands[1]);
         //this.mdb=new DataChannel(commands[0],commands[1]);
+
+        Runtime.getRuntime().addShutdownHook(new Thread()
+        {
+            @Override
+            public void run()
+            {
+                mc.getSocket().close();
+                mc.shutdown();
+                mdb.getSocket().close();
+                mdb.shutdown();
+                controlThread.interrupt();
+                dataThread.interrupt();
+            }
+        });
     }
 
     public void start() {
-        //new Thread(mc).start();
-        new Thread(mdb).start();
+        controlThread = new Thread(mc);
+        dataThread = new Thread(mdb);
+
+        controlThread.start();
+        dataThread.start();
 
         try {
-            BackupProtocol.sendFileChunks(mdb, "storage/a3_prototipo_da_interface_com_o_utilizador.pdf","1.0",serverID,"3");
+            BackupProtocol.sendFileChunks(mdb, "storage/amizade.jpg","1.0", serverID,"3");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -66,8 +81,17 @@ public class Server implements PeerInterface {
         return serverID;
     }
 
-    public void sendStored(String fileID,int chunkNo){
-        BackupProtocol.sendStoredMessage(mc,fileID,chunkNo,serverID);
+    public void sendStored(String fileID, int chunkNo) {
+        new Timer().schedule(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                        System.out.println("Enviei");
+                        BackupProtocol.sendStoredMessage(mc, fileID, chunkNo, serverID);
+                    }
+                },
+                GoodGuy.sleepTime(0, 400)
+        );
     }
 
     public void readFile() {

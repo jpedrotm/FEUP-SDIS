@@ -14,6 +14,7 @@ abstract class Channel implements Runnable {
     protected InetAddress address;
     protected int port;
     protected Server server;
+    protected volatile boolean shutdown;
 
     public Channel(Server server, String addressStr, String portVar) {
 
@@ -24,11 +25,12 @@ abstract class Channel implements Runnable {
             this.port = Integer.parseInt(portVar);
 
             socket = new MulticastSocket(port);
-            socket.joinGroup(address); //provavelmente o join não é feito aqui depois julgo eu
+            socket.joinGroup(address);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+        shutdown = false;
     }
 
     abstract void handler();
@@ -46,7 +48,14 @@ abstract class Channel implements Runnable {
     public void send(Message msg) throws IOException {
         byte[] sendMsg = msg.getMessage().getBytes(StandardCharsets.US_ASCII);
         DatagramPacket packet = new DatagramPacket(sendMsg, sendMsg.length, address, port);
-        System.out.println(sendMsg.length);
         socket.send(packet);
+    }
+
+    public MulticastSocket getSocket() {
+        return socket;
+    }
+
+    public void shutdown() {
+        shutdown = true;
     }
 }

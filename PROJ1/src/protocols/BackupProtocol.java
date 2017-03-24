@@ -3,6 +3,7 @@ package protocols;
 
 import channels.ControlChannel;
 import channels.DataChannel;
+import utils.GoodGuy;
 import utils.Message;
 
 import java.io.*;
@@ -23,9 +24,9 @@ public class BackupProtocol extends Protocol {
         BasicFileAttributes attr = Files.readAttributes(filePath, BasicFileAttributes.class);
         String lastModified = String.valueOf(attr.lastModifiedTime());
         String owner = String.valueOf(Files.getOwner(filePath));
-        String fileId=filename+owner+lastModified;
+        String fileId = filename+owner+lastModified;
 
-        String hashFileId=Message.buildHash(fileId);
+        String hashFileId = Message.buildHash(fileId);
 
         int i=0;
         while (true) {
@@ -38,7 +39,11 @@ public class BackupProtocol extends Protocol {
 
             byte[] body = Arrays.copyOf(content, bytesRead);
             Message msg = new Message(header, new String(body, StandardCharsets.US_ASCII));
-            System.out.println(msg.getMessage());
+            try {
+                Thread.sleep(GoodGuy.sleepTime(200, 400));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             mdb.send(msg);
             i++;
         }
@@ -46,11 +51,10 @@ public class BackupProtocol extends Protocol {
         return true;
     }
 
-    public static void sendStoredMessage(ControlChannel mc,String fileID, int chunckNo, String serverID){
+    public static void sendStoredMessage(ControlChannel mc,String fileID, int chunkNo, String serverID){
 
-        String header=Message.buildHeader(MessageType.Stored,"1.0",serverID,fileID,Integer.toString(chunckNo));
-        Message msg=new Message(header);
-        System.out.println(msg.getMessage());
+        String header = Message.buildHeader(MessageType.Stored,"1.0", serverID, fileID, Integer.toString(chunkNo));
+        Message msg = new Message(header);
         try {
             mc.send(msg);
         } catch (IOException e) {

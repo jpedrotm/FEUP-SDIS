@@ -29,13 +29,11 @@ public class DataChannel extends Channel {
             e.printStackTrace();
         }
 
-        System.out.println(new String(packet.getData(), 0, packet.getLength()));
-
     }
 
     @Override
     public void run() {
-        while (true) {
+        while (!shutdown) {
             DatagramPacket packet = new DatagramPacket(new byte[Message.MAX_CHUNK_SIZE], Message.MAX_CHUNK_SIZE);
             try {
                 this.socket.receive(packet);
@@ -46,6 +44,8 @@ public class DataChannel extends Channel {
             Message message = new Message(packet);
             String[] headerFields = message.getHeaderFields();
             String body = message.getBody();
+
+            System.out.println(message.getHeader());
 
             switch (headerFields[FieldIndex.MessageType]) {
                 case Protocol.MessageType.Putchunk:
@@ -62,8 +62,8 @@ public class DataChannel extends Channel {
         int chunkNo = Integer.parseInt(headerFields[FieldIndex.ChunkNo]);
         int replicationDegree = Integer.parseInt(headerFields[FieldIndex.ReplicationDeg]);
 
-        if (senderID == server.getServerID())
-            return;
+        //if (senderID.equals(server.getServerID()))
+           // return;
 
         FileChunk file;
         if (FileManager.instance().hasFile(fileID))
@@ -71,16 +71,9 @@ public class DataChannel extends Channel {
         else
             file = new FileChunk(fileID);
 
-        //chamar aqui função do timer para delay
-        long delay=GoodGuy.sleepTime(0,400);
-        try {
-            System.err.println("Vou dar delay");
-            Thread.sleep(delay);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
         if (file.hasChunk(chunkNo)) {
+            System.out.println("Enviado do data");
             server.sendStored(fileID, chunkNo);
             return;
         }
@@ -89,6 +82,7 @@ public class DataChannel extends Channel {
             file.addChunk(chunk);
             try {
                 chunk.storeContent(fileID);
+                System.out.println("Enviado do data");
                 server.sendStored(fileID,chunkNo);
             } catch (IOException e) { /* Do nothing */ }
         }

@@ -23,9 +23,7 @@ public class ControlChannel extends Channel {
     @Override
     public void run() {
 
-        while (true) {
-
-            System.out.println("ESTOU A DAR");
+        while (!shutdown) {
 
             DatagramPacket packet = new DatagramPacket(new byte[Message.MAX_CHUNK_SIZE], Message.MAX_CHUNK_SIZE);
             try {
@@ -37,8 +35,7 @@ public class ControlChannel extends Channel {
             Message message = new Message(packet);
             String[] headerFields = message.getHeaderFields();
 
-            //System.out.println(message.getHeader());
-            //System.out.println(message.getBody());
+            System.out.println(message.getMessage());
 
             switch (headerFields[FieldIndex.MessageType]) {
                 case "STORED":
@@ -67,7 +64,7 @@ public class ControlChannel extends Channel {
         String fileID = headerFields[FieldIndex.FileId];
         String chunkNumber = headerFields[FieldIndex.ChunkNo];
 
-        if (senderID == server.getServerID())
+        if (senderID.equals(server.getServerID()))
             return;
 
         if (FileManager.instance().hasFile(fileID)) {
