@@ -1,7 +1,7 @@
 package protocols;
 
 
-import channels.BackupChannel;
+import channels.DataChannel;
 import utils.Message;
 
 import java.io.*;
@@ -13,7 +13,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 
 public class BackupProtocol extends Protocol {
-    public static boolean sendFileChunks(BackupChannel mdr, String path, String version, String senderId, String replicationDeg) throws IOException {
+    public static boolean sendFileChunks(DataChannel mdb, String path, String version, String senderId, String replicationDeg) throws IOException {
         File file = new File(path);
         FileInputStream is = new FileInputStream(file);
         String filename = file.getName();
@@ -38,7 +38,7 @@ public class BackupProtocol extends Protocol {
             byte[] body = Arrays.copyOf(content, bytesRead);
             Message msg = new Message(header, new String(body, StandardCharsets.US_ASCII));
             System.out.println(msg.getMessage());
-            mdr.send(msg);
+            mdb.send(msg);
             i++;
         }
 

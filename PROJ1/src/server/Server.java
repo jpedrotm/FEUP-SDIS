@@ -4,18 +4,19 @@ import channels.BackupChannel;
 import channels.ControlChannel;
 
 import java.io.IOException;
-import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+
+import channels.DataChannel;
 import protocols.BackupProtocol;
 
 public class Server implements PeerInterface {
     private String serverID;
     private ControlChannel mc;
     private BackupChannel mdr;
-    //private DataChannel mdb;
+    private DataChannel mdb;
 
     public static void main(String[] args) {
 
@@ -41,7 +42,7 @@ public class Server implements PeerInterface {
         this.serverID = commands[0]; //temporario só para testar o RMI
 
         this.mc = new ControlChannel(this, commands[1], commands[2]);
-        this.mdr = new BackupChannel(this, commands[3], commands[4]);
+        this.mdb = new DataChannel(this, commands[3], commands[4]);
         //this.mdr=new BackupChannel(commands[0],commands[1]);
         //this.mdb=new DataChannel(commands[0],commands[1]);
     }
@@ -50,7 +51,7 @@ public class Server implements PeerInterface {
         new Thread(mc).start();
 
         try {
-            BackupProtocol.sendFileChunks(mdr, "storage/a3_prototipo_da_interface_com_o_utilizador.pdf","1.0",serverID,"3");
+            BackupProtocol.sendFileChunks(mdb, "storage/a3_prototipo_da_interface_com_o_utilizador.pdf","1.0",serverID,"3");
         } catch (IOException e) {
             e.printStackTrace();
         }
