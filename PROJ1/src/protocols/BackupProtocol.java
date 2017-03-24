@@ -1,24 +1,19 @@
 package protocols;
 
 
-import channels.ControlChannel;
+import channels.BackupChannel;
 import utils.Message;
 
 import java.io.*;
-import java.net.DatagramPacket;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 public class BackupProtocol extends Protocol {
-                                        // BACKUP CHANNEL !!!
-    public static boolean sendFileChunks(ControlChannel mc, String path, String version, String senderId, String replicationDeg) throws IOException {
+    public static boolean sendFileChunks(BackupChannel mdr, String path, String version, String senderId, String replicationDeg) throws IOException {
         File file = new File(path);
         FileInputStream is = new FileInputStream(file);
         String filename = file.getName();
@@ -43,7 +38,7 @@ public class BackupProtocol extends Protocol {
             byte[] body = Arrays.copyOf(content, bytesRead);
             Message msg = new Message(header, new String(body, StandardCharsets.US_ASCII));
             System.out.println(msg.getMessage());
-            mc.send(msg);
+            mdr.send(msg);
             i++;
         }
 
