@@ -50,6 +50,7 @@ public class BackupProtocol extends Protocol {
 
         String header=Message.buildHeader(MessageType.Stored,"1.0",serverID,fileID,Integer.toString(chunckNo));
         Message msg=new Message(header);
+        System.out.println(msg.getMessage());
         try {
             mc.send(msg);
         } catch (IOException e) {
