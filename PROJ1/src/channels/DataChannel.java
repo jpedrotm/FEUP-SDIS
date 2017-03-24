@@ -71,7 +71,7 @@ public class DataChannel extends Channel {
 
 
         if (file.hasChunk(chunkNo)) {
-            // server.sendStored(fileId, chunkNo);
+            server.sendStored(fileID, chunkNo);
             return;
         }
         else {
@@ -79,7 +79,8 @@ public class DataChannel extends Channel {
             file.addChunk(chunk);
             try {
                 chunk.storeContent(fileID);
-                // server.sendStored(fileId, chunkNo);
+                //chamar aqui função do timer para delay
+                server.sendStored(fileID,chunkNo);
             } catch (IOException e) { /* Do nothing */ }
         }
     }

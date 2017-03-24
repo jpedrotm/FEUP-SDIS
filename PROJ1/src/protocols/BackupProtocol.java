@@ -1,6 +1,7 @@
 package protocols;
 
 
+import channels.ControlChannel;
 import channels.DataChannel;
 import utils.Message;
 
@@ -43,6 +44,17 @@ public class BackupProtocol extends Protocol {
         }
 
         return true;
+    }
+
+    public static void sendStoredMessage(ControlChannel mc,String fileID, int chunckNo, String serverID){
+
+        String header=Message.buildHeader(MessageType.Stored,"1.0",serverID,fileID,Integer.toString(chunckNo));
+        Message msg=new Message(header);
+        try {
+            mc.send(msg);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

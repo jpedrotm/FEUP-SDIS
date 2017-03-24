@@ -27,22 +27,6 @@ public class ControlChannel extends Channel {
 
             System.out.println("ESTOU A DAR");
 
-            /*
-            String msg = "qwrqwrqwrq hehe \r\n\r\nasdddsa";
-            DatagramPacket packet1 = new DatagramPacket(msg.getBytes(), msg.length(), address, port);
-            try {
-                socket.send(packet1);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            */
-
             DatagramPacket packet = new DatagramPacket(new byte[Message.MAX_CHUNK_SIZE], Message.MAX_CHUNK_SIZE);
             try {
                 this.socket.receive(packet);

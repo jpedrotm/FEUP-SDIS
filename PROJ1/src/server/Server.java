@@ -1,8 +1,9 @@
 package server;
 
-import channels.BackupChannel;
-import channels.ControlChannel;
+import channels.*;
+import protocols.*;
 
+import java.awt.*;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -11,6 +12,7 @@ import java.rmi.server.UnicastRemoteObject;
 
 import channels.DataChannel;
 import protocols.BackupProtocol;
+import utils.Message;
 
 public class Server implements PeerInterface {
     private String serverID;
@@ -27,8 +29,6 @@ public class Server implements PeerInterface {
             Registry registry= LocateRegistry.getRegistry();
             registry.rebind(server.getServerID(), stub);
             server.start();
-
-
 
             System.err.println("Server is ready.");
 
@@ -48,7 +48,8 @@ public class Server implements PeerInterface {
     }
 
     public void start() {
-        new Thread(mc).start();
+        //new Thread(mc).start();
+        new Thread(mdb).start();
 
         try {
             BackupProtocol.sendFileChunks(mdb, "storage/a3_prototipo_da_interface_com_o_utilizador.pdf","1.0",serverID,"3");
@@ -63,6 +64,10 @@ public class Server implements PeerInterface {
 
     public String getServerID() {
         return serverID;
+    }
+
+    public void sendStored(String fileID,int chunkNo){
+        BackupProtocol.sendStoredMessage(mc,fileID,chunkNo,serverID);
     }
 
     public void readFile() {

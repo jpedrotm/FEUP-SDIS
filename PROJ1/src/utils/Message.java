@@ -28,6 +28,12 @@ public class Message {
         this.message = this.header + " \r\n\r\n" + this.body;
     }
 
+    public Message(String header){
+        this.header=header;
+        this.body="";
+        this.message=this.header+ " \r\n\r\n" + this.body;
+    }
+
     public String getMessage() {
         return message;
     }
@@ -46,6 +52,10 @@ public class Message {
 
     public static String buildHeader(String messageType, String version, String senderId, String fileId, String chunkNo, String replicationDeg) {
         return messageType + " " + version + " " + senderId + " " + fileId + " " + chunkNo + " " + replicationDeg;
+    }
+
+    public static String buildHeader(String messageType, String version, String senderId, String fileId, String chunkNo){
+        return messageType + " " + version + " " + senderId + " " + fileId + " " + chunkNo;
     }
 
     public static String buildHash(String fileId){
