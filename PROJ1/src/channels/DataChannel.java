@@ -1,8 +1,8 @@
 package channels;
 
 import filesystem.Chunk;
-import filesystem.FileChunk;
 import filesystem.FileManager;
+import filesystem.FileChunk;
 import protocols.Protocol;
 import server.Server;
 import utils.Message;
@@ -82,7 +82,7 @@ public class DataChannel extends Channel {
             Chunk chunk = new Chunk(chunkNo, replicationDegree, body.getBytes(StandardCharsets.US_ASCII));
             file.addChunk(chunk);
             try {
-                chunk.storeContent(fileID);
+                chunk.storeContent(server.getServerID(), fileID);
                 server.sendStored(fileID,chunkNo);
             } catch (IOException e) { /* Do nothing */ }
         }

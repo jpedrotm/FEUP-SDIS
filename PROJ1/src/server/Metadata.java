@@ -1,10 +1,11 @@
 package server;
 
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class Metadata {
+public class Metadata implements Serializable {
     HashSet<String> hashSet;
     HashMap<String, FileInfo> map;
 
@@ -44,7 +45,7 @@ public class Metadata {
         FILENAME, HASH
     }
 
-    private class FileInfo {
+    private class FileInfo implements Serializable {
         private String filename;
         private String extension;
 

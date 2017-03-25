@@ -1,7 +1,14 @@
 package server;
 
 import channels.*;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -58,6 +65,12 @@ public class Server implements PeerInterface {
                 mdb.shutdown();
                 controlThread.interrupt();
                 dataThread.interrupt();
+
+                try {
+                    saveMetadata();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -115,5 +128,16 @@ public class Server implements PeerInterface {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+
+    private void saveMetadata() throws IOException {
+        String savePath = "storage/metadata/" + serverID;
+        Path pathToFile = Paths.get(savePath);
+        Files.createDirectories(pathToFile.getParent());
+
+        FileOutputStream fout = new FileOutputStream(savePath);
+        ObjectOutputStream oos = new ObjectOutputStream(fout);
+        oos.writeObject(metadata);
     }
 }

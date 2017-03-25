@@ -14,8 +14,8 @@ public class PathHelper {
      * @param chunkNo
      * @return Path used for storage
      */
-    public static String buildPath(String fileId, int chunkNo) {
-        return basePath + fileId + "/" + chunkNo + ".txt";
+    public static String buildPath(String serverId, String fileId, int chunkNo) {
+        return basePath + serverId + "/" + fileId + "/" + chunkNo + ".txt";
     }
 
     /**

@@ -44,8 +44,8 @@ public class Chunk {
 
     public void resetReplication() { actualReplicationDegree = 0; }
 
-    public void storeContent(String fileId) throws IOException {
-        Path pathToFile = Paths.get(PathHelper.buildPath(fileId, number));
+    public void storeContent(String serverId, String fileId) throws IOException {
+        Path pathToFile = Paths.get(PathHelper.buildPath(serverId, fileId, number));
         Files.createDirectories(pathToFile.getParent());
         Files.write(pathToFile, content);
         content = null;     // free space when content is saved
