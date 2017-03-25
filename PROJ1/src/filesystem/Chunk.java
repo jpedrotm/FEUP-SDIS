@@ -14,12 +14,14 @@ public class Chunk {
     private int replicationDegree;
     private byte[] content;
     private int actualReplicationDegree;
+    private String path;
 
-    public Chunk(int number, int replicationDegree, byte[] content) {
+    public Chunk(int number, int replicationDegree, byte[] content, String path) {
         this.number = number;
         this.replicationDegree = replicationDegree;
         this.content = content;
         this.actualReplicationDegree = 0;
+        this.path = path;
     }
 
     public int getNumber() {
@@ -44,12 +46,17 @@ public class Chunk {
 
     public void resetReplication() { actualReplicationDegree = 0; }
 
-    public void storeContent(String serverId, String fileId) throws IOException {
-        Path pathToFile = Paths.get(PathHelper.buildPath(serverId, fileId, number));
+    public void storeContent() throws IOException {
+        Path pathToFile = Paths.get(path);
         Files.createDirectories(pathToFile.getParent());
         Files.write(pathToFile, content);
         content = null;     // free space when content is saved
     };
+
+    public void deleteContent() throws IOException {
+        Path pathToFile = Paths.get(path);
+        Files.delete(pathToFile);
+    }
 
     @Override
     public String toString() {

@@ -14,10 +14,16 @@ public class Metadata implements Serializable {
         hashSet = new HashSet<>();
     }
 
-    public void addMetadata(String filename, String extension, String hash) {
-        map.put(filename, new FileInfo(filename, extension, hash));
+    public void addMetadata(String filename, String extension, String path, String hash) {
+        map.put(filename, new FileInfo(filename, extension, path));
         hashSet.add(hash);
     }
+
+    public void deleteMetadata(String filename, String hash) {
+        map.remove(filename);
+        hashSet.remove(hash);
+    }
+
 
     public boolean contains(InfoRequest infoRequest, String key) {
         switch (infoRequest) {
@@ -48,10 +54,12 @@ public class Metadata implements Serializable {
     private class FileInfo implements Serializable {
         private String filename;
         private String extension;
+        private String path;
 
-        public FileInfo(String filename, String extension, String hash) {
+        public FileInfo(String filename, String extension, String path) {
             this.filename = filename;
             this.extension = extension;
+            this.path = path;
         }
 
         public String getFilename() {

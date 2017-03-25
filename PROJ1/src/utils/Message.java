@@ -64,7 +64,11 @@ public class Message {
         return messageType + " " + version + " " + senderId + " " + fileId + " " + chunkNo;
     }
 
-    public static String buildHash(String fileId){
+    public static String buildHeader(String messageType, String version, String senderId, String fileId){
+        return messageType + " " + version + " " + senderId + " " + fileId;
+    }
+
+    public static String buildHash(String fileId) {
         StringBuffer hexString;
         MessageDigest hashAlgorithm=null;
         try {

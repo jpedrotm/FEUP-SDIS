@@ -2,7 +2,6 @@ package server;
 
 import channels.*;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -18,7 +17,8 @@ import java.util.TimerTask;
 
 import channels.DataChannel;
 import filesystem.FileManager;
-import protocols.BackupProtocol;
+import protocols.Backup;
+import protocols.Delete;
 import utils.GoodGuy;
 
 public class Server implements PeerInterface {
@@ -35,7 +35,7 @@ public class Server implements PeerInterface {
         try {
             Server server = new Server(args);
             PeerInterface stub = (PeerInterface) UnicastRemoteObject.exportObject(server,0);
-            Registry registry= LocateRegistry.getRegistry();
+            Registry registry = LocateRegistry.getRegistry();
             registry.rebind(server.getServerID(), stub);
             server.start();
 
@@ -91,6 +91,16 @@ public class Server implements PeerInterface {
         }
 
         System.out.println(FileManager.instance());
+
+        delete("storage/amizade.jpg");
+
+        try {
+            Thread.sleep(6000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println(FileManager.instance());
     }
 
     public void writeID(){
@@ -106,25 +116,26 @@ public class Server implements PeerInterface {
                 new TimerTask() {
                     @Override
                     public void run() {
-                        BackupProtocol.sendStoredMessage(mc, fileID, chunkNo, serverID);
+                        Backup.sendStoredMessage(mc, fileID, chunkNo, serverID);
                     }
                 },
                 GoodGuy.sleepTime(0, 400)
         );
     }
 
-    public void readFile() {
-
-    }
-
-
-    public boolean hasMetadata(String key) {
-        return (metadata.contains(Metadata.InfoRequest.FILENAME, key) || metadata.contains(Metadata.InfoRequest.HASH, key));
-    }
 
     public void backup(String path, String replicationDeg) {
         try {
-            BackupProtocol.sendFileChunks(metadata, mdb, path,"1.0", serverID, replicationDeg);
+            Backup.sendFileChunks(metadata, mdb, path,"1.0", serverID, replicationDeg);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void delete(String path) {
+        try {
+            Delete.DeleteFile(metadata, mc, path, "1.0", serverID);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -36,6 +36,11 @@ public class ControlChannel extends Channel {
             Message message = new Message(packet);
             String[] headerFields = message.getHeaderFields();
 
+            /*if (headerFields[FieldIndex.SenderId].equals(server.getServerID())) {
+                return;
+            }*/
+
+
             switch (headerFields[FieldIndex.MessageType]) {
                 case "STORED":
                     store(headerFields);
@@ -57,18 +62,18 @@ public class ControlChannel extends Channel {
     }
 
     private void delete(String[] headerFields) {
+        String fileID = headerFields[FieldIndex.FileId];
 
+        if (FileManager.instance().hasFile(fileID)) {
+            try {
+                FileManager.instance().deleteFile(fileID);
+            } catch (IOException e) {}
+        }
     }
 
     private void store(String[] headerFields) {
-        String senderID = headerFields[FieldIndex.SenderId];
         String fileID = headerFields[FieldIndex.FileId];
         String chunkNumber = headerFields[FieldIndex.ChunkNo];
-
-        /*if (senderID.equals(server.getServerID())) {
-            return;
-        }
-        */
 
         if (FileManager.instance().hasFile(fileID)) {
             FileChunk file = FileManager.instance().getFile(fileID);

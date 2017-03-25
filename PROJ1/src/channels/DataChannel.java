@@ -7,6 +7,7 @@ import protocols.Protocol;
 import server.Server;
 import utils.Message;
 import utils.Message.FieldIndex;
+import utils.PathHelper;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -47,6 +48,11 @@ public class DataChannel extends Channel {
             String[] headerFields = message.getHeaderFields();
             String body = message.getBody();
 
+            /*
+            if (headerFields[FieldIndex.SenderId].equals(server.getServerID()))
+                return;
+            */
+
             System.out.println(message.getHeader());
 
             switch (headerFields[FieldIndex.MessageType]) {
@@ -59,31 +65,29 @@ public class DataChannel extends Channel {
 
 
     private void putChunk(String[] headerFields, String body) {
-        String senderID = headerFields[FieldIndex.SenderId];
         String fileID = headerFields[FieldIndex.FileId];
         int chunkNo = Integer.parseInt(headerFields[FieldIndex.ChunkNo]);
         int replicationDegree = Integer.parseInt(headerFields[FieldIndex.ReplicationDeg]);
 
-        //if (senderID.equals(server.getServerID()))
-           // return;
-
         FileChunk file;
         if (FileManager.instance().hasFile(fileID))
             file = FileManager.instance().getFile(fileID);
-        else
-            file = new FileChunk(fileID);
-
+        else {
+            String dirPath = PathHelper.buildDir(server.getServerID(), fileID);
+            file = new FileChunk(fileID, dirPath);
+        }
 
         if (file.hasChunk(chunkNo)) {
             server.sendStored(fileID, chunkNo);
             return;
         }
         else {
-            Chunk chunk = new Chunk(chunkNo, replicationDegree, body.getBytes(StandardCharsets.US_ASCII));
-            file.addChunk(chunk);
+            String path = PathHelper.buildPath(server.getServerID(), fileID, chunkNo);
+            Chunk chunk = new Chunk(chunkNo, replicationDegree, body.getBytes(StandardCharsets.US_ASCII), path);
             try {
-                chunk.storeContent(server.getServerID(), fileID);
-                server.sendStored(fileID,chunkNo);
+                chunk.storeContent();
+                file.addChunk(chunk);
+                server.sendStored(fileID, chunkNo);
             } catch (IOException e) { /* Do nothing */ }
         }
     }

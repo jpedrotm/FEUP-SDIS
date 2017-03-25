@@ -3,6 +3,7 @@ package filesystem;
 
 import utils.Message;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 public class FileManager {
@@ -45,9 +46,20 @@ public class FileManager {
     public boolean chunkDegreeSatisfied(String fileId, String chunkNumber) {
         int chunkNo = Integer.parseInt(chunkNumber);
         FileChunk fileChunk = getFile(fileId);
+        if (fileChunk == null)
+            return false;
+
         Chunk chunk = fileChunk.getChunk(chunkNo);
+        if (chunk == null)
+            return false;
 
         return (chunk.getActualReplicationDegree() >= chunk.getReplicationDegree());
+    }
+
+    public void deleteFile(String fileID) throws IOException {
+        FileChunk file = FileManager.instance().getFile(fileID);
+        file.delete();
+        files.remove(fileID);
     }
 
     @Override
