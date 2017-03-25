@@ -87,4 +87,15 @@ public class Message {
 
         return hexString.toString();
     }
+
+
+
+    public static class FieldIndex {
+        public static final int MessageType = 0;
+        public static final int Version = 1;
+        public static final int SenderId = 2;
+        public static final int FileId = 3;
+        public static final int ChunkNo = 4;
+        public static final int ReplicationDeg = 5;
+    }
 }

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 public class Chunk {
     private int number;
@@ -49,4 +50,14 @@ public class Chunk {
         Files.write(pathToFile, content);
         content = null;     // free space when content is saved
     };
+
+    @Override
+    public String toString() {
+        return "Chunk{" +
+                "number=" + number +
+                ", replicationDegree=" + replicationDegree +
+                ", content=" + Arrays.toString(content) +
+                ", actualReplicationDegree=" + actualReplicationDegree +
+                '}';
+    }
 }

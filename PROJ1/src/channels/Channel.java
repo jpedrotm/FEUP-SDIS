@@ -35,16 +35,6 @@ abstract class Channel implements Runnable {
 
     abstract void handler();
 
-
-    protected static class FieldIndex {
-        public static final int MessageType = 0;
-        public static final int Version = 1;
-        public static final int SenderId = 2;
-        public static final int FileId = 3;
-        public static final int ChunkNo = 4;
-        public static final int ReplicationDeg = 5;
-    }
-
     public void send(Message msg) throws IOException {
         byte[] sendMsg = msg.getMessage().getBytes(StandardCharsets.US_ASCII);
         DatagramPacket packet = new DatagramPacket(sendMsg, sendMsg.length, address, port);

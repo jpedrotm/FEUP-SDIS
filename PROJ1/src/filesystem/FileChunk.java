@@ -28,4 +28,12 @@ public class FileChunk {
     public void updateChunk(int chunkNo) {
         chunks.get(chunkNo).addReplication();
     }
+
+    @Override
+    public String toString() {
+        return "FileChunk{" +
+                "id='" + id + '\'' +
+                ", chunks=" + chunks +
+                '}';
+    }
 }

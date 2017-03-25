@@ -1,6 +1,8 @@
 package filesystem;
 
 
+import utils.Message;
+
 import java.util.HashMap;
 
 public class FileManager {
@@ -38,5 +40,20 @@ public class FileManager {
 
     public FileChunk getFile(String fileId) {
         return files.get(fileId);
+    }
+
+    public boolean chunkDegreeSatisfied(String fileId, String chunkNumber) {
+        int chunkNo = Integer.parseInt(chunkNumber);
+        FileChunk fileChunk = getFile(fileId);
+        Chunk chunk = fileChunk.getChunk(chunkNo);
+
+        return (chunk.getActualReplicationDegree() >= chunk.getReplicationDegree());
+    }
+
+    @Override
+    public String toString() {
+        return "FileManager{" +
+                "files=" + files +
+                '}';
     }
 }

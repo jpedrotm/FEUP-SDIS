@@ -4,6 +4,7 @@ import filesystem.FileChunk;
 import filesystem.FileManager;
 import server.Server;
 import utils.Message;
+import utils.Message.FieldIndex;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -35,8 +36,6 @@ public class ControlChannel extends Channel {
             Message message = new Message(packet);
             String[] headerFields = message.getHeaderFields();
 
-            System.out.println(message.getMessage());
-
             switch (headerFields[FieldIndex.MessageType]) {
                 case "STORED":
                     store(headerFields);
@@ -48,6 +47,8 @@ public class ControlChannel extends Channel {
                     removed(headerFields);
                     break;
             }
+
+            System.out.println(message.getHeader());
         }
     }
 
@@ -64,8 +65,10 @@ public class ControlChannel extends Channel {
         String fileID = headerFields[FieldIndex.FileId];
         String chunkNumber = headerFields[FieldIndex.ChunkNo];
 
-        if (senderID.equals(server.getServerID()))
+        /*if (senderID.equals(server.getServerID())) {
             return;
+        }
+        */
 
         if (FileManager.instance().hasFile(fileID)) {
             FileChunk file = FileManager.instance().getFile(fileID);

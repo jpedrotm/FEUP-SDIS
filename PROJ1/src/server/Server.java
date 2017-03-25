@@ -10,11 +10,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import channels.DataChannel;
+import filesystem.FileManager;
 import protocols.BackupProtocol;
 import utils.GoodGuy;
 
 public class Server implements PeerInterface {
     private String serverID;
+    private Metadata metadata;
     private ControlChannel mc;
     private BackupChannel mdr;
     private DataChannel mdb;
@@ -38,6 +40,7 @@ public class Server implements PeerInterface {
     public Server(String[] commands) {
 
         this.serverID = commands[0]; //temporario só para testar o RMI
+        this.metadata = new Metadata();
 
         this.mc = new ControlChannel(this, commands[1], commands[2]);
         this.mdb = new DataChannel(this, commands[3], commands[4]);
@@ -66,11 +69,15 @@ public class Server implements PeerInterface {
         controlThread.start();
         dataThread.start();
 
+        backup("storage/amizade.jpg", "3");
+
         try {
-            BackupProtocol.sendFileChunks(mdb, "storage/amizade.jpg","1.0", serverID,"3");
-        } catch (IOException e) {
+            Thread.sleep(6000);
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        System.out.println(FileManager.instance());
     }
 
     public void writeID(){
@@ -86,7 +93,6 @@ public class Server implements PeerInterface {
                 new TimerTask() {
                     @Override
                     public void run() {
-                        System.out.println("Enviei");
                         BackupProtocol.sendStoredMessage(mc, fileID, chunkNo, serverID);
                     }
                 },
@@ -96,5 +102,18 @@ public class Server implements PeerInterface {
 
     public void readFile() {
 
+    }
+
+
+    public boolean hasMetadata(String key) {
+        return (metadata.contains(Metadata.InfoRequest.FILENAME, key) || metadata.contains(Metadata.InfoRequest.HASH, key));
+    }
+
+    public void backup(String path, String replicationDeg) {
+        try {
+            BackupProtocol.sendFileChunks(metadata, mdb, path,"1.0", serverID, replicationDeg);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

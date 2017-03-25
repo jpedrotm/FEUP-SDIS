@@ -5,12 +5,14 @@ import filesystem.FileChunk;
 import filesystem.FileManager;
 import protocols.Protocol;
 import server.Server;
-import utils.GoodGuy;
 import utils.Message;
+import utils.Message.FieldIndex;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.nio.charset.StandardCharsets;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class DataChannel extends Channel {
 
@@ -73,7 +75,6 @@ public class DataChannel extends Channel {
 
 
         if (file.hasChunk(chunkNo)) {
-            System.out.println("Enviado do data");
             server.sendStored(fileID, chunkNo);
             return;
         }
@@ -82,9 +83,37 @@ public class DataChannel extends Channel {
             file.addChunk(chunk);
             try {
                 chunk.storeContent(fileID);
-                System.out.println("Enviado do data");
                 server.sendStored(fileID,chunkNo);
             } catch (IOException e) { /* Do nothing */ }
         }
+    }
+
+
+    @Override
+    public void send(Message msg) throws IOException {
+        super.send(msg);
+
+        new Timer().schedule(new TimerTask() {
+            int tries = 1;
+            String[] headerFields = msg.getHeaderFields();
+            String fileId = headerFields[FieldIndex.FileId];
+            String chunkNumber = headerFields[FieldIndex.ChunkNo];
+
+            @Override
+            public void run() {
+                if (tries == 5 || FileManager.instance().chunkDegreeSatisfied(fileId, chunkNumber)) {
+                    this.cancel();
+                    return;
+                }
+
+                try {
+                    DataChannel.super.send(msg);
+                } catch (IOException e) {
+                    tries--;        // TALVEZ? (exceção pode significar buffer cheio)
+                }
+
+                tries++;
+            }
+        }, 1000, 1000);
     }
 }
