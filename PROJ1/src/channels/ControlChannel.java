@@ -59,9 +59,9 @@ public class ControlChannel extends Channel {
                     break;
                 case "GETCHUNK":
                     restore(headerFields); //envia para o mdr a CHUNK message
+                    break;
             }
 
-            System.out.println(message.getHeader());
         }
     }
 
@@ -114,6 +114,8 @@ public class ControlChannel extends Channel {
             byte[] body = Arrays.copyOf(content, bytesRead);
 
             Message msg=new Message(header,new String(body, StandardCharsets.US_ASCII));
+            System.out.println(msg.getHeader());
+
             try{
                 server.getBackupChannel().send(msg); //precisei de criar o get para aceder ao mdr
             }catch(IOException e){

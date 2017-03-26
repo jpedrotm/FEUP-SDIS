@@ -21,6 +21,7 @@ public class Restore extends Protocol{
             String header=Message.buildHeader(MessageType.GetChunk,version,senderID,hashFileId,Integer.toString(i));
             Message msg=new Message(header);
             mc.send(msg);
+            i++;
         }
     }
 

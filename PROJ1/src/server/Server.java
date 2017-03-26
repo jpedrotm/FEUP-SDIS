@@ -52,7 +52,7 @@ public class Server implements PeerInterface {
 
         this.mc = new ControlChannel(this, commands[1], commands[2]);
         this.mdb = new DataChannel(this, commands[3], commands[4]);
-        //this.mdr=new BackupChannel(commands[0],commands[1]);
+        this.mdr=new BackupChannel(this,commands[5],commands[6]);
 
         Runtime.getRuntime().addShutdownHook(new Thread()
         {
