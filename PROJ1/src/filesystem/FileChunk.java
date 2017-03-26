@@ -37,6 +37,10 @@ public class FileChunk {
         chunks.get(chunkNo).addReplication();
     }
 
+    public int getNumChunks(){
+        return chunks.size();
+    }
+
     @Override
     public String toString() {
         return "FileChunk{" +

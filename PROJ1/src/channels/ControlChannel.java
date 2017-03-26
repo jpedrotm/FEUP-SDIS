@@ -2,12 +2,18 @@ package channels;
 
 import filesystem.FileChunk;
 import filesystem.FileManager;
+import protocols.Protocol;
+import server.Metadata;
 import server.Server;
 import utils.Message;
 import utils.Message.FieldIndex;
+import utils.PathHelper;
 
-import java.io.IOException;
+import java.beans.FeatureDescriptor;
+import java.io.*;
 import java.net.DatagramPacket;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class ControlChannel extends Channel {
 
@@ -51,6 +57,8 @@ public class ControlChannel extends Channel {
                 case "REMOVED":
                     removed(headerFields);
                     break;
+                case "GETCHUNK":
+                    restore(headerFields); //envia para o mdr a CHUNK message
             }
 
             System.out.println(message.getHeader());
@@ -81,4 +89,38 @@ public class ControlChannel extends Channel {
             file.updateChunk(chunkNo);
         }
     }
+
+    private void restore(String[] headerFiles){
+        String version=headerFiles[FieldIndex.Version];
+        String fileID=headerFiles[FieldIndex.FileId];
+        String senderID=headerFiles[FieldIndex.SenderId];
+        String chunkNo=headerFiles[FieldIndex.ChunkNo];
+
+        if(server.getMetadata().contains(Metadata.InfoRequest.HASH,fileID) && FileManager.instance().getFile(fileID).hasChunk(Integer.parseInt(chunkNo))){
+            String header=Message.buildHeader(Protocol.MessageType.Chunk,version,senderID,fileID,chunkNo);
+            String chunkPath= PathHelper.buildPath(senderID,fileID,Integer.parseInt(chunkNo));
+            File chunkFile=new File(chunkPath);
+            byte[] content=new byte[Message.MAX_CHUNK_SIZE];
+            int bytesRead=-1;
+
+            try {
+                FileInputStream is=new FileInputStream(chunkFile);
+                 bytesRead= is.read(content, 0, Message.MAX_CHUNK_SIZE - header.length() - 5);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            byte[] body = Arrays.copyOf(content, bytesRead);
+
+            Message msg=new Message(header,new String(body, StandardCharsets.US_ASCII));
+            try{
+                server.getBackupChannel().send(msg); //precisei de criar o get para aceder ao mdr
+            }catch(IOException e){
+                e.printStackTrace();
+            }
+        }
+
+    }
+
 }

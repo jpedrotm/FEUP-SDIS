@@ -19,6 +19,7 @@ import channels.DataChannel;
 import filesystem.FileManager;
 import protocols.Backup;
 import protocols.Delete;
+import protocols.Restore;
 import utils.GoodGuy;
 
 public class Server implements PeerInterface {
@@ -52,7 +53,6 @@ public class Server implements PeerInterface {
         this.mc = new ControlChannel(this, commands[1], commands[2]);
         this.mdb = new DataChannel(this, commands[3], commands[4]);
         //this.mdr=new BackupChannel(commands[0],commands[1]);
-        //this.mdb=new DataChannel(commands[0],commands[1]);
 
         Runtime.getRuntime().addShutdownHook(new Thread()
         {
@@ -82,7 +82,7 @@ public class Server implements PeerInterface {
         controlThread.start();
         dataThread.start();
 
-        backup("storage/amizade.jpg", "3");
+        backup("storage/ola.pdf", "3");
 
         try {
             Thread.sleep(6000);
@@ -92,13 +92,15 @@ public class Server implements PeerInterface {
 
         System.out.println(FileManager.instance());
 
-        delete("storage/amizade.jpg");
+        restore("storage/ola.pdf");
 
-        try {
+        //delete("storage/ola.pdf");
+
+        /*try {
             Thread.sleep(6000);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
 
         System.out.println(FileManager.instance());
     }
@@ -109,6 +111,14 @@ public class Server implements PeerInterface {
 
     public String getServerID() {
         return serverID;
+    }
+
+    public BackupChannel getBackupChannel(){
+        return mdr;
+    }
+
+    public Metadata getMetadata(){
+        return metadata;
     }
 
     public void sendStored(String fileID, int chunkNo) {
@@ -123,7 +133,6 @@ public class Server implements PeerInterface {
         );
     }
 
-
     public void backup(String path, String replicationDeg) {
         try {
             Backup.sendFileChunks(metadata, mdb, path,"1.0", serverID, replicationDeg);
@@ -136,6 +145,14 @@ public class Server implements PeerInterface {
     public void delete(String path) {
         try {
             Delete.DeleteFile(metadata, mc, path, "1.0", serverID);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void restore(String path){
+        try {
+            Restore.receiveFileChuncks(mc,path,"1.0",serverID);
         } catch (IOException e) {
             e.printStackTrace();
         }
