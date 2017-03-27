@@ -10,7 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class BackupChannel extends Channel{
+public class BackupChannel extends Channel {
 
     public BackupChannel(Server server, String addressStr, String portVar){
         super(server, addressStr,portVar);
@@ -26,18 +26,20 @@ public class BackupChannel extends Channel{
     public void run() {
         while(!shutdown)
         {
-            DatagramPacket packet=new DatagramPacket(new byte[Message.MAX_CHUNK_SIZE],Message.MAX_CHUNK_SIZE);
+            DatagramPacket packet = new DatagramPacket(new byte[Message.MAX_CHUNK_SIZE],Message.MAX_CHUNK_SIZE);
             try {
                 this.socket.receive(packet);
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            Message message=new Message(packet);
-            String[] headerFields=message.getHeaderFields();
-            String body=message.getBody();
+            Message message = new Message(packet);
+            String[] headerFields = message.getHeaderFields();
+            byte[] body = message.getBody();
 
-            switch(headerFields[Message.FieldIndex.MessageType]){
+            System.out.println(new String(body));
+
+            switch(headerFields[Message.FieldIndex.MessageType]) {
                 case Protocol.MessageType.Chunk:
                     restoreFileChunk(headerFields,body);
                     break;
@@ -46,7 +48,7 @@ public class BackupChannel extends Channel{
 
     }
 
-    public void restoreFileChunk(String[] headerFields,String body){
+    public void restoreFileChunk(String[] headerFields, byte[] body){
         String fileID=headerFields[Message.FieldIndex.FileId];
         int chunkNo = Integer.parseInt(headerFields[Message.FieldIndex.ChunkNo]);
 

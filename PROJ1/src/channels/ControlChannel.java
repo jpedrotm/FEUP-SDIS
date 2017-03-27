@@ -113,12 +113,16 @@ public class ControlChannel extends Channel {
 
             byte[] body = Arrays.copyOf(content, bytesRead);
 
-            Message msg=new Message(header,new String(body, StandardCharsets.US_ASCII));
-            System.out.println(msg.getHeader());
+            Message msg = null;
+            try {
+                msg = new Message(header, body);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             try{
                 server.getBackupChannel().send(msg); //precisei de criar o get para aceder ao mdr
-            }catch(IOException e){
+            } catch(IOException e){
                 e.printStackTrace();
             }
         }

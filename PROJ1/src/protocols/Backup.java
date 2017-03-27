@@ -33,7 +33,7 @@ public class Backup extends Protocol {
             }
 
             byte[] body = Arrays.copyOf(content, bytesRead);
-            Message msg = new Message(header, new String(body, StandardCharsets.US_ASCII));
+            Message msg = new Message(header, body);
 
             try {
                 Thread.sleep(400);
@@ -47,7 +47,14 @@ public class Backup extends Protocol {
 
     public static void sendStoredMessage(ControlChannel mc,String fileID, int chunkNo, String serverID) {
         String header = Message.buildHeader(MessageType.Stored,"1.0", serverID, fileID, Integer.toString(chunkNo));
-        Message msg = new Message(header);
+        Message msg = null;
+
+        try {
+            msg = new Message(header);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         try {
             mc.send(msg);
         } catch (IOException e) {

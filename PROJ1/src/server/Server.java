@@ -78,11 +78,12 @@ public class Server implements PeerInterface {
     public void start() {
         controlThread = new Thread(mc);
         dataThread = new Thread(mdb);
+        new Thread(mdr).start();
 
         controlThread.start();
         dataThread.start();
 
-        backup("storage/ola.pdf", "3");
+        backup("storage/CV-en.pdf", "3");
 
         try {
             Thread.sleep(6000);
@@ -92,7 +93,7 @@ public class Server implements PeerInterface {
 
         System.out.println(FileManager.instance());
 
-        restore("storage/ola.pdf");
+        restore("storage/CV-en.pdf");
 
         //delete("storage/ola.pdf");
 
@@ -152,7 +153,7 @@ public class Server implements PeerInterface {
 
     public void restore(String path){
         try {
-            Restore.receiveFileChuncks(mc,path,"1.0",serverID);
+            Restore.receiveFileChuncks(mc, path,"1.0",serverID);
         } catch (IOException e) {
             e.printStackTrace();
         }

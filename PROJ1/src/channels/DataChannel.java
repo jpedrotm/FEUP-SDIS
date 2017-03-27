@@ -46,14 +46,12 @@ public class DataChannel extends Channel {
 
             Message message = new Message(packet);
             String[] headerFields = message.getHeaderFields();
-            String body = message.getBody();
+            byte[] body = message.getBody();
 
             /*
             if (headerFields[FieldIndex.SenderId].equals(server.getServerID()))
                 return;
             */
-
-            System.out.println(message.getHeader());
 
             switch (headerFields[FieldIndex.MessageType]) {
                 case Protocol.MessageType.Putchunk:
@@ -64,7 +62,7 @@ public class DataChannel extends Channel {
     }
 
 
-    private void putChunk(String[] headerFields, String body) {
+    private void putChunk(String[] headerFields, byte[] body) {
         String fileID = headerFields[FieldIndex.FileId];
         int chunkNo = Integer.parseInt(headerFields[FieldIndex.ChunkNo]);
         int replicationDegree = Integer.parseInt(headerFields[FieldIndex.ReplicationDeg]);
@@ -83,7 +81,7 @@ public class DataChannel extends Channel {
         }
         else {
             String path = PathHelper.buildPath(server.getServerID(), fileID, chunkNo);
-            Chunk chunk = new Chunk(chunkNo, replicationDegree, body.getBytes(StandardCharsets.US_ASCII), path);
+            Chunk chunk = new Chunk(chunkNo, replicationDegree, body, path);
             try {
                 chunk.storeContent();
                 file.addChunk(chunk);

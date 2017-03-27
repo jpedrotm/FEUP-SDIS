@@ -1,5 +1,7 @@
 package utils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.nio.charset.StandardCharsets;
@@ -10,37 +12,51 @@ import java.security.NoSuchAlgorithmException;
 public class Message {
     public static final int MAX_CHUNK_SIZE = 65507;
 
-    private String message;
+    private byte[] message;
     private String header;
-    private String body;
+    private byte[] body;
 
     public Message(DatagramPacket packet) {
-        message = new String(packet.getData(), packet.getOffset(), packet.getLength(), StandardCharsets.US_ASCII);
+        message = packet.getData();
 
-        String[] tokens = message.split("(\\r\\n){2}");
-        header = tokens[0];
+        String messageString = new String(packet.getData(), packet.getOffset(), packet.getLength());
+        String[] tokens = messageString.split("(\\r\\n){2}");
+
+        header = new String(tokens[0].getBytes(), StandardCharsets.US_ASCII);
 
         try {
-            body = tokens[1];
+            body = tokens[1].getBytes();
         }
         catch (ArrayIndexOutOfBoundsException e) {
             body = null;
         }
     }
 
-    public Message(String header, String body) {
+    public Message(String header, byte[] body) throws IOException {
         this.header = header;
         this.body = body;
-        this.message = this.header + " \r\n\r\n" + this.body;
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        baos.write(header.getBytes(StandardCharsets.US_ASCII));
+        baos.write(" \r\n\r\n".getBytes());
+        baos.write(body);
+
+        this.message = baos.toByteArray();
     }
 
-    public Message(String header){
-        this.header=header;
-        this.body="";
-        this.message=this.header+ " \r\n\r\n" + this.body;
+    public Message(String header) throws IOException {
+        this.header = header;
+        this.body = null;
+
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        baos.write(header.getBytes(StandardCharsets.US_ASCII));
+        baos.write(" \r\n\r\n".getBytes());
+
+        this.message = baos.toByteArray();
     }
 
-    public String getMessage() {
+    public byte[] getMessage() {
         return message;
     }
 
@@ -48,7 +64,7 @@ public class Message {
         return header;
     }
 
-    public String getBody() {
+    public byte[] getBody() {
         return body;
     }
 

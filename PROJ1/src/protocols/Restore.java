@@ -17,9 +17,9 @@ public class Restore extends Protocol{
         int numChunks= FileManager.instance().getFile(hashFileId).getNumChunks();
 
         int i=0;
-        while(i<numChunks){
+        while(i < numChunks){
             String header=Message.buildHeader(MessageType.GetChunk,version,senderID,hashFileId,Integer.toString(i));
-            Message msg=new Message(header);
+            Message msg = new Message(header);
             mc.send(msg);
             i++;
         }
