@@ -37,7 +37,7 @@ public class BackupChannel extends Channel {
             String[] headerFields = message.getHeaderFields();
             byte[] body = message.getBody();
 
-            System.out.println(new String(body));
+            System.out.println(message.getHeader());
 
             switch(headerFields[Message.FieldIndex.MessageType]) {
                 case Protocol.MessageType.Chunk:
@@ -52,18 +52,21 @@ public class BackupChannel extends Channel {
         String fileID=headerFields[Message.FieldIndex.FileId];
         int chunkNo = Integer.parseInt(headerFields[Message.FieldIndex.ChunkNo]);
 
-        System.err.println("escreveu1");
-
         try {
-            String path="storage/ola.txt";
+            String path="storage/restored/cv-example.doc";
             Path pathToFile= Paths.get(path);
-            Files.createDirectories(pathToFile.getParent());
-            Files.write(pathToFile,"ola".getBytes());
 
-            System.err.println("escreveu2");
+            if(chunkNo==0){
+                Files.createDirectories(pathToFile.getParent());
+            }
 
-            //ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            //baos.write(body.getBytes());
+            FileOutputStream fos = new FileOutputStream (new File(path),true);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            baos.write(body);
+            baos.writeTo(fos);
+            baos.close();
+            fos.close();
+            //Não sei se é preciso fechar o ByteArrayOupuyStream
 
         } catch (IOException e) {
             e.printStackTrace();

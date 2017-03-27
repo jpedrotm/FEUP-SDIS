@@ -105,26 +105,30 @@ public class ControlChannel extends Channel {
 
             try {
                 FileInputStream is=new FileInputStream(chunkFile);
-                 bytesRead= is.read(content, 0, Message.MAX_CHUNK_SIZE - header.length() - 5);
+                while((bytesRead=is.read(content, 0, Message.MAX_CHUNK_SIZE - header.length() - 5))!=-1)
+                {
+                    byte[] body = Arrays.copyOf(content, bytesRead);
+
+                    Message msg = null;
+                    try {
+                        msg = new Message(header, body);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    try{
+                        server.getBackupChannel().send(msg); //precisei de criar o get para aceder ao mdr
+                    } catch(IOException e){
+                        e.printStackTrace();
+                    }
+                }
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            byte[] body = Arrays.copyOf(content, bytesRead);
-
-            Message msg = null;
-            try {
-                msg = new Message(header, body);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try{
-                server.getBackupChannel().send(msg); //precisei de criar o get para aceder ao mdr
-            } catch(IOException e){
-                e.printStackTrace();
-            }
+            System.out.println("HEADER SIZE: "+header.length());
+            System.out.println("BYTES READ: "+bytesRead);
         }
 
     }
