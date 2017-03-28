@@ -7,6 +7,7 @@ import java.net.DatagramPacket;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 
 public class Message {
@@ -25,7 +26,7 @@ public class Message {
         header = new String(tokens[0].getBytes(), StandardCharsets.US_ASCII);
 
         try {
-            body = tokens[1].getBytes();
+            body = Arrays.copyOfRange(message, header.length() + 5, message.length);
         }
         catch (ArrayIndexOutOfBoundsException e) {
             body = null;
