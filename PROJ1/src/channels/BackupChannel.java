@@ -53,7 +53,7 @@ public class BackupChannel extends Channel {
         int chunkNo = Integer.parseInt(headerFields[Message.FieldIndex.ChunkNo]);
 
         try {
-            String path="storage/restored/ola.pdf";
+            String path="storage/restored/amizade.jpg";
             Path pathToFile= Paths.get(path);
 
             if(chunkNo==0){
