@@ -67,7 +67,6 @@ public class FileManager {
 
     public void updateStoredSize(Chunk chunk) {
         storedContentSize += chunk.getContentSize();
-        System.out.println(storedContentSize);
     }
 
     @Override
