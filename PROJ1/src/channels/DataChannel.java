@@ -48,12 +48,8 @@ public class DataChannel extends Channel {
             String[] headerFields = message.getHeaderFields();
             byte[] body = message.getBody();
 
-            System.out.println(message.getHeader());
-
-            /*
             if (headerFields[FieldIndex.SenderId].equals(server.getServerID()))
-                return;
-            */
+                continue;
 
             switch (headerFields[FieldIndex.MessageType]) {
                 case Protocol.MessageType.Putchunk:

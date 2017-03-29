@@ -10,11 +10,11 @@ import java.io.IOException;
 
 public class Restore extends Protocol{
 
-    public static void receiveFileChuncks(ControlChannel mc,String path,String version,String senderID) throws IOException{
+    public static void receiveFileChunks(ControlChannel mc,String path,String version,String senderID) throws IOException{
 
         Protocol.FileInfo fi=Protocol.generateFileInfo(path);
         String hashFileId=Message.buildHash(fi.fileId);
-        int numChunks= FileManager.instance().getFile(hashFileId).getNumChunks();
+        int numChunks = FileManager.instance().getFile(hashFileId).getNumChunks();
 
         int i=0;
         while(i < numChunks){

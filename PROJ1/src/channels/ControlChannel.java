@@ -39,10 +39,10 @@ public class ControlChannel extends Channel {
             Message message = new Message(packet);
             String[] headerFields = message.getHeaderFields();
 
-            /*if (headerFields[FieldIndex.SenderId].equals(server.getServerID())) {
-                return;
-            }*/
+            if (headerFields[FieldIndex.SenderId].equals(server.getServerID()))
+                continue;
 
+            System.out.println(message.getHeader());
 
             switch (headerFields[FieldIndex.MessageType]) {
                 case "STORED":

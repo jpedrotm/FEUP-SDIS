@@ -18,7 +18,7 @@ public class Message {
     private byte[] body;
 
     public Message(DatagramPacket packet) {
-        message = Arrays.copyOf(packet.getData(), packet.getLength());
+        message = Arrays.copyOfRange(packet.getData(), packet.getOffset(), packet.getLength());
 
         String messageString = new String(packet.getData(), packet.getOffset(), packet.getLength());
         String[] tokens = messageString.split("( \\r\\n\\r\\n)", 2);
