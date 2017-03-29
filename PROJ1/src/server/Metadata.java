@@ -6,33 +6,34 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class Metadata implements Serializable {
-    HashSet<String> hashSet;
-    HashMap<String, FileInfo> map;
+    HashMap<String,String> hashMap;
+    HashMap<String, FileInfo> fileInfoHashMap;
 
     public Metadata() {
-        map = new HashMap<>();
-        hashSet = new HashSet<>();
+        fileInfoHashMap = new HashMap<>();
+        hashMap = new HashMap<>();
     }
 
     public void addMetadata(String filename, String extension, String path, String hash) {
-        map.put(filename, new FileInfo(filename, extension, path));
-        hashSet.add(hash);
+        fileInfoHashMap.put(filename, new FileInfo(filename, extension, path));
+        hashMap.put(hash,filename);
     }
 
     public void deleteMetadata(String filename, String hash) {
-        map.remove(filename);
-        hashSet.remove(hash);
+        fileInfoHashMap.remove(filename);
+        hashMap.remove(hash);
     }
 
-
-
+    public String getFileName(String key){
+        return hashMap.get(key);
+    }
 
     public boolean contains(InfoRequest infoRequest, String key) {
         switch (infoRequest) {
             case FILENAME:
-                return map.containsKey(key);
+                return fileInfoHashMap.containsKey(key);
             case HASH:
-                return hashSet.contains(key);
+                return hashMap.containsKey(key);
             default:
                 return false;
         }
@@ -41,8 +42,8 @@ public class Metadata implements Serializable {
     @Override
     public String toString() {
         return "Metadata{" +
-                "hashSet=" + hashSet +
-                ", map=" + map +
+                "hashSet=" + hashMap +
+                ", map=" + fileInfoHashMap +
                 '}';
     }
 

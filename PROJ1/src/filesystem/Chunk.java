@@ -1,8 +1,12 @@
 package filesystem;
 
 
+import utils.Message;
 import utils.PathHelper;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,8 +34,18 @@ public class Chunk {
         return number;
     }
 
-    public byte[] getContent() {
-        return null;
+    public byte[] getContent(int byteReadSize) throws IOException {
+
+        File chunkFile=new File(path);
+        byte[] content=new byte[Message.MAX_CHUNK_SIZE];
+        int bytesRead;
+
+        FileInputStream is=new FileInputStream(chunkFile);
+        bytesRead=is.read(content, 0, byteReadSize);
+
+        byte[] body = Arrays.copyOf(content, bytesRead);
+
+        return body;
     }
 
     public int getReplicationDegree() {
@@ -60,7 +74,6 @@ public class Chunk {
         Path pathToFile = Paths.get(path);
         Files.createDirectories(pathToFile.getParent());
         Files.write(pathToFile, content);
-        content = null;     // free space when content is saved
     };
 
     public void deleteContent() throws IOException {

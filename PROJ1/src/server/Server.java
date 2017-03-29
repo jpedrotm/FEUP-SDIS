@@ -83,7 +83,7 @@ public class Server implements PeerInterface {
         controlThread.start();
         dataThread.start();
 
-        backup("storage/amizade.jpg", "3");
+        backup("storage/amizade.mp3", "3");
 
         try {
             Thread.sleep(6000);
@@ -93,7 +93,7 @@ public class Server implements PeerInterface {
 
         System.out.println(FileManager.instance());
 
-        restore("storage/amizade.jpg");
+        restore("storage/amizade.mp3");
 
         //delete("storage/asdas.pdf");
 

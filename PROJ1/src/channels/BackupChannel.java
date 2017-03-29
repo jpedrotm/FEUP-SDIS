@@ -51,9 +51,10 @@ public class BackupChannel extends Channel {
     public void restoreFileChunk(String[] headerFields, byte[] body){
         String fileID=headerFields[Message.FieldIndex.FileId];
         int chunkNo = Integer.parseInt(headerFields[Message.FieldIndex.ChunkNo]);
+        String fileName=server.getMetadata().getFileName(fileID);
 
         try {
-            String path="storage/restored/amizade.jpg";
+            String path="storage/restored/"+fileName;
             Path pathToFile= Paths.get(path);
 
             if(chunkNo==0){
@@ -66,7 +67,6 @@ public class BackupChannel extends Channel {
             baos.writeTo(fos);
             baos.close();
             fos.close();
-            //Não sei se é preciso fechar o ByteArrayOupuyStream
 
         } catch (IOException e) {
             e.printStackTrace();

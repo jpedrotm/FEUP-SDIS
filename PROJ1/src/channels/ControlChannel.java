@@ -90,45 +90,33 @@ public class ControlChannel extends Channel {
         }
     }
 
-    private void restore(String[] headerFiles){
-        String version=headerFiles[FieldIndex.Version];
-        String fileID=headerFiles[FieldIndex.FileId];
-        String senderID=headerFiles[FieldIndex.SenderId];
-        String chunkNo=headerFiles[FieldIndex.ChunkNo];
+    private void restore(String[] headerFields){
+        String version=headerFields[FieldIndex.Version];
+        String fileID=headerFields[FieldIndex.FileId];
+        String senderID=headerFields[FieldIndex.SenderId];
+        String chunkNo=headerFields[FieldIndex.ChunkNo];
 
         if(server.getMetadata().contains(Metadata.InfoRequest.HASH,fileID) && FileManager.instance().getFile(fileID).hasChunk(Integer.parseInt(chunkNo))){
             String header=Message.buildHeader(Protocol.MessageType.Chunk,version,senderID,fileID,chunkNo);
-            String chunkPath= PathHelper.buildPath(senderID,fileID,Integer.parseInt(chunkNo));
-            File chunkFile=new File(chunkPath);
-            byte[] content=new byte[Message.MAX_CHUNK_SIZE];
-            int bytesRead=-1;
 
             try {
-                FileInputStream is=new FileInputStream(chunkFile);
-                while((bytesRead=is.read(content, 0, Message.MAX_CHUNK_SIZE - header.length() - 5))!=-1)
-                {
-                    byte[] body = Arrays.copyOf(content, bytesRead);
+                byte[] body=FileManager.instance().getFile(fileID).getChunk(Integer.parseInt(chunkNo)).getContent(Message.MAX_CHUNK_SIZE - header.length() - 5);//new byte[Message.MAX_CHUNK_SIZE];
+                Message msg = null;
+                try {
+                    msg = new Message(header, body);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
-                    Message msg = null;
-                    try {
-                        msg = new Message(header, body);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    try{
-                        server.getBackupChannel().send(msg); //precisei de criar o get para aceder ao mdr
-                    } catch(IOException e){
-                        e.printStackTrace();
-                    }
+                try{
+                    server.getBackupChannel().send(msg); //precisei de criar o get para aceder ao mdr
+                } catch(IOException e){
+                    e.printStackTrace();
                 }
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-            System.out.println("HEADER SIZE: "+header.length());
-            System.out.println("BYTES READ: "+bytesRead);
         }
 
     }
