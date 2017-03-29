@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -66,5 +67,21 @@ public class FileChunk {
 
         Path dir = Paths.get(dirPath);
         Files.delete(dir);
+    }
+
+    public ArrayList<Chunk> getChunksOverRep() {
+        ArrayList<Chunk> chunkList = new ArrayList<>();
+
+        Iterator it = chunks.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            Chunk chunk = (Chunk) pair.getValue();
+
+            if (chunk.getActualReplicationDegree() > chunk.getReplicationDegree()) {
+                chunkList.add(chunk);
+            }
+        }
+
+        return chunkList;
     }
 }
