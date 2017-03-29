@@ -1,10 +1,12 @@
 package filesystem;
 
 
+import javafx.util.Pair;
+import utils.FileChunkPair;
 import utils.Message;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.*;
 
 public class FileManager {
     private HashMap<String, FileChunk> files;
@@ -67,6 +69,33 @@ public class FileManager {
 
     public void updateStoredSize(Chunk chunk) {
         storedContentSize += chunk.getContentSize();
+    }
+
+    public boolean canStore(int newContentSize) {
+        return storedContentSize + newContentSize <= maxContentSize;
+    }
+
+    public FileChunkPair getRemovableChunk() {
+        ArrayList<FileChunkPair> pairs = new ArrayList<>();
+
+        Iterator it = files.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            FileChunk file = (FileChunk) pair.getValue();
+
+            ArrayList<Chunk> chunks = file.getChunksOverRep();
+            Collections.sort(chunks, (a, b) -> a.getActualReplicationDegree() < b.getActualReplicationDegree() ? 1 : a.getActualReplicationDegree() == b.getActualReplicationDegree() ? 0 : -1);
+
+            if (chunks.size() > 0) {
+                pairs.add(new FileChunkPair(file, chunks.get(0)));
+            }
+        }
+
+        Collections.sort(pairs, (a, b) -> a.chunk.getActualReplicationDegree() < b.chunk.getActualReplicationDegree() ? 1 : a.chunk.getActualReplicationDegree() == b.chunk.getActualReplicationDegree() ? 0 : -1);
+        if (pairs.size() > 0)
+            return pairs.get(0);
+        else
+            return null;
     }
 
     @Override
