@@ -9,7 +9,7 @@ import java.rmi.registry.Registry;
 
 public class TestApp {
 
-    private int peerAp; //peer access point (não sei bem para que usar)
+    private int peerAccessPoint; //peer access point (não sei bem para que usar)
     private String subProtocol; //sub protocol usado
     private String filePath; //path do ficheiro para faze backup
     private int nRep; //número de replicações para fazer do ficheiro (apenas em caso do sub protocolo backup)
@@ -36,19 +36,19 @@ public class TestApp {
 
         switch(n){
             case 4:
-                this.peerAp=Integer.parseInt(args[0]);
+                this.peerAccessPoint=Integer.parseInt(args[0]);
                 this.subProtocol=args[1];
                 this.filePath=args[2];
                 this.nRep=Integer.parseInt(args[3]);
                 break;
             case 3:
-                this.peerAp=Integer.parseInt(args[0]);
+                this.peerAccessPoint=Integer.parseInt(args[0]);
                 this.subProtocol=args[1];
                 this.filePath=args[2];
                 this.nRep=-1;
                 break;
             case 2:
-                this.peerAp=Integer.parseInt(args[0]);
+                this.peerAccessPoint=Integer.parseInt(args[0]);
                 this.subProtocol=args[1];
                 this.filePath=null;
                 this.nRep=-1;
@@ -64,10 +64,9 @@ public class TestApp {
     public void start(){
 
         try {
-
             Registry registry= LocateRegistry.getRegistry("localhost");
-            PeerInterface stub=(PeerInterface) registry.lookup(Integer.toString(peerAp));
-            stub.writeID();
+            PeerInterface stub=(PeerInterface) registry.lookup(Integer.toString(peerAccessPoint));
+            stub.backup(filePath,Integer.toString(nRep));
 
         } catch (RemoteException | NotBoundException e) {
             e.printStackTrace();

@@ -5,15 +5,12 @@ import filesystem.FileManager;
 import protocols.Protocol;
 import server.Metadata;
 import server.Server;
+import utils.GoodGuy;
 import utils.Message;
 import utils.Message.FieldIndex;
-import utils.PathHelper;
 
-import java.beans.FeatureDescriptor;
 import java.io.*;
 import java.net.DatagramPacket;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 public class ControlChannel extends Channel {
 
@@ -91,6 +88,13 @@ public class ControlChannel extends Channel {
     }
 
     private void restore(String[] headerFields){
+
+        try {
+            Thread.sleep(GoodGuy.sleepTime(0,400));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         String version=headerFields[FieldIndex.Version];
         String fileID=headerFields[FieldIndex.FileId];
         String senderID=headerFields[FieldIndex.SenderId];

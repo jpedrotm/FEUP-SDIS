@@ -32,7 +32,6 @@ public class Server implements PeerInterface {
     private Thread dataThread;
 
     public static void main(String[] args) {
-
         try {
             Server server = new Server(args);
             PeerInterface stub = (PeerInterface) UnicastRemoteObject.exportObject(server,0);
@@ -83,7 +82,7 @@ public class Server implements PeerInterface {
         controlThread.start();
         dataThread.start();
 
-        backup("storage/amizade.mp3", "3");
+        backup("storage/ola.pdf", "3");
 
         try {
             Thread.sleep(6000);
@@ -93,7 +92,7 @@ public class Server implements PeerInterface {
 
         System.out.println(FileManager.instance());
 
-        restore("storage/amizade.mp3");
+        restore("storage/ola.pdf");
 
         //delete("storage/asdas.pdf");
 
@@ -103,11 +102,8 @@ public class Server implements PeerInterface {
             e.printStackTrace();
         }*/
 
-        System.out.println(FileManager.instance());
-    }
 
-    public void writeID(){
-        System.out.println("My id: "+this.serverID);
+        System.out.println(FileManager.instance());
     }
 
     public String getServerID() {

@@ -48,11 +48,6 @@ public class DataChannel extends Channel {
             String[] headerFields = message.getHeaderFields();
             byte[] body = message.getBody();
 
-            /*
-            if (headerFields[FieldIndex.SenderId].equals(server.getServerID()))
-                return;
-            */
-
             System.out.println(message.getHeader());
 
             switch (headerFields[FieldIndex.MessageType]) {
