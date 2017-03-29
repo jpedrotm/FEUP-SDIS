@@ -37,8 +37,6 @@ public class BackupChannel extends Channel {
             String[] headerFields = message.getHeaderFields();
             byte[] body = message.getBody();
 
-            System.out.println(message.getHeader());
-
             switch(headerFields[Message.FieldIndex.MessageType]) {
                 case Protocol.MessageType.Chunk:
                     restoreFileChunk(headerFields,body);

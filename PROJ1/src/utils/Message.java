@@ -24,7 +24,6 @@ public class Message {
         String[] tokens = messageString.split("( \\r\\n\\r\\n)", 2);
 
         header = new String(tokens[0].getBytes(), StandardCharsets.US_ASCII);
-        System.out.println(header);
 
         try {
             body = Arrays.copyOfRange(message, header.length() + 5, message.length);

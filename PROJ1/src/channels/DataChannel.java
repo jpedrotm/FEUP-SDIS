@@ -53,8 +53,6 @@ public class DataChannel extends Channel {
                 return;
             */
 
-            System.out.println(message.getHeader());
-
             switch (headerFields[FieldIndex.MessageType]) {
                 case Protocol.MessageType.Putchunk:
                     putChunk(headerFields, body);
