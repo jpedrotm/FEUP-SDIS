@@ -83,10 +83,10 @@ public class DataChannel extends Channel {
         }
         else {
             String path = PathHelper.buildPath(server.getServerID(), fileID, chunkNo);
-            Chunk chunk = new Chunk(chunkNo, replicationDegree, body, path);
             try {
-                chunk.storeContent();
+                Chunk chunk = new Chunk(chunkNo, replicationDegree, body, path);
                 file.addChunk(chunk);
+                FileManager.instance().updateStoredSize(chunk);
                 server.sendStored(fileID, chunkNo);
             } catch (IOException e) { /* Do nothing */ }
         }

@@ -12,16 +12,18 @@ import java.util.Arrays;
 public class Chunk {
     private int number;
     private int replicationDegree;
-    private byte[] content;
     private int actualReplicationDegree;
     private String path;
+    private int contentSize;
 
-    public Chunk(int number, int replicationDegree, byte[] content, String path) {
+    public Chunk(int number, int replicationDegree, byte[] content, String path) throws IOException {
         this.number = number;
         this.replicationDegree = replicationDegree;
-        this.content = content;
         this.actualReplicationDegree = 0;
         this.path = path;
+        contentSize = content.length;
+
+        storeContent(content);
     }
 
     public int getNumber() {
@@ -29,7 +31,7 @@ public class Chunk {
     }
 
     public byte[] getContent() {
-        return content;
+        return null;
     }
 
     public int getReplicationDegree() {
@@ -40,13 +42,21 @@ public class Chunk {
         return actualReplicationDegree;
     }
 
+    public String getPath() {
+        return path;
+    }
+
+    public int getContentSize() {
+        return contentSize;
+    }
+
     public void addReplication() { actualReplicationDegree++; }
 
     public void subReplication() { actualReplicationDegree--; }
 
     public void resetReplication() { actualReplicationDegree = 0; }
 
-    public void storeContent() throws IOException {
+    private void storeContent(byte[] content) throws IOException {
         Path pathToFile = Paths.get(path);
         Files.createDirectories(pathToFile.getParent());
         Files.write(pathToFile, content);
@@ -63,8 +73,9 @@ public class Chunk {
         return "Chunk{" +
                 "number=" + number +
                 ", replicationDegree=" + replicationDegree +
-                ", content=" + Arrays.toString(content) +
                 ", actualReplicationDegree=" + actualReplicationDegree +
+                ", path='" + path + '\'' +
+                ", contentSize=" + contentSize +
                 '}';
     }
 }

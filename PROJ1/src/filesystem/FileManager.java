@@ -8,6 +8,8 @@ import java.util.HashMap;
 
 public class FileManager {
     private HashMap<String, FileChunk> files;
+    private int storedContentSize;
+    private int maxContentSize = 64000 * 10;
 
 
     private static FileManager instance = null;
@@ -27,6 +29,7 @@ public class FileManager {
 
     private FileManager() {
         files = new HashMap<>();
+        storedContentSize = 0;
     }
 
 
@@ -62,10 +65,17 @@ public class FileManager {
         files.remove(fileID);
     }
 
+    public void updateStoredSize(Chunk chunk) {
+        storedContentSize += chunk.getContentSize();
+        System.out.println(storedContentSize);
+    }
+
     @Override
     public String toString() {
         return "FileManager{" +
                 "files=" + files +
+                ", storedContentSize=" + storedContentSize +
+                ", maxContentSize=" + maxContentSize +
                 '}';
     }
 }
