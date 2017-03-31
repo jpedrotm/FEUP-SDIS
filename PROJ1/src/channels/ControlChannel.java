@@ -95,13 +95,14 @@ public class ControlChannel extends Channel {
             e.printStackTrace();
         }
 
+        System.out.println("BOAS");
+
         String version=headerFields[FieldIndex.Version];
         String fileID=headerFields[FieldIndex.FileId];
-        String senderID=headerFields[FieldIndex.SenderId];
         String chunkNo=headerFields[FieldIndex.ChunkNo];
 
-        if(server.getMetadata().contains(Metadata.InfoRequest.HASH,fileID) && FileManager.instance().getFile(fileID).hasChunk(Integer.parseInt(chunkNo))){
-            String header=Message.buildHeader(Protocol.MessageType.Chunk,version,senderID,fileID,chunkNo);
+        if(FileManager.instance().getFile(fileID).hasChunk(Integer.parseInt(chunkNo))){
+            String header=Message.buildHeader(Protocol.MessageType.Chunk,version,server.getServerID(),fileID,chunkNo);
 
             try {
                 byte[] body=FileManager.instance().getFile(fileID).getChunk(Integer.parseInt(chunkNo)).getContent(Message.MAX_CHUNK_SIZE - header.length() - 5);//new byte[Message.MAX_CHUNK_SIZE];

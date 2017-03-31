@@ -5,6 +5,7 @@ import filesystem.FileManager;
 import filesystem.FileChunk;
 import protocols.Protocol;
 import server.Server;
+import utils.FileChunkPair;
 import utils.Message;
 import utils.Message.FieldIndex;
 import utils.PathHelper;
@@ -64,6 +65,16 @@ public class DataChannel extends Channel {
         String fileID = headerFields[FieldIndex.FileId];
         int chunkNo = Integer.parseInt(headerFields[FieldIndex.ChunkNo]);
         int replicationDegree = Integer.parseInt(headerFields[FieldIndex.ReplicationDeg]);
+
+        if (!FileManager.instance().canStore(body.length)) {
+            FileChunkPair pair = FileManager.instance().getRemovableChunk(body.length);
+            if (pair != null) {
+                if (!FileManager.instance().deleteChunk(pair))
+                    return;
+            }
+            else
+                return;
+        }
 
         FileChunk file;
         if (FileManager.instance().hasFile(fileID))

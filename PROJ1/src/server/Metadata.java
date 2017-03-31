@@ -3,19 +3,18 @@ package server;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.HashSet;
 
 public class Metadata implements Serializable {
     HashMap<String,String> hashMap;
-    HashMap<String, FileInfo> fileInfoHashMap;
+    HashMap<String, FileMetadata> fileInfoHashMap;
 
     public Metadata() {
         fileInfoHashMap = new HashMap<>();
         hashMap = new HashMap<>();
     }
 
-    public void addMetadata(String filename, String extension, String path, String hash) {
-        fileInfoHashMap.put(filename, new FileInfo(filename, extension, path));
+    public void addMetadata(String filename, String extension, String path, String hash,int numChunks) {
+        fileInfoHashMap.put(filename, new FileMetadata(filename, extension, path, numChunks, hash));
         hashMap.put(hash,filename);
     }
 
@@ -28,11 +27,16 @@ public class Metadata implements Serializable {
         return hashMap.get(key);
     }
 
+    public int getFileNumChunks(String fileID){
+        return fileInfoHashMap.get(fileID).getNumChunks();
+    }
+
     public boolean contains(InfoRequest infoRequest, String key) {
         switch (infoRequest) {
             case FILENAME:
                 return fileInfoHashMap.containsKey(key);
             case HASH:
+                System.out.println("KEY: "+hashMap.get(key));
                 return hashMap.containsKey(key);
             default:
                 return false;
@@ -47,6 +51,9 @@ public class Metadata implements Serializable {
                 '}';
     }
 
+    public String getHashFileId(String path) {
+        return fileInfoHashMap.get(path).getHashFileId();
+    }
 
 
     /*** Helper classes ***/
@@ -54,15 +61,19 @@ public class Metadata implements Serializable {
         FILENAME, HASH
     }
 
-    private class FileInfo implements Serializable {
+    private class FileMetadata implements Serializable {
         private String filename;
         private String extension;
         private String path;
+        private int numChunks;
+        private String hashFileId;
 
-        public FileInfo(String filename, String extension, String path) {
+        public FileMetadata(String filename, String extension, String path, int numChunks, String hashFileId) {
             this.filename = filename;
             this.extension = extension;
             this.path = path;
+            this.numChunks=numChunks;
+            this.hashFileId = hashFileId;
         }
 
         public String getFilename() {
@@ -73,12 +84,20 @@ public class Metadata implements Serializable {
             return extension;
         }
 
+        public int getNumChunks(){
+            return numChunks;
+        }
+
         @Override
         public String toString() {
-            return "FileInfo{" +
+            return "FileMetadata{" +
                     "filename='" + filename + '\'' +
                     ", extension='" + extension + '\'' +
                     '}';
+        }
+
+        public String getHashFileId() {
+            return hashFileId;
         }
     }
 }

@@ -1,9 +1,6 @@
 package filesystem;
 
-
-import javafx.util.Pair;
 import utils.FileChunkPair;
-import utils.Message;
 
 import java.io.IOException;
 import java.util.*;
@@ -11,7 +8,7 @@ import java.util.*;
 public class FileManager {
     private HashMap<String, FileChunk> files;
     private int storedContentSize;
-    private int maxContentSize = 64000 * 10;
+    private int maxContentSize = 64000 * 100;
 
 
     private static FileManager instance = null;
@@ -75,7 +72,7 @@ public class FileManager {
         return storedContentSize + newContentSize <= maxContentSize;
     }
 
-    public FileChunkPair getRemovableChunk() {
+    public FileChunkPair getRemovableChunk(int newContentSize) {
         ArrayList<FileChunkPair> pairs = new ArrayList<>();
 
         Iterator it = files.entrySet().iterator();
@@ -84,10 +81,10 @@ public class FileManager {
             FileChunk file = (FileChunk) pair.getValue();
 
             ArrayList<Chunk> chunks = file.getChunksOverRep();
-            Collections.sort(chunks, (a, b) -> a.getActualReplicationDegree() < b.getActualReplicationDegree() ? 1 : a.getActualReplicationDegree() == b.getActualReplicationDegree() ? 0 : -1);
-
-            if (chunks.size() > 0) {
-                pairs.add(new FileChunkPair(file, chunks.get(0)));
+            for (Chunk chunk : chunks) {
+                if (storedContentSize - chunk.getContentSize() + newContentSize <= maxContentSize) {
+                    pairs.add(new FileChunkPair(file, chunk));
+                }
             }
         }
 
@@ -105,5 +102,14 @@ public class FileManager {
                 ", storedContentSize=" + storedContentSize +
                 ", maxContentSize=" + maxContentSize +
                 '}';
+    }
+
+    public boolean deleteChunk(FileChunkPair pair) {
+        if (pair.file.deleteChunk(pair.chunk.getNumber())) {
+            storedContentSize -= pair.chunk.getContentSize();
+            return true;
+        }
+
+        return false;
     }
 }

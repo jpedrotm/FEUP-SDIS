@@ -10,11 +10,19 @@ import java.rmi.registry.Registry;
 public class TestApp {
 
     private int peerAccessPoint; //peer access point (não sei bem para que usar)
-    private String subProtocol; //sub protocol usado
+    private String protocol; //sub protocol usado
     private String filePath; //path do ficheiro para faze backup
-    private int nRep; //número de replicações para fazer do ficheiro (apenas em caso do sub protocolo backup)
+    private String nRep; //número de replicações para fazer do ficheiro (apenas em caso do sub protocolo backup)
 
     public static void main(String[] args){
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("VAMOOOOOS");
 
         TestApp application=new TestApp(args);
         application.start();
@@ -35,23 +43,23 @@ public class TestApp {
         int n=args.length;
 
         switch(n){
-            case 4:
+            case 4: //backup
                 this.peerAccessPoint=Integer.parseInt(args[0]);
-                this.subProtocol=args[1];
+                this.protocol=args[1];
                 this.filePath=args[2];
-                this.nRep=Integer.parseInt(args[3]);
+                this.nRep=args[3];
                 break;
-            case 3:
+            case 3: //restore
                 this.peerAccessPoint=Integer.parseInt(args[0]);
-                this.subProtocol=args[1];
+                this.protocol=args[1];
                 this.filePath=args[2];
-                this.nRep=-1;
+                this.nRep=null;
                 break;
-            case 2:
+            case 2: //state and delete
                 this.peerAccessPoint=Integer.parseInt(args[0]);
-                this.subProtocol=args[1];
+                this.protocol=args[1];
                 this.filePath=null;
-                this.nRep=-1;
+                this.nRep=null;
                 break;
             default:
                 return 1;
@@ -62,15 +70,35 @@ public class TestApp {
     }
 
     public void start(){
-
         try {
             Registry registry= LocateRegistry.getRegistry("localhost");
             PeerInterface stub=(PeerInterface) registry.lookup(Integer.toString(peerAccessPoint));
-            stub.backup(filePath,Integer.toString(nRep));
+
+            switch(protocol)
+            {
+                case CommandType.Backup:
+                    stub.backup(filePath,nRep);
+                    break;
+                case CommandType.Delete:
+                    stub.delete(filePath);
+                    break;
+                case CommandType.Restore:
+                    stub.restore(filePath);
+                    break;
+                default:
+                    break;
+            }
 
         } catch (RemoteException | NotBoundException e) {
             e.printStackTrace();
         }
 
+    }
+
+    private static class CommandType{
+        public static final String Backup="BACKUP";
+        public static final String Delete="DELETE";
+        public static final String Restore="RESTORE";
+        public static final String State="STATE";
     }
 }

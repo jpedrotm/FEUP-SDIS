@@ -30,6 +30,7 @@ public class Server implements PeerInterface {
     private DataChannel mdb;
     private Thread controlThread;
     private Thread dataThread;
+    private Thread backupThread;
 
     public static void main(String[] args) {
         try {
@@ -62,8 +63,11 @@ public class Server implements PeerInterface {
                 mc.shutdown();
                 mdb.getSocket().close();
                 mdb.shutdown();
+                mdr.getSocket().close();
+                mdr.shutdown();
                 controlThread.interrupt();
                 dataThread.interrupt();
+                backupThread.interrupt();
 
                 try {
                     saveMetadata();
@@ -77,22 +81,34 @@ public class Server implements PeerInterface {
     public void start() {
         controlThread = new Thread(mc);
         dataThread = new Thread(mdb);
-        new Thread(mdr).start();
+        backupThread=new Thread(mdr);
 
         controlThread.start();
         dataThread.start();
+        backupThread.start();
 
-        backup("storage/amizade.jpg", "3");
+        /*if(serverID.equals("1")){
 
-        try {
-            Thread.sleep(4000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
-        System.out.println(FileManager.instance());
+            System.out.println("GOOOOOOO");
 
-        restore("storage/amizade.jpg");
+            backup("storage/ola.pdf", "3");
+
+            try {
+                Thread.sleep(4000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            System.out.println(FileManager.instance());
+
+            restore("storage/ola.pdf");
+        }*/
 
         //delete("storage/asdas.pdf");
 
@@ -100,10 +116,17 @@ public class Server implements PeerInterface {
             Thread.sleep(6000);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }*/
+        }
 
 
-        System.out.println(FileManager.instance());
+        System.out.println(FileManager.instance());*/
+
+        try {
+            Thread.sleep(8000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println(metadata);
     }
 
     public String getServerID() {
@@ -149,7 +172,7 @@ public class Server implements PeerInterface {
 
     public void restore(String path){
         try {
-            Restore.receiveFileChunks(mc, path,"1.0",serverID);
+            Restore.receiveFileChunks(metadata,mc, path,"1.0",serverID);
         } catch (IOException e) {
             e.printStackTrace();
         }

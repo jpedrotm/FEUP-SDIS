@@ -40,6 +40,8 @@ public class BackupChannel extends Channel {
             if (headerFields[Message.FieldIndex.SenderId].equals(server.getServerID()))
                 continue;
 
+            System.out.println(message.getHeader());
+
             switch(headerFields[Message.FieldIndex.MessageType]) {
                 case Protocol.MessageType.Chunk:
                     restoreFileChunk(headerFields,body);

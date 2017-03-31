@@ -85,4 +85,16 @@ public class FileChunk {
 
         return chunkList;
     }
+
+    public boolean deleteChunk(int chunkNo) {
+        try {
+            Chunk chunk = chunks.get(chunkNo);
+            chunk.deleteContent();
+            chunks.remove(chunkNo);
+        } catch (Exception e) {
+            return false;
+        }
+
+        return true;
+    }
 }

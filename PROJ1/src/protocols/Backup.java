@@ -20,9 +20,6 @@ public class Backup extends Protocol {
         FileInfo fi = Protocol.generateFileInfo(path);
         String hashFileId = Message.buildHash(fi.fileId);
 
-        // Metadata
-        metadata.addMetadata(fi.filename, fi.extension, path, hashFileId);
-
         int i = 0;
         while (true) {
             byte[] content = new byte[Message.MAX_CHUNK_SIZE];
@@ -43,6 +40,10 @@ public class Backup extends Protocol {
             mdb.send(msg);
             i++;
         }
+
+        // Metadata
+        metadata.addMetadata(fi.filename, fi.extension, path, hashFileId,i);
+
     }
 
     public static void sendStoredMessage(ControlChannel mc,String fileID, int chunkNo, String serverID) {
