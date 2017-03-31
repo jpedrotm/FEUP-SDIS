@@ -70,6 +70,10 @@ public class Chunk {
 
     public void resetReplication() { actualReplicationDegree = 0; }
 
+    public boolean isReplicationDegreeDown(){
+        return replicationDegree<actualReplicationDegree;
+    }
+
     private void storeContent(byte[] content) throws IOException {
         Path pathToFile = Paths.get(path);
         Files.createDirectories(pathToFile.getParent());

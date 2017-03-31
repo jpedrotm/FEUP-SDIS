@@ -21,6 +21,7 @@ import protocols.Backup;
 import protocols.Delete;
 import protocols.Restore;
 import utils.GoodGuy;
+import utils.Tuplo3;
 
 public class Server implements PeerInterface {
     private String serverID;
@@ -31,6 +32,7 @@ public class Server implements PeerInterface {
     private Thread controlThread;
     private Thread dataThread;
     private Thread backupThread;
+    private Tuplo3 removedTuple;
 
     public static void main(String[] args) {
         try {
@@ -49,6 +51,8 @@ public class Server implements PeerInterface {
 
         this.serverID = commands[0]; //temporario só para testar o RMI
         this.metadata = new Metadata();
+
+        this.removedTuple=null;
 
         this.mc = new ControlChannel(this, commands[1], commands[2]);
         this.mdb = new DataChannel(this, commands[3], commands[4]);
@@ -137,8 +141,20 @@ public class Server implements PeerInterface {
         return mdr;
     }
 
+    public ControlChannel getControlChannel(){
+        return mc;
+    }
+
+    public DataChannel getDataChannel(){
+        return mdb;
+    }
+
     public Metadata getMetadata(){
         return metadata;
+    }
+
+    public Tuplo3 getRemovedTuple(){
+        return removedTuple;
     }
 
     public void sendStored(String fileID, int chunkNo) {
@@ -151,6 +167,20 @@ public class Server implements PeerInterface {
                 },
                 GoodGuy.sleepTime(0, 400)
         );
+    }
+
+    public void newRemovedTuple(Tuplo3 tuple){
+        this.removedTuple=tuple;
+    }
+
+    public void resetRemovedTuple(){
+        this.removedTuple=null;
+    }
+
+    public void updateRemovedTuple(String fileID,int chunkNo){
+        if(removedTuple!=null){
+            removedTuple.verifyEquality(fileID,chunkNo);
+        }
     }
 
     public void backup(String path, String replicationDeg) {

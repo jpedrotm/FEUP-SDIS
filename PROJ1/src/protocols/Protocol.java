@@ -18,6 +18,7 @@ public abstract class Protocol {
         public final static String Delete = "DELETE";
         public final static String Chunk="CHUNK";
         public final static String GetChunk="GETCHUNK";
+        public final static String Removed="REMOVED";
     }
 
 

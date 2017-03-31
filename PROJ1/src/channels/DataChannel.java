@@ -4,6 +4,7 @@ import filesystem.Chunk;
 import filesystem.FileManager;
 import filesystem.FileChunk;
 import protocols.Protocol;
+import protocols.Reclaim;
 import server.Server;
 import utils.FileChunkPair;
 import utils.Message;
@@ -65,12 +66,18 @@ public class DataChannel extends Channel {
         String fileID = headerFields[FieldIndex.FileId];
         int chunkNo = Integer.parseInt(headerFields[FieldIndex.ChunkNo]);
         int replicationDegree = Integer.parseInt(headerFields[FieldIndex.ReplicationDeg]);
+        String version=headerFields[FieldIndex.Version];
+
+        server.updateRemovedTuple(fileID,chunkNo); //verificação que atualiza o removedTuple que indica em caso de um comando removed ser utilizado
 
         if (!FileManager.instance().canStore(body.length)) {
             FileChunkPair pair = FileManager.instance().getRemovableChunk(body.length);
             if (pair != null) {
                 if (!FileManager.instance().deleteChunk(pair))
+                {
+                    Reclaim.sendRemoved(server.getControlChannel(),version,server.getServerID(),fileID,Integer.toString(chunkNo));
                     return;
+                }
             }
             else
                 return;
