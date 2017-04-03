@@ -114,8 +114,12 @@ public class DataChannel extends Channel {
     public void send(Message msg) throws IOException {
         super.send(msg);
 
-
         Limiter limiter = new Limiter(5);
+        startTimer(msg, limiter);
+    }
+
+
+    private void startTimer(Message msg, Limiter limiter) {
         new Timer().schedule(new TimerTask() {
             String[] headerFields = msg.getHeaderFields();
             String fileId = headerFields[FieldIndex.FileId];
@@ -123,20 +127,25 @@ public class DataChannel extends Channel {
 
             @Override
             public void run() {
-                if (limiter.limitReached() || Metadata.instance().chunkDegreeSatisfied(fileId, chunkNumber)) {
+                if (limiter.limitReached() /*|| Metadata.instance().chunkDegreeSatisfied(fileId, chunkNumber)*/) {
                     this.cancel();
                     return;
                 }
 
                 try {
                     DataChannel.super.send(msg);
+
+                    if (headerFields[FieldIndex.ChunkNo].equals("0"))
+                        System.out.println(limiter.getCurrentTry());
                 } catch (IOException e) {
                     limiter.untick();
                 }
 
                 limiter.tick();
+                this.cancel();
+                startTimer(msg, limiter);
             }
-        }, 1000, limiter.getCurrentTry() * 1000);
+        }, limiter.getCurrentTry() * 1000);
     }
 
 
