@@ -1,20 +1,20 @@
 package channels;
 
 import filesystem.Chunk;
-import filesystem.FileManager;
 import filesystem.FileChunk;
+import filesystem.FileManager;
 import metadata.Metadata;
 import protocols.Protocol;
 import protocols.Reclaim;
 import server.Server;
 import utils.FileChunkPair;
+import utils.GoodGuy;
 import utils.Message;
 import utils.Message.FieldIndex;
 import utils.PathHelper;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.nio.charset.StandardCharsets;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -95,6 +95,7 @@ public class DataChannel extends Channel {
         }
 
         if (file.hasChunk(chunkNo)) {
+            FileManager.instance().resetActualRepDegree(fileID, chunkNo);
             server.sendStored(fileID, chunkNo);
             return;
         }
@@ -103,9 +104,20 @@ public class DataChannel extends Channel {
             try {
                 Chunk chunk = new Chunk(chunkNo, replicationDegree, body, path);
                 file.addChunk(chunk);
-                FileManager.instance().updateStoredSize(chunk);
-                server.sendStored(fileID, chunkNo);
-            } catch (IOException e) { /* Do nothing */ }
+
+                Thread.sleep(GoodGuy.sleepTime(0, 800));
+                if (FileManager.instance().chunkDegreeSatisfied(fileID, chunkNo)) {
+                    file.deleteChunk(chunk.getNumber());
+                }
+                else {
+                    server.sendStored(fileID, chunkNo);
+                    chunk.addReplication();
+                }
+            }
+            catch (IOException e) { /* Do nothing */ }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -127,16 +139,14 @@ public class DataChannel extends Channel {
 
             @Override
             public void run() {
-                if (limiter.limitReached() /*|| Metadata.instance().chunkDegreeSatisfied(fileId, chunkNumber)*/) {
+                if (limiter.limitReached() || Metadata.instance().chunkDegreeSatisfied(fileId, chunkNumber)) {
                     this.cancel();
                     return;
                 }
 
                 try {
+                    Metadata.instance().resetActualRepDegree(fileId, chunkNumber);
                     DataChannel.super.send(msg);
-
-                    if (headerFields[FieldIndex.ChunkNo].equals("0"))
-                        System.out.println(limiter.getCurrentTry());
                 } catch (IOException e) {
                     limiter.untick();
                 }
