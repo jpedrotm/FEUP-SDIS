@@ -2,11 +2,9 @@ package filesystem;
 
 
 import utils.Message;
-import utils.PathHelper;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -44,7 +42,6 @@ public class Chunk {
         bytesRead=is.read(content, 0, byteReadSize);
 
         byte[] body = Arrays.copyOf(content, bytesRead);
-
         return body;
     }
 
@@ -64,11 +61,11 @@ public class Chunk {
         return contentSize;
     }
 
-    public void addReplication() { actualReplicationDegree++; }
+    public synchronized void addReplication() { actualReplicationDegree++; }
 
-    public void subReplication() { actualReplicationDegree--; }
+    public synchronized void subReplication() { actualReplicationDegree--; }
 
-    public void resetReplication() { actualReplicationDegree = 0; }
+    public synchronized void resetReplication() { actualReplicationDegree = 1; }
 
     public boolean isReplicationDegreeDown(){
         return replicationDegree<actualReplicationDegree;

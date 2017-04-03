@@ -1,13 +1,12 @@
 package channels;
 
+import server.Server;
+import utils.Message;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.nio.charset.StandardCharsets;
-
-import server.Server;
-import utils.Message;
 
 abstract class Channel implements Runnable {
     protected MulticastSocket socket;

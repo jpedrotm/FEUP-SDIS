@@ -6,7 +6,7 @@ import channels.DataChannel;
 import metadata.Metadata;
 import utils.Message;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.Arrays;
 
 public class Backup extends Protocol {
@@ -28,13 +28,8 @@ public class Backup extends Protocol {
 
             byte[] body = Arrays.copyOf(content, bytesRead);
             Message msg = new Message(header, body);
-
-            try {
-                Thread.sleep(400);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             mdb.send(msg);
+
             Metadata.instance().addChunkMetadata(fi.filename, i, Integer.parseInt(replicationDeg));
             i++;
         }

@@ -69,14 +69,6 @@ public class Metadata implements Serializable {
         f.addChunk(c);
     }
 
-    @Override
-    public String toString() {
-        return "Metadata{" +
-                "hashSet=" + hashMap +
-                ", map=" + fileInfoHashMap +
-                '}';
-    }
-
     public boolean chunkDegreeSatisfied(String fileId, String chunkNumber) {
         String filename = hashMap.get(fileId);
         FileMetadata f = fileInfoHashMap.get(filename);
@@ -92,6 +84,19 @@ public class Metadata implements Serializable {
     public FileMetadata getFileMetadata(String fileID) {
         String filename = hashMap.get(fileID);
         return fileInfoHashMap.get(filename);
+    }
+
+    public void resetActualRepDegree(String fileID, String chunkNo) {
+        FileMetadata f = getFileMetadata(fileID);
+        f.getChunk(chunkNo).resetReplication();
+    }
+
+    @Override
+    public String toString() {
+        return "Metadata{" +
+                "hashSet=" + hashMap +
+                ", map=" + fileInfoHashMap +
+                '}';
     }
 
     /*** Helper classes ***/

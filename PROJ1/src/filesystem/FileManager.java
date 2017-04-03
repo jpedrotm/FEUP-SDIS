@@ -7,7 +7,6 @@ import java.util.*;
 
 public class FileManager {
     private HashMap<String, FileChunk> files;
-    private int storedContentSize;
     private int maxContentSize = 64000 * 100;
 
 
@@ -28,7 +27,6 @@ public class FileManager {
 
     private FileManager() {
         files = new HashMap<>();
-        storedContentSize = 0;
     }
 
 
@@ -45,35 +43,19 @@ public class FileManager {
         return files.get(fileId);
     }
 
-    public boolean chunkDegreeSatisfied(String fileId, String chunkNumber) {
-        int chunkNo = Integer.parseInt(chunkNumber);
-        FileChunk fileChunk = getFile(fileId);
-        if (fileChunk == null)
-            return false;
-
-        Chunk chunk = fileChunk.getChunk(chunkNo);
-        if (chunk == null)
-            return false;
-
-        return (chunk.getActualReplicationDegree() >= chunk.getReplicationDegree());
-    }
-
     public void deleteFile(String fileID) throws IOException {
         FileChunk file = FileManager.instance().getFile(fileID);
         file.delete();
         files.remove(fileID);
     }
 
-    public void updateStoredSize(Chunk chunk) {
-        storedContentSize += chunk.getContentSize();
-    }
-
     public boolean canStore(int newContentSize) {
-        return storedContentSize + newContentSize <= maxContentSize;
+        return getStoredSize() + newContentSize <= maxContentSize;
     }
 
     public FileChunkPair getRemovableChunk(int newContentSize) {
         ArrayList<FileChunkPair> pairs = new ArrayList<>();
+        int storedContentSize = getStoredSize();
 
         Iterator it = files.entrySet().iterator();
         while (it.hasNext()) {
@@ -95,21 +77,41 @@ public class FileManager {
             return null;
     }
 
-    @Override
-    public String toString() {
-        return "FileManager{" +
-                "files=" + files +
-                ", storedContentSize=" + storedContentSize +
-                ", maxContentSize=" + maxContentSize +
-                '}';
-    }
-
     public boolean deleteChunk(FileChunkPair pair) {
         if (pair.file.deleteChunk(pair.chunk.getNumber())) {
-            storedContentSize -= pair.chunk.getContentSize();
             return true;
         }
 
         return false;
+    }
+
+    public void resetActualRepDegree(String fileID, int chunkNo) {
+        FileChunk file = getFile(fileID);
+        file.getChunk(chunkNo).resetReplication();
+    }
+
+    public int getStoredSize() {
+        int storedSize = 0;
+        for (FileChunk file : files.values()) {
+            storedSize += file.getContentSize();
+        }
+
+        return storedSize;
+    }
+
+    public boolean chunkDegreeSatisfied(String fileId, int chunkNumber) {
+        FileChunk f = files.get(fileId);
+        Chunk c = f.getChunk(chunkNumber);
+
+        return c.getActualReplicationDegree() >= c.getReplicationDegree();
+    }
+
+    @Override
+    public String toString() {
+        return "FileManager{" +
+                "files=" + files +
+                ", storedContentSize=" + getStoredSize() +
+                ", maxContentSize=" + maxContentSize +
+                '}';
     }
 }

@@ -45,6 +45,8 @@ public class ControlChannel extends Channel {
             if (headerFields[FieldIndex.SenderId].equals(server.getServerID()))
                 continue;
 
+            System.out.println(message.getHeader());
+
             switch (headerFields[FieldIndex.MessageType]) {
                 case "STORED":
                     store(headerFields);

@@ -1,6 +1,15 @@
 package server;
 
-import channels.*;
+import channels.BackupChannel;
+import channels.ControlChannel;
+import channels.DataChannel;
+import filesystem.FileManager;
+import metadata.Metadata;
+import protocols.Backup;
+import protocols.Delete;
+import protocols.Restore;
+import utils.GoodGuy;
+import utils.Tuplo3;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,15 +23,6 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import channels.DataChannel;
-import filesystem.FileManager;
-import metadata.Metadata;
-import protocols.Backup;
-import protocols.Delete;
-import protocols.Restore;
-import utils.GoodGuy;
-import utils.Tuplo3;
 
 public class Server implements PeerInterface {
     private String serverID;
@@ -119,23 +119,20 @@ public class Server implements PeerInterface {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        */
 
-
-        System.out.println(FileManager.instance());*/
-
-        System.out.println(serverID);
         if (serverID.equals("1")) {
             try {
-                Thread.sleep(2000);
+                Thread.sleep(10000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
-            backup("storage/amizade.jpg", "3");
+            backup("storage/amizade.jpg", "2");
         }
 
         try {
-            Thread.sleep(8000);
+            Thread.sleep(12000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

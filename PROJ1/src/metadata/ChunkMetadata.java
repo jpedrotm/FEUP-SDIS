@@ -12,11 +12,11 @@ public class ChunkMetadata {
         this.actualRepDegree = 0;
     }
 
-    public void addReplication() {
+    public synchronized void addReplication() {
         actualRepDegree++;
     }
 
-    public void resetReplication() {
+    public synchronized void resetReplication() {
         actualRepDegree = 0;
     }
 

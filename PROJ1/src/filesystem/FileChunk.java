@@ -97,4 +97,13 @@ public class FileChunk {
 
         return true;
     }
+
+    public int getContentSize() {
+        int size = 0;
+        for (Chunk chunk : chunks.values()) {
+            size += chunk.getContentSize();
+        }
+
+        return size;
+    }
 }
