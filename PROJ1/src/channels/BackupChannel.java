@@ -1,6 +1,7 @@
 package channels;
 
 import protocols.Protocol;
+import metadata.Metadata;
 import server.Server;
 import utils.Message;
 
@@ -54,7 +55,7 @@ public class BackupChannel extends Channel {
     public void restoreFileChunk(String[] headerFields, byte[] body){
         String fileID=headerFields[Message.FieldIndex.FileId];
         int chunkNo = Integer.parseInt(headerFields[Message.FieldIndex.ChunkNo]);
-        String fileName=server.getMetadata().getFileName(fileID);
+        String fileName = Metadata.instance().getFileName(fileID);
 
         try {
             String path="storage/restored/"+fileName;

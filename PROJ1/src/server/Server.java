@@ -17,6 +17,7 @@ import java.util.TimerTask;
 
 import channels.DataChannel;
 import filesystem.FileManager;
+import metadata.Metadata;
 import protocols.Backup;
 import protocols.Delete;
 import protocols.Restore;
@@ -25,7 +26,6 @@ import utils.Tuplo3;
 
 public class Server implements PeerInterface {
     private String serverID;
-    private Metadata metadata;
     private ControlChannel mc;
     private BackupChannel mdr;
     private DataChannel mdb;
@@ -50,9 +50,7 @@ public class Server implements PeerInterface {
     public Server(String[] commands) {
 
         this.serverID = commands[0]; //temporario só para testar o RMI
-        this.metadata = new Metadata();
-
-        this.removedTuple=null;
+        this.removedTuple = null;
 
         this.mc = new ControlChannel(this, commands[1], commands[2]);
         this.mdb = new DataChannel(this, commands[3], commands[4]);
@@ -101,7 +99,7 @@ public class Server implements PeerInterface {
 
             System.out.println("GOOOOOOO");
 
-            backup("storage/ola.pdf", "3");
+
 
             try {
                 Thread.sleep(4000);
@@ -125,12 +123,24 @@ public class Server implements PeerInterface {
 
         System.out.println(FileManager.instance());*/
 
+        System.out.println(serverID);
+        if (serverID.equals("1")) {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            backup("storage/amizade.jpg", "3");
+        }
+
         try {
             Thread.sleep(8000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        System.out.println(metadata);
+        System.out.println(FileManager.instance());
+        System.out.println(Metadata.instance());
     }
 
     public String getServerID() {
@@ -147,10 +157,6 @@ public class Server implements PeerInterface {
 
     public DataChannel getDataChannel(){
         return mdb;
-    }
-
-    public Metadata getMetadata(){
-        return metadata;
     }
 
     public Tuplo3 getRemovedTuple(){
@@ -185,7 +191,7 @@ public class Server implements PeerInterface {
 
     public void backup(String path, String replicationDeg) {
         try {
-            Backup.sendFileChunks(metadata, mdb, path,"1.0", serverID, replicationDeg);
+            Backup.sendFileChunks(mdb, path,"1.0", serverID, replicationDeg);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -194,7 +200,7 @@ public class Server implements PeerInterface {
 
     public void delete(String path) {
         try {
-            Delete.DeleteFile(metadata, mc, path, "1.0", serverID);
+            Delete.DeleteFile(mc, path, "1.0", serverID);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -202,7 +208,7 @@ public class Server implements PeerInterface {
 
     public void restore(String path){
         try {
-            Restore.receiveFileChunks(metadata,mc, path,"1.0",serverID);
+            Restore.receiveFileChunks(mc, path,"1.0",serverID);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -216,6 +222,6 @@ public class Server implements PeerInterface {
 
         FileOutputStream fout = new FileOutputStream(savePath);
         ObjectOutputStream oos = new ObjectOutputStream(fout);
-        oos.writeObject(metadata);
+        oos.writeObject(Metadata.instance());
     }
 }

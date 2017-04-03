@@ -3,6 +3,7 @@ package channels;
 import filesystem.Chunk;
 import filesystem.FileManager;
 import filesystem.FileChunk;
+import metadata.Metadata;
 import protocols.Protocol;
 import protocols.Reclaim;
 import server.Server;
@@ -52,6 +53,8 @@ public class DataChannel extends Channel {
 
             if (headerFields[FieldIndex.SenderId].equals(server.getServerID()))
                 continue;
+
+            System.out.println(message.getHeader());
 
             switch (headerFields[FieldIndex.MessageType]) {
                 case Protocol.MessageType.Putchunk:
@@ -111,15 +114,16 @@ public class DataChannel extends Channel {
     public void send(Message msg) throws IOException {
         super.send(msg);
 
+
+        Limiter limiter = new Limiter(5);
         new Timer().schedule(new TimerTask() {
-            int tries = 1;
             String[] headerFields = msg.getHeaderFields();
             String fileId = headerFields[FieldIndex.FileId];
             String chunkNumber = headerFields[FieldIndex.ChunkNo];
 
             @Override
             public void run() {
-                if (tries == 5 || FileManager.instance().chunkDegreeSatisfied(fileId, chunkNumber)) {
+                if (limiter.limitReached() || Metadata.instance().chunkDegreeSatisfied(fileId, chunkNumber)) {
                     this.cancel();
                     return;
                 }
@@ -127,11 +131,38 @@ public class DataChannel extends Channel {
                 try {
                     DataChannel.super.send(msg);
                 } catch (IOException e) {
-                    tries--;        // TALVEZ? (exceção pode significar buffer cheio)
+                    limiter.untick();
                 }
 
-                tries++;
+                limiter.tick();
             }
-        }, 1000, 1000);
+        }, 1000, limiter.getCurrentTry() * 1000);
+    }
+
+
+    private class Limiter {
+        private int maxTries;
+        private int currentTry;
+
+        public Limiter(int maxTries) {
+            this.maxTries = maxTries;
+            this.currentTry = 1;
+        }
+
+        public void tick() {
+            currentTry++;
+        }
+
+        public void untick() {
+            currentTry--;
+        }
+
+        public boolean limitReached() {
+            return currentTry >= maxTries;
+        }
+
+        public int getCurrentTry() {
+            return currentTry;
+        }
     }
 }

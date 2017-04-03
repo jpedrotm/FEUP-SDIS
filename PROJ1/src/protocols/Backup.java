@@ -3,22 +3,19 @@ package protocols;
 
 import channels.ControlChannel;
 import channels.DataChannel;
-import server.Metadata;
-import utils.GoodGuy;
+import metadata.Metadata;
 import utils.Message;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 
 public class Backup extends Protocol {
-    public static void sendFileChunks(Metadata metadata, DataChannel mdb, String path, String version, String senderId, String replicationDeg) throws IOException {
+    public static void sendFileChunks(DataChannel mdb, String path, String version, String senderId, String replicationDeg) throws IOException {
         FileInfo fi = Protocol.generateFileInfo(path);
         String hashFileId = Message.buildHash(fi.fileId);
+
+        // Metadata
+        Metadata.instance().addMetadata(fi.filename, fi.extension, path, hashFileId);
 
         int i = 0;
         while (true) {
@@ -38,12 +35,9 @@ public class Backup extends Protocol {
                 e.printStackTrace();
             }
             mdb.send(msg);
+            Metadata.instance().addChunkMetadata(fi.filename, i, Integer.parseInt(replicationDeg));
             i++;
         }
-
-        // Metadata
-        metadata.addMetadata(fi.filename, fi.extension, path, hashFileId,i);
-
     }
 
     public static void sendStoredMessage(ControlChannel mc,String fileID, int chunkNo, String serverID) {

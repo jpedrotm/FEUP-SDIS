@@ -3,9 +3,9 @@ package channels;
 import filesystem.Chunk;
 import filesystem.FileChunk;
 import filesystem.FileManager;
-import protocols.Backup;
+import metadata.FileMetadata;
+import metadata.Metadata;
 import protocols.Protocol;
-import server.Metadata;
 import server.Server;
 import utils.GoodGuy;
 import utils.Message;
@@ -44,8 +44,6 @@ public class ControlChannel extends Channel {
 
             if (headerFields[FieldIndex.SenderId].equals(server.getServerID()))
                 continue;
-
-            System.out.println(message.getHeader());
 
             switch (headerFields[FieldIndex.MessageType]) {
                 case "STORED":
@@ -120,6 +118,11 @@ public class ControlChannel extends Channel {
             FileChunk file = FileManager.instance().getFile(fileID);
             int chunkNo = Integer.parseInt(chunkNumber);
             file.updateChunk(chunkNo);
+        }
+        else if (Metadata.instance().hasFile(fileID)) {
+            FileMetadata f = Metadata.instance().getFileMetadata(fileID);
+            int chunkNo = Integer.parseInt(chunkNumber);
+            f.updateChunk(chunkNo);
         }
     }
 
