@@ -53,9 +53,8 @@ public class FileManager {
         return getStoredSize() + newContentSize <= maxContentSize;
     }
 
-    public FileChunkPair getRemovableChunk(int newContentSize) {
+    public ArrayList<FileChunkPair> getChunksOrdered(int newContentSize) {
         ArrayList<FileChunkPair> pairs = new ArrayList<>();
-        int storedContentSize = getStoredSize();
 
         Iterator it = files.entrySet().iterator();
         while (it.hasNext()) {
@@ -64,17 +63,14 @@ public class FileManager {
 
             ArrayList<Chunk> chunks = file.getChunksOverRep();
             for (Chunk chunk : chunks) {
-                if (storedContentSize - chunk.getContentSize() + newContentSize <= maxContentSize) {
-                    pairs.add(new FileChunkPair(file, chunk));
-                }
+                pairs.add(new FileChunkPair(file, chunk));
             }
         }
 
-        Collections.sort(pairs, (a, b) -> a.chunk.getActualReplicationDegree() < b.chunk.getActualReplicationDegree() ? 1 : a.chunk.getActualReplicationDegree() == b.chunk.getActualReplicationDegree() ? 0 : -1);
-        if (pairs.size() > 0)
-            return pairs.get(0);
-        else
-            return null;
+        Collections.sort(pairs, (a, b) -> a.chunk.getActualReplicationDegree() - a.chunk.getReplicationDegree() < b.chunk.getActualReplicationDegree() - b.chunk.getReplicationDegree() ?
+                                    1 : a.chunk.getActualReplicationDegree() - a.chunk.getReplicationDegree() == b.chunk.getActualReplicationDegree() - b.chunk.getReplicationDegree() ?
+                                    0 : -1);
+        return pairs;
     }
 
     public boolean deleteChunk(FileChunkPair pair) {

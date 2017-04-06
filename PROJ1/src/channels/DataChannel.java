@@ -75,6 +75,7 @@ public class DataChannel extends Channel {
 
         server.updateRemovedTuple(fileID,chunkNo); //verificação que atualiza o removedTuple que indica em caso de um comando removed ser utilizado
 
+        /*
         if (!FileManager.instance().canStore(body.length)) {
             FileChunkPair pair = FileManager.instance().getRemovableChunk(body.length);
             if (pair != null) {
@@ -87,6 +88,7 @@ public class DataChannel extends Channel {
             else
                 return;
         }
+        */
 
         FileChunk file;
         if (FileManager.instance().hasFile(fileID))
