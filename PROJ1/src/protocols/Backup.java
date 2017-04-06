@@ -34,7 +34,7 @@ public class Backup extends Protocol {
             Message msg = new Message(header, body);
 
             mdb.send(msg);
-            Metadata.instance().addChunkMetadata(fi.filename, i, Integer.parseInt(replicationDeg));
+            Metadata.instance().addChunkMetadata(path, i, Integer.parseInt(replicationDeg));
 
             try {
                 latch.await(5, TimeUnit.SECONDS);

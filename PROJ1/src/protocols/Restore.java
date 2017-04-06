@@ -9,11 +9,9 @@ import java.io.IOException;
 public class Restore extends Protocol{
 
     public static void receiveFileChunks(ControlChannel mc,String path,String version,String senderID) throws IOException{
-        int idx = path.replaceAll("\\\\", "/").lastIndexOf("/");
-        String filename =  idx >= 0 ? path.substring(idx + 1) : path;
 
-        int numChunks = Metadata.instance().getFileNumChunks(filename);
-        String hashFileId = Metadata.instance().getHashFileId(filename);
+        int numChunks = Metadata.instance().getFileNumChunks(path);
+        String hashFileId = Metadata.instance().getHashFileId(path);
 
         int i = 0;
         while(i < numChunks){
