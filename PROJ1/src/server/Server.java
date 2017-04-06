@@ -11,6 +11,7 @@ import protocols.Restore;
 import utils.GoodGuy;
 import utils.Tuplo3;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -209,6 +210,13 @@ public class Server implements PeerInterface {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public String state(String path){
+
+        String stateInfo="Informação da metadata: \n"+Metadata.instance().toString()+"\nInformação do FileManager: \n"+ FileManager.instance().toString();
+
+        return stateInfo;
     }
 
 

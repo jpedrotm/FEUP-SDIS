@@ -2,6 +2,7 @@ package metadata;
 
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Metadata implements Serializable {
@@ -29,8 +30,8 @@ public class Metadata implements Serializable {
         hashMap = new HashMap<>();
     }
 
-    public void addMetadata(String filename, String extension, String path, String hash) {
-        fileInfoHashMap.put(path, new FileMetadata(filename, extension, path, hash));
+    public void addMetadata(String filename, String extension, String path, String hash,int repDegree) {
+        fileInfoHashMap.put(path, new FileMetadata(filename, extension, path, hash,repDegree));
         hashMap.put(hash,path);
     }
 
@@ -89,10 +90,17 @@ public class Metadata implements Serializable {
 
     @Override
     public String toString() {
-        return "Metadata{" +
-                "hashSet=" + hashMap +
-                ", map=" + fileInfoHashMap +
-                '}';
+
+        String metadataInfo="";
+        ArrayList<FileMetadata> info=new ArrayList<>(fileInfoHashMap.values());
+        for(int i=0;i<info.size();i++)
+        {
+            metadataInfo+=info.get(i).toString();
+        }
+
+
+
+        return metadataInfo;
     }
 
     /*** Helper classes ***/

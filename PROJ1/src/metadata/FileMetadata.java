@@ -8,13 +8,15 @@ public class FileMetadata implements Serializable {
     private String extension;
     private String path;
     private String hashFileId;
+    private int repDegree;
     private HashMap<Integer, ChunkMetadata> chunksMetadata;
 
-    public FileMetadata(String filename, String extension, String path, String hashFileId) {
+    public FileMetadata(String filename, String extension, String path, String hashFileId,int repDegree) {
         this.filename = filename;
         this.extension = extension;
         this.path = path;
         this.hashFileId = hashFileId;
+        this.repDegree=repDegree;
         chunksMetadata = new HashMap<>();
     }
 
@@ -30,15 +32,18 @@ public class FileMetadata implements Serializable {
         return chunksMetadata.size();
     }
 
+    public int getRepDegree(){
+        return repDegree;
+    }
+
     @Override
     public String toString() {
         return "FileMetadata{" +
-                "filename='" + filename + '\'' +
-                ", extension='" + extension + '\'' +
-                ", path='" + path + '\'' +
+                "path='" + path + '\'' +
                 ", hashFileId='" + hashFileId + '\'' +
-                ", chunksMetadata=" + chunksMetadata +
-                '}';
+                ", replicationDegree=" + repDegree + "\'\n"+
+                chunksMetadata.toString()+
+                "}\n";
     }
 
     public String getHashFileId() {

@@ -33,11 +33,6 @@ public class ChunkMetadata {
 
     @Override
     public String toString() {
-        return "ChunkMetadata{" +
-                "chunkNo=" + chunkNo +
-                ", repDegree=" + repDegree +
-                ", actualRepDegree=" + storeds.size() +
-                ", storeds=" + storeds +
-                '}';
+        return "Chunk: nº"+chunkNo+" , perceivedRepDegree: "+storeds.size();
     }
 }

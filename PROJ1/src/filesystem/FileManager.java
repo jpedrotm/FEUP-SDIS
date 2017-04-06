@@ -100,9 +100,10 @@ public class FileManager {
     @Override
     public String toString() {
         return "FileManager{" +
-                "files=" + files +
-                ", storedContentSize=" + getStoredSize() +
-                ", maxContentSize=" + maxContentSize +
+                files.toString() +"\n"+
+                ", storage capacity=" + maxContentSize +
+                ", free space=" + (maxContentSize-getStoredSize()) +
+                ", space used= "+getStoredSize()+
                 '}';
     }
 }

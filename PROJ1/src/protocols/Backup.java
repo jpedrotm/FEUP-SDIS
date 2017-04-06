@@ -19,7 +19,7 @@ public class Backup extends Protocol {
         String hashFileId = Message.buildHash(fi.fileId);
 
         // Metadata
-        Metadata.instance().addMetadata(fi.filename, fi.extension, path, hashFileId);
+        Metadata.instance().addMetadata(fi.filename, fi.extension, path, hashFileId,Integer.parseInt(replicationDeg));
 
         int i = 0;
         while (true) {

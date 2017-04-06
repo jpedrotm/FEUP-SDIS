@@ -45,10 +45,7 @@ public class FileChunk {
 
     @Override
     public String toString() {
-        return "FileChunk{" +
-                "id='" + id + '\'' +
-                ", chunks=" + chunks +
-                '}';
+        return chunks.toString();
     }
 
     public void delete() throws IOException {

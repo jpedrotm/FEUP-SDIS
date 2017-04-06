@@ -85,6 +85,8 @@ public class TestApp {
                 case CommandType.Restore:
                     stub.restore(filePath);
                     break;
+                case CommandType.State:
+                    System.out.println(stub.state(filePath));
                 default:
                     break;
             }

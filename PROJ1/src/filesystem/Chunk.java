@@ -90,12 +90,9 @@ public class Chunk {
     @Override
     public String toString() {
         return "Chunk{" +
-                "number=" + number +
-                ", replicationDegree=" + replicationDegree +
-                ", actualReplicationDegree=" + storeds.size() +
-                ", storeds=" + storeds +
-                ", path='" + path + '\'' +
-                ", contentSize=" + contentSize +
+                "id: "+number+" , "+
+                "size: "+contentSize+" , "+
+                "perceived repDegree: "+storeds.size()+
                 '}';
     }
 }

@@ -7,4 +7,5 @@ public interface PeerInterface extends Remote { //todas as funções do Server s
     void backup(String path,String replicationDeg) throws RemoteException;
     void delete(String path) throws RemoteException;
     void restore(String path) throws RemoteException;
+    String state(String path) throws  RemoteException;
 }
