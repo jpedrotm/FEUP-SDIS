@@ -146,7 +146,6 @@ public class DataChannel extends Channel {
             @Override
             public void run() {
                 if (limiter.limitReached() || Metadata.instance().chunkDegreeSatisfied(fileId, chunkNumber)) {
-                    Backup.latch.countDown();
                     this.cancel();
                     return;
                 }

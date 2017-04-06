@@ -12,8 +12,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class Backup extends Protocol {
-    public static CountDownLatch latch = new CountDownLatch(1);
-
     public static void sendFileChunks(DataChannel mdb, String path, String version, String senderId, String replicationDeg) throws IOException {
         FileInfo fi = Protocol.generateFileInfo(path);
         String hashFileId = Message.buildHash(fi.fileId);
@@ -35,13 +33,6 @@ public class Backup extends Protocol {
 
             mdb.send(msg);
             Metadata.instance().addChunkMetadata(path, i, Integer.parseInt(replicationDeg));
-
-            try {
-                latch.await(5, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
             i++;
         }
     }
