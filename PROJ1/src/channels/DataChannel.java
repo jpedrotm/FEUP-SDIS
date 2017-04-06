@@ -4,6 +4,7 @@ import filesystem.Chunk;
 import filesystem.FileChunk;
 import filesystem.FileManager;
 import metadata.Metadata;
+import protocols.Backup;
 import protocols.Protocol;
 import protocols.Reclaim;
 import server.Server;
@@ -66,6 +67,7 @@ public class DataChannel extends Channel {
 
 
     private void putChunk(String[] headerFields, byte[] body) {
+        String senderID = headerFields[FieldIndex.SenderId];
         String fileID = headerFields[FieldIndex.FileId];
         int chunkNo = Integer.parseInt(headerFields[FieldIndex.ChunkNo]);
         int replicationDegree = Integer.parseInt(headerFields[FieldIndex.ReplicationDeg]);
@@ -78,7 +80,7 @@ public class DataChannel extends Channel {
             if (pair != null) {
                 if (!FileManager.instance().deleteChunk(pair))
                 {
-                    Reclaim.sendRemoved(server.getControlChannel(),version,server.getServerID(),fileID,Integer.toString(chunkNo));
+                    Reclaim.sendRemoved(server.getControlChannel(), version, server.getServerID(), fileID, Integer.toString(chunkNo));
                     return;
                 }
             }
@@ -95,7 +97,6 @@ public class DataChannel extends Channel {
         }
 
         if (file.hasChunk(chunkNo)) {
-            FileManager.instance().resetActualRepDegree(fileID, chunkNo);
             server.sendStored(fileID, chunkNo);
             return;
         }
@@ -105,13 +106,16 @@ public class DataChannel extends Channel {
                 Chunk chunk = new Chunk(chunkNo, replicationDegree, body, path);
                 file.addChunk(chunk);
 
-                Thread.sleep(GoodGuy.sleepTime(0, 800));
+                long r;
+                Thread.sleep( (r= GoodGuy.sleepTime(0, 800)) );
+                System.out.println("FREE FROM SLEEP  " + r + "  " + chunkNo);
                 if (FileManager.instance().chunkDegreeSatisfied(fileID, chunkNo)) {
                     file.deleteChunk(chunk.getNumber());
                 }
                 else {
+                    System.out.println("GONNA STORE  " + chunkNo);
                     server.sendStored(fileID, chunkNo);
-                    chunk.addReplication();
+                    chunk.addReplication(server.getServerID());
                 }
             }
             catch (IOException e) { /* Do nothing */ }
@@ -140,12 +144,12 @@ public class DataChannel extends Channel {
             @Override
             public void run() {
                 if (limiter.limitReached() || Metadata.instance().chunkDegreeSatisfied(fileId, chunkNumber)) {
+                    Backup.latch.countDown();
                     this.cancel();
                     return;
                 }
 
                 try {
-                    Metadata.instance().resetActualRepDegree(fileId, chunkNumber);
                     DataChannel.super.send(msg);
                 } catch (IOException e) {
                     limiter.untick();

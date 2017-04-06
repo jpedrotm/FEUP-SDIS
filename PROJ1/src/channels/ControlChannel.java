@@ -66,15 +66,16 @@ public class ControlChannel extends Channel {
     }
 
     private void removed(String[] headerFields) {
-        String fileID=headerFields[FieldIndex.FileId];
-        int chunkNo=Integer.parseInt(headerFields[FieldIndex.ChunkNo]);
-        String version=headerFields[FieldIndex.Version];
+        String senderID = headerFields[FieldIndex.SenderId];
+        String fileID = headerFields[FieldIndex.FileId];
+        int chunkNo = Integer.parseInt(headerFields[FieldIndex.ChunkNo]);
+        String version = headerFields[FieldIndex.Version];
 
         if(FileManager.instance().hasFile(fileID)){
             if(FileManager.instance().getFile(fileID).hasChunk(chunkNo))
             {
                 Chunk chunk=FileManager.instance().getFile(fileID).getChunk(chunkNo);
-                chunk.subReplication();
+                chunk.subReplication(senderID);
                 if(chunk.isReplicationDegreeDown()){
                     server.newRemovedTuple(new Tuplo3(fileID,chunkNo));
                     try {
@@ -113,18 +114,19 @@ public class ControlChannel extends Channel {
     }
 
     private void store(String[] headerFields) {
+        String senderID = headerFields[FieldIndex.SenderId];
         String fileID = headerFields[FieldIndex.FileId];
         String chunkNumber = headerFields[FieldIndex.ChunkNo];
 
         if (FileManager.instance().hasFile(fileID)) {
             FileChunk file = FileManager.instance().getFile(fileID);
             int chunkNo = Integer.parseInt(chunkNumber);
-            file.updateChunk(chunkNo);
+            file.updateChunk(chunkNo, senderID);
         }
         else if (Metadata.instance().hasFile(fileID)) {
             FileMetadata f = Metadata.instance().getFileMetadata(fileID);
             int chunkNo = Integer.parseInt(chunkNumber);
-            f.updateChunk(chunkNo);
+            f.updateChunk(chunkNo, senderID);
         }
     }
 

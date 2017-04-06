@@ -34,9 +34,9 @@ public class FileChunk {
         return chunks.containsKey(chunkNo);
     }
 
-    public void updateChunk(int chunkNo) {
+    public void updateChunk(int chunkNo, String serverId) {
         if (chunks.containsKey(chunkNo))
-            chunks.get(chunkNo).addReplication();
+            chunks.get(chunkNo).addReplication(serverId);
     }
 
     public int getNumChunks(){

@@ -132,7 +132,7 @@ public class Server implements PeerInterface {
         }
 
         try {
-            Thread.sleep(18000);
+            Thread.sleep(16000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

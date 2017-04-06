@@ -1,23 +1,22 @@
 package metadata;
 
 
+import java.util.HashSet;
+
 public class ChunkMetadata {
     private int chunkNo;
     private int repDegree;
-    private int actualRepDegree;
+    private HashSet<String> storeds;
 
     public ChunkMetadata(int chunkNo, int repDegree) {
         this.chunkNo = chunkNo;
         this.repDegree = repDegree;
-        this.actualRepDegree = 0;
+        this.storeds = new HashSet<>();
     }
 
-    public synchronized void addReplication() {
-        actualRepDegree++;
-    }
-
-    public synchronized void resetReplication() {
-        actualRepDegree = 0;
+    public synchronized void addReplication(String serverID) {
+        if (!storeds.contains(serverID))
+            storeds.add(serverID);
     }
 
     public int getChunkNo() {
@@ -28,8 +27,8 @@ public class ChunkMetadata {
         return repDegree;
     }
 
-    public int getActualRepDegree() {
-        return actualRepDegree;
+    public synchronized int getActualRepDegree() {
+        return storeds.size();
     }
 
     @Override
@@ -37,7 +36,8 @@ public class ChunkMetadata {
         return "ChunkMetadata{" +
                 "chunkNo=" + chunkNo +
                 ", repDegree=" + repDegree +
-                ", actualRepDegree=" + actualRepDegree +
+                ", actualRepDegree=" + storeds.size() +
+                ", storeds=" + storeds +
                 '}';
     }
 }

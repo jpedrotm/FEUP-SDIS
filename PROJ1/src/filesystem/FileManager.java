@@ -85,11 +85,6 @@ public class FileManager {
         return false;
     }
 
-    public void resetActualRepDegree(String fileID, int chunkNo) {
-        FileChunk file = getFile(fileID);
-        file.getChunk(chunkNo).resetReplication();
-    }
-
     public int getStoredSize() {
         int storedSize = 0;
         for (FileChunk file : files.values()) {
@@ -103,7 +98,7 @@ public class FileManager {
         FileChunk f = files.get(fileId);
         Chunk c = f.getChunk(chunkNumber);
 
-        return c.getActualReplicationDegree() >= c.getReplicationDegree();
+        return c.getActualReplicationDegreeSync() >= c.getReplicationDegree();
     }
 
     @Override

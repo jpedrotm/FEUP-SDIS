@@ -8,8 +8,12 @@ import utils.Message;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class Backup extends Protocol {
+    public static CountDownLatch latch = new CountDownLatch(1);
+
     public static void sendFileChunks(DataChannel mdb, String path, String version, String senderId, String replicationDeg) throws IOException {
         FileInfo fi = Protocol.generateFileInfo(path);
         String hashFileId = Message.buildHash(fi.fileId);
@@ -29,18 +33,20 @@ public class Backup extends Protocol {
             byte[] body = Arrays.copyOf(content, bytesRead);
             Message msg = new Message(header, body);
 
+            mdb.send(msg);
+            Metadata.instance().addChunkMetadata(fi.filename, i, Integer.parseInt(replicationDeg));
+
             try {
-                Thread.sleep(400);
+                latch.await(5, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            mdb.send(msg);
-            Metadata.instance().addChunkMetadata(fi.filename, i, Integer.parseInt(replicationDeg));
+
             i++;
         }
     }
 
-    public static void sendStoredMessage(ControlChannel mc,String fileID, int chunkNo, String serverID) {
+    public static void sendStoredMessage(ControlChannel mc, String fileID, int chunkNo, String serverID) {
         String header = Message.buildHeader(MessageType.Stored,"1.0", serverID, fileID, Integer.toString(chunkNo));
         Message msg = null;
 

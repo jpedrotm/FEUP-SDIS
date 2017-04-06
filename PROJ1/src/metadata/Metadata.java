@@ -86,11 +86,6 @@ public class Metadata implements Serializable {
         return fileInfoHashMap.get(filename);
     }
 
-    public void resetActualRepDegree(String fileID, String chunkNo) {
-        FileMetadata f = getFileMetadata(fileID);
-        f.getChunk(chunkNo).resetReplication();
-    }
-
     @Override
     public String toString() {
         return "Metadata{" +

@@ -10,20 +10,21 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashSet;
 
 public class Chunk {
     private int number;
     private int replicationDegree;
-    private int actualReplicationDegree;
+    private HashSet<String> storeds;
     private String path;
     private int contentSize;
 
     public Chunk(int number, int replicationDegree, byte[] content, String path) throws IOException {
         this.number = number;
         this.replicationDegree = replicationDegree;
-        this.actualReplicationDegree = 0;
         this.path = path;
-        contentSize = content.length;
+        this.contentSize = content.length;
+        this.storeds = new HashSet<>();
 
         storeContent(content);
     }
@@ -49,10 +50,6 @@ public class Chunk {
         return replicationDegree;
     }
 
-    public int getActualReplicationDegree() {
-        return actualReplicationDegree;
-    }
-
     public String getPath() {
         return path;
     }
@@ -61,14 +58,22 @@ public class Chunk {
         return contentSize;
     }
 
-    public synchronized void addReplication() { actualReplicationDegree++; }
+    public int getActualReplicationDegree() {
+        return storeds.size();
+    }
 
-    public synchronized void subReplication() { actualReplicationDegree--; }
+    public synchronized int getActualReplicationDegreeSync() { return  storeds.size(); }
 
-    public synchronized void resetReplication() { actualReplicationDegree = 1; }
+    public synchronized void addReplication(String serverId) {
+        if (!storeds.contains(serverId)) {
+            storeds.add(serverId);
+        }
+    }
+
+    public synchronized void subReplication(String serverId) { storeds.remove(serverId); }
 
     public boolean isReplicationDegreeDown(){
-        return replicationDegree<actualReplicationDegree;
+        return replicationDegree < storeds.size();
     }
 
     private void storeContent(byte[] content) throws IOException {
@@ -87,7 +92,8 @@ public class Chunk {
         return "Chunk{" +
                 "number=" + number +
                 ", replicationDegree=" + replicationDegree +
-                ", actualReplicationDegree=" + actualReplicationDegree +
+                ", actualReplicationDegree=" + storeds.size() +
+                ", storeds=" + storeds +
                 ", path='" + path + '\'' +
                 ", contentSize=" + contentSize +
                 '}';
