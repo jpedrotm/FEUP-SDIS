@@ -121,7 +121,7 @@ public class Server implements PeerInterface {
         }
         */
 
-        if (serverID.equals("1")) {
+        /*if (serverID.equals("1")) {
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
@@ -129,7 +129,7 @@ public class Server implements PeerInterface {
             }
 
             backup("storage/amizade.jpg", "2");
-        }
+        }*/
 
         try {
             Thread.sleep(16000);

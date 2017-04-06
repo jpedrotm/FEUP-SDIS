@@ -58,7 +58,13 @@ public class BackupChannel extends Channel {
     public void restoreFileChunk(String[] headerFields, byte[] body){
         String fileID=headerFields[Message.FieldIndex.FileId];
         int chunkNo = Integer.parseInt(headerFields[Message.FieldIndex.ChunkNo]);
+
+        if (!Metadata.instance().hasFile(fileID))
+            return;
+
         String fileName = Metadata.instance().getFileName(fileID);
+
+        System.out.println("FILENAME: "+fileName);
 
         try {
             String path="storage/restored/"+fileName;
