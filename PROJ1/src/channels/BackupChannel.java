@@ -5,10 +5,7 @@ import protocols.Protocol;
 import server.Server;
 import utils.Message;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.DatagramPacket;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,10 +13,10 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 
 public class BackupChannel extends Channel {
-    private HashMap<String,Integer> filesToRead;
+    private HashMap<String,ChunkRestore> filesToRead;
     public BackupChannel(Server server, String addressStr, String portVar){
         super(server, addressStr,portVar);
-        filesToRead=new HashMap<String, Integer>();
+        filesToRead=new HashMap<>();
     }
 
     @Override
@@ -72,19 +69,22 @@ public class BackupChannel extends Channel {
 
             if(chunkNo==0){
                 Files.createDirectories(pathToFile.getParent());
-                filesToRead.put(fileID,0);
+                filesToRead.put(fileID,new ChunkRestore());
             }
 
             if(filesToRead.containsKey(fileID)){
-                if(filesToRead.get(fileID)==chunkNo){
+                if(filesToRead.get(fileID).getCurrentChunkNo()==chunkNo){
                     FileOutputStream fos = new FileOutputStream (new File(path),true);
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     baos.write(body);
                     baos.writeTo(fos);
+                    filesToRead.get(fileID).verifyIfHasNextChunks(baos,fos);
                     baos.close();
                     fos.close();
-
                     this.updateFilesToRead(fileID,chunkNo);
+                }
+                else{
+                    filesToRead.get(fileID).addChunk(chunkNo,body);
                 }
             }
 
@@ -92,6 +92,53 @@ public class BackupChannel extends Channel {
             e.printStackTrace();
         }
 
+
+    }
+
+    private class ChunkRestore{
+
+        private HashMap<Integer,byte[]> chunkBody;
+        private int currentChunkNo;
+
+        public ChunkRestore(){
+            chunkBody=new HashMap<>();
+            currentChunkNo=0;
+        }
+
+        public void addChunk(int chunkNo,byte[] body){
+            chunkBody.put(chunkNo,body);
+        }
+
+        public void deleteChunk(int chunkNo){
+            chunkBody.remove(chunkNo);
+        }
+
+        public void updateChunkNo(){
+            this.currentChunkNo++;
+        }
+
+        public int getCurrentChunkNo(){
+            return currentChunkNo;
+        }
+
+        public void verifyIfHasNextChunks(ByteArrayOutputStream baos,FileOutputStream fos){
+
+            while(true){
+                if(chunkBody.containsKey(currentChunkNo)){
+                    updateChunkNo();
+                    try {
+                        baos.write(chunkBody.get(currentChunkNo));
+                        baos.writeTo(fos);
+                        deleteChunk(currentChunkNo);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else{
+                    break;
+                }
+            }
+        }
 
     }
 
@@ -105,9 +152,7 @@ public class BackupChannel extends Channel {
             System.out.println("Apaguei file: "+fileId+"->"+filesToRead.size());
         }
         else{
-            int actualChunkNo=filesToRead.get(fileId);
-            actualChunkNo++;
-            filesToRead.replace(fileId,actualChunkNo);
+            filesToRead.get(fileId).updateChunkNo();
         }
 
     }
