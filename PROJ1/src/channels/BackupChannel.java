@@ -84,7 +84,9 @@ public class BackupChannel extends Channel {
                     this.updateFilesToRead(fileID,chunkNo);
                 }
                 else{
-                    filesToRead.get(fileID).addChunk(chunkNo,body);
+                    if(chunkNo>filesToRead.get(fileID).getCurrentChunkNo()){
+                        filesToRead.get(fileID).addChunk(chunkNo,body);
+                    }
                 }
             }
 

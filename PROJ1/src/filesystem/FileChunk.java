@@ -43,6 +43,10 @@ public class FileChunk {
         return chunks.size();
     }
 
+    public String getFileId(){
+        return id;
+    }
+
     @Override
     public String toString() {
         return chunks.toString();

@@ -1,7 +1,10 @@
 package filesystem;
 
+import channels.ControlChannel;
+import protocols.Reclaim;
 import utils.FileChunkPair;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -29,8 +32,6 @@ public class FileManager {
         files = new HashMap<>();
     }
 
-
-
     public void addFile(String fileId, FileChunk file) {
         files.put(fileId, file);
     }
@@ -53,7 +54,7 @@ public class FileManager {
         return getStoredSize() + newContentSize <= maxContentSize;
     }
 
-    public ArrayList<FileChunkPair> getChunksOrdered(int newContentSize) {
+    public ArrayList<FileChunkPair> getChunksOrdered() {
         ArrayList<FileChunkPair> pairs = new ArrayList<>();
 
         Iterator it = files.entrySet().iterator();
@@ -71,6 +72,28 @@ public class FileManager {
                                     1 : a.chunk.getActualReplicationDegree() - a.chunk.getReplicationDegree() == b.chunk.getActualReplicationDegree() - b.chunk.getReplicationDegree() ?
                                     0 : -1);
         return pairs;
+    }
+
+    public void updateLimitContentSize(int newMaxContentSize, ControlChannel mc,String serverID){
+
+
+
+        if(newMaxContentSize>this.maxContentSize){
+            this.maxContentSize=newMaxContentSize;
+        }
+        else{
+            ArrayList<FileChunkPair> chunksPair=getChunksOrdered();
+
+            int i=0;
+            while(getStoredSize()>newMaxContentSize){
+                String chunkNo=Integer.toString(chunksPair.get(i).chunk.getNumber());
+                String fileId=chunksPair.get(i).file.getFileId();
+                deleteChunk(chunksPair.get(i));
+                Reclaim.sendRemoved(mc,"1.0",serverID,fileId,chunkNo);
+                i++;
+            }
+            this.maxContentSize=newMaxContentSize;
+        }
     }
 
     public boolean deleteChunk(FileChunkPair pair) {

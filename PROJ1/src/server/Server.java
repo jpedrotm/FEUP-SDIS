@@ -212,7 +212,13 @@ public class Server implements PeerInterface {
         }
     }
 
-    public String state(String path){
+    public void reclaim(String space){
+        int newMaxContentSize=Integer.parseInt(space)*1000; //porque o tamanho é dado e Kb
+        System.out.println("new content size: "+newMaxContentSize);
+        FileManager.instance().updateLimitContentSize(newMaxContentSize,mc,serverID);
+    }
+
+    public String state(){
 
         String stateInfo="Informação da metadata: \n"+Metadata.instance().toString()+"\nInformação do FileManager: \n"+ FileManager.instance().toString();
 
