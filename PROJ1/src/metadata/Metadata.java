@@ -110,6 +110,10 @@ public class Metadata implements Serializable {
         return metadataInfo;
     }
 
+    public static void load(Metadata metadata) {
+        instance = metadata;
+    }
+
     /*** Helper classes ***/
     public enum InfoRequest {
         FILEPATH, HASH

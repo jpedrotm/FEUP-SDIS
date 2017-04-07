@@ -6,9 +6,10 @@ import utils.FileChunkPair;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.*;
 
-public class FileManager {
+public class FileManager implements Serializable {
     private HashMap<String, FileChunk> files;
     private int maxContentSize = 64000 * 100;
 
@@ -128,5 +129,9 @@ public class FileManager {
                 ", free space=" + (maxContentSize-getStoredSize()) +
                 ", space used= "+getStoredSize()+
                 '}';
+    }
+
+    public static void load(FileManager fileManager) {
+        instance = fileManager;
     }
 }

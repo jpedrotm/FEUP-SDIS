@@ -6,13 +6,14 @@ import utils.Message;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashSet;
 
-public class Chunk {
+public class Chunk  implements Serializable {
     private int number;
     private int replicationDegree;
     private HashSet<String> storeds;

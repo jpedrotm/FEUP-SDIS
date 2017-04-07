@@ -1,9 +1,10 @@
 package metadata;
 
 
+import java.io.Serializable;
 import java.util.HashSet;
 
-public class ChunkMetadata {
+public class ChunkMetadata implements Serializable {
     private int chunkNo;
     private int repDegree;
     private HashSet<String> storeds;
