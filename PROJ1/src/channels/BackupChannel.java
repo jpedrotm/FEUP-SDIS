@@ -13,11 +13,13 @@ import java.net.DatagramPacket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 
 public class BackupChannel extends Channel {
-
+    private HashMap<String,Integer> filesToRead;
     public BackupChannel(Server server, String addressStr, String portVar){
         super(server, addressStr,portVar);
+        filesToRead=new HashMap<String, Integer>();
     }
 
     @Override
@@ -64,27 +66,49 @@ public class BackupChannel extends Channel {
 
         String fileName = Metadata.instance().getFileName(fileID);
 
-        System.out.println("FILENAME: "+fileName);
-
         try {
             String path="storage/restored/"+fileName;
             Path pathToFile= Paths.get(path);
 
             if(chunkNo==0){
                 Files.createDirectories(pathToFile.getParent());
+                filesToRead.put(fileID,0);
             }
 
-            FileOutputStream fos = new FileOutputStream (new File(path),true);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            baos.write(body);
-            baos.writeTo(fos);
-            baos.close();
-            fos.close();
+            if(filesToRead.containsKey(fileID)){
+                if(filesToRead.get(fileID)==chunkNo){
+                    FileOutputStream fos = new FileOutputStream (new File(path),true);
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    baos.write(body);
+                    baos.writeTo(fos);
+                    baos.close();
+                    fos.close();
+
+                    this.updateFilesToRead(fileID,chunkNo);
+                }
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+
+    }
+
+    private void updateFilesToRead(String fileId,int chunkNo){
+
+        System.out.println("RECEIVED CHUNK No: "+chunkNo);
+
+        int numChunks=Metadata.instance().getFileNumChunks(fileId, Metadata.InfoRequest.HASH);
+        if(chunkNo == (numChunks-1)){
+            filesToRead.remove(fileId);
+            System.out.println("Apaguei file: "+fileId+"->"+filesToRead.size());
+        }
+        else{
+            int actualChunkNo=filesToRead.get(fileId);
+            actualChunkNo++;
+            filesToRead.replace(fileId,actualChunkNo);
+        }
 
     }
 

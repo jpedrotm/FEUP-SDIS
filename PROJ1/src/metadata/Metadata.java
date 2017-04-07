@@ -46,13 +46,20 @@ public class Metadata implements Serializable {
         return fileName;
     }
 
-    public int getFileNumChunks(String path){
-        return fileInfoHashMap.get(path).getNumChunks();
+    public int getFileNumChunks(String path,InfoRequest infoRequest){
+        switch(infoRequest){
+            case FILEPATH:
+                return fileInfoHashMap.get(path).getNumChunks();
+            case HASH:
+                return fileInfoHashMap.get(hashMap.get(path)).getNumChunks();
+            default:
+                return -1;
+        }
     }
 
     public boolean contains(InfoRequest infoRequest, String key) {
         switch (infoRequest) {
-            case FILENAME:
+            case FILEPATH:
                 return fileInfoHashMap.containsKey(key);
             case HASH:
                 return hashMap.containsKey(key);
@@ -105,6 +112,6 @@ public class Metadata implements Serializable {
 
     /*** Helper classes ***/
     public enum InfoRequest {
-        FILENAME, HASH
+        FILEPATH, HASH
     }
 }

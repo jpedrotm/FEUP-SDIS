@@ -13,7 +13,7 @@ public class Delete {
         //Protocol.FileInfo fi = Protocol.generateFileInfo(path);
         //String hashFileId = Message.buildHash(fi.fileId);
 
-        if (Metadata.instance().contains(Metadata.InfoRequest.FILENAME, path)) {
+        if (Metadata.instance().contains(Metadata.InfoRequest.FILEPATH, path)) {
             String hashFileId = Metadata.instance().getHashFileId(path);
             Metadata.instance().deleteMetadata(path, hashFileId);
             String header = Message.buildHeader(Protocol.MessageType.Delete, version, senderId, hashFileId);
