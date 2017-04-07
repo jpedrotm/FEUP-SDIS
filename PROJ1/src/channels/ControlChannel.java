@@ -14,6 +14,8 @@ import utils.Tuplo3;
 
 import java.io.*;
 import java.net.DatagramPacket;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 public class ControlChannel extends Channel {
 
@@ -58,7 +60,7 @@ public class ControlChannel extends Channel {
                     removed(headerFields);
                     break;
                 case "GETCHUNK":
-                    restore(headerFields); //envia para o mdr a CHUNK message
+                    restore(headerFields, packet); //envia para o mdr a CHUNK message
                     break;
             }
 
@@ -130,7 +132,7 @@ public class ControlChannel extends Channel {
         }
     }
 
-    private void restore(String[] headerFields){
+    private void restore(String[] headerFields, DatagramPacket packet){
 
         try {
             Thread.sleep(GoodGuy.sleepTime(0,400));
@@ -146,7 +148,7 @@ public class ControlChannel extends Channel {
             String header=Message.buildHeader(Protocol.MessageType.Chunk,version,server.getServerID(),fileID,chunkNo);
 
             try {
-                byte[] body=FileManager.instance().getFile(fileID).getChunk(Integer.parseInt(chunkNo)).getContent(Message.MAX_CHUNK_SIZE - header.length() - 5);//new byte[Message.MAX_CHUNK_SIZE];
+                byte[] body = FileManager.instance().getFile(fileID).getChunk(Integer.parseInt(chunkNo)).getContent(Message.MAX_CHUNK_SIZE - header.length() - 5);//new byte[Message.MAX_CHUNK_SIZE];
                 Message msg = null;
                 try {
                     msg = new Message(header, body);
@@ -154,11 +156,7 @@ public class ControlChannel extends Channel {
                     e.printStackTrace();
                 }
 
-                try{
-                    server.getBackupChannel().send(msg); //precisei de criar o get para aceder ao mdr
-                } catch(IOException e){
-                    e.printStackTrace();
-                }
+                server.getBackupChannel().sendChunk(msg, packet);
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -166,5 +164,4 @@ public class ControlChannel extends Channel {
         }
 
     }
-
 }

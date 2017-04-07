@@ -44,7 +44,17 @@ abstract class Channel implements Runnable {
         return socket;
     }
 
+    public InetAddress getAddress() {
+        return address;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
     public void shutdown() {
         shutdown = true;
     }
+
+
 }

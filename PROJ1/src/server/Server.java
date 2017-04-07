@@ -54,7 +54,7 @@ public class Server implements PeerInterface {
 
         this.mc = new ControlChannel(this, commands[1], commands[2]);
         this.mdb = new DataChannel(this, commands[3], commands[4]);
-        this.mdr=new BackupChannel(this,commands[5],commands[6]);
+        this.mdr = new BackupChannel(this,commands[5],commands[6]);
 
         Runtime.getRuntime().addShutdownHook(new Thread()
         {
@@ -121,7 +121,7 @@ public class Server implements PeerInterface {
         }
         */
 
-        /*if (serverID.equals("1")) {
+        if (serverID.equals("1")) {
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
@@ -129,15 +129,24 @@ public class Server implements PeerInterface {
             }
 
             backup("storage/amizade.jpg", "2");
-        }*/
 
-        try {
-            Thread.sleep(16000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            try {
+                Thread.sleep(16000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            System.out.println(FileManager.instance());
+            System.out.println(Metadata.instance());
+
+            restore("storage/amizade.jpg");
+
+            try {
+                Thread.sleep(16000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-        System.out.println(FileManager.instance());
-        System.out.println(Metadata.instance());
     }
 
     public String getServerID() {
@@ -205,7 +214,7 @@ public class Server implements PeerInterface {
 
     public void restore(String path){
         try {
-            Restore.receiveFileChunks(mc, path,"1.0",serverID);
+            Restore.receiveFileChunks(mc, mdr, path,"1.0",serverID);
         } catch (IOException e) {
             e.printStackTrace();
         }

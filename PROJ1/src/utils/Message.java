@@ -2,6 +2,7 @@ package utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.nio.charset.StandardCharsets;
@@ -10,7 +11,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 
-public class Message {
+public class Message implements Serializable {
     public static final int MAX_CHUNK_SIZE = 65507;
 
     private byte[] message;

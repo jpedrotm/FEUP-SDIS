@@ -3,13 +3,12 @@ package channels;
 import metadata.Metadata;
 import protocols.Protocol;
 import server.Server;
+import utils.GoodGuy;
 import utils.Message;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.DatagramPacket;
+import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -48,7 +47,7 @@ public class BackupChannel extends Channel {
 
             switch(headerFields[Message.FieldIndex.MessageType]) {
                 case Protocol.MessageType.Chunk:
-                    restoreFileChunk(headerFields,body);
+                    restoreFileChunk(headerFields, body);
                     break;
             }
         }
@@ -56,7 +55,7 @@ public class BackupChannel extends Channel {
     }
 
     public void restoreFileChunk(String[] headerFields, byte[] body){
-        String fileID=headerFields[Message.FieldIndex.FileId];
+        String fileID = headerFields[Message.FieldIndex.FileId];
         int chunkNo = Integer.parseInt(headerFields[Message.FieldIndex.ChunkNo]);
 
         if (!Metadata.instance().hasFile(fileID))
@@ -88,4 +87,18 @@ public class BackupChannel extends Channel {
 
     }
 
+    public void sendChunk(Message msg, DatagramPacket packet) {
+        Socket replySocket = null;
+        try {
+            replySocket = new Socket(packet.getAddress(), port);
+            ObjectOutputStream oos = new ObjectOutputStream(replySocket.getOutputStream());
+            oos.writeObject(msg);
+        } catch (IOException e) {}
+        finally {
+            if (replySocket != null)
+                try {
+                    replySocket.close();
+                } catch (IOException e) {}
+        }
+    }
 }
