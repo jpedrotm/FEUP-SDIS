@@ -138,6 +138,11 @@ public class DataChannel extends Channel {
     public void send(Message msg) throws IOException {
         super.send(msg);
 
+        String[] headerFields = msg.getHeaderFields();
+        String fileId = headerFields[FieldIndex.FileId];
+        String chunkNumber = headerFields[FieldIndex.ChunkNo];
+        Metadata.instance().startChunkTransaction(fileId, chunkNumber);
+
         Limiter limiter = new Limiter(5);
         startTimer(msg, limiter);
     }
@@ -152,6 +157,7 @@ public class DataChannel extends Channel {
             @Override
             public void run() {
                 if (limiter.limitReached() || Metadata.instance().chunkDegreeSatisfied(fileId, chunkNumber)) {
+                    Metadata.instance().stopChunkTransaction(fileId, chunkNumber);
                     this.cancel();
                     return;
                 }

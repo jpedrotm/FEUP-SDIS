@@ -4,6 +4,7 @@ import channels.BackupChannel;
 import channels.ControlChannel;
 import channels.DataChannel;
 import filesystem.FileManager;
+import metadata.FileMetadata;
 import metadata.Metadata;
 import protocols.Backup;
 import protocols.Delete;
@@ -19,6 +20,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -56,6 +58,8 @@ public class Server implements PeerInterface {
         this.mc = new ControlChannel(this, commands[1], commands[2]);
         this.mdb = new DataChannel(this, commands[3], commands[4]);
         this.mdr = new BackupChannel(this,commands[5],commands[6]);
+
+        handleTransactions();
 
         Runtime.getRuntime().addShutdownHook(new Thread()
         {
@@ -128,7 +132,7 @@ public class Server implements PeerInterface {
         */
 
 
-
+        /*
         if (serverID.equals("1")) {
             try {
                 Thread.sleep(4000);
@@ -138,23 +142,32 @@ public class Server implements PeerInterface {
 
             backup("amizade.jpg", "2");
 
-            try {
-                Thread.sleep(4000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            restore("amizade.jpg");
         }
 
         try {
-            Thread.sleep(16000);
+            Thread.sleep(8000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        */
+
 
 
         System.out.println(FileManager.instance());
         System.out.println(Metadata.instance());
+    }
+
+    private void handleTransactions() {
+        HashMap<String, FileMetadata> fms = Metadata.instance().getFileInfoHashMap();
+        for (FileMetadata fileMetadata : fms.values()) {
+            if (fileMetadata.isOnTransaction()) {
+                try {
+                    Backup.sendFileChunks(mdb, fileMetadata.getPath(), "1.0", serverID, Integer.toString(fileMetadata.getRepDegree()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     public String getServerID() {

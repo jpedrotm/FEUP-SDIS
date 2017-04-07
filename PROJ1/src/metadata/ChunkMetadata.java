@@ -8,16 +8,30 @@ public class ChunkMetadata implements Serializable {
     private int chunkNo;
     private int repDegree;
     private HashSet<String> storeds;
+    boolean onTransaction;
 
     public ChunkMetadata(int chunkNo, int repDegree) {
         this.chunkNo = chunkNo;
         this.repDegree = repDegree;
         this.storeds = new HashSet<>();
+        onTransaction = false;
     }
 
     public synchronized void addReplication(String serverID) {
         if (!storeds.contains(serverID))
             storeds.add(serverID);
+    }
+
+    public boolean isOnTransaction() {
+        return onTransaction;
+    }
+
+    public void startTransaction() {
+        onTransaction = true;
+    }
+
+    public void stopTransaction() {
+        onTransaction = false;
     }
 
     public int getChunkNo() {
@@ -34,6 +48,6 @@ public class ChunkMetadata implements Serializable {
 
     @Override
     public String toString() {
-        return "Chunk: nº"+chunkNo+" , perceivedRepDegree: "+storeds.size();
+        return "Chunk: ontransaction=" + onTransaction + "   nº"+chunkNo+" , perceivedRepDegree: "+storeds.size();
     }
 }

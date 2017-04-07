@@ -31,8 +31,9 @@ public class Metadata implements Serializable {
     }
 
     public void addMetadata(String filename, String extension, String path, String hash,int repDegree) {
-        fileInfoHashMap.put(path, new FileMetadata(filename, extension, path, hash,repDegree));
-        hashMap.put(hash,path);
+        FileMetadata fileMetadata = new FileMetadata(filename, extension, path, hash,repDegree);
+        fileInfoHashMap.put(path, fileMetadata);
+        hashMap.put(hash, path);
     }
 
     public void deleteMetadata(String path, String hash) {
@@ -40,9 +41,8 @@ public class Metadata implements Serializable {
         hashMap.remove(hash);
     }
 
-    public String getFileName(String key){
-
-        String fileName=fileInfoHashMap.get(hashMap.get(key)).getFilename();
+    public String getFileName(String key) {
+        String fileName = fileInfoHashMap.get(hashMap.get(key)).getFilename();
         return fileName;
     }
 
@@ -55,6 +55,10 @@ public class Metadata implements Serializable {
             default:
                 return -1;
         }
+    }
+
+    public HashMap<String, FileMetadata> getFileInfoHashMap() {
+        return fileInfoHashMap;
     }
 
     public boolean contains(InfoRequest infoRequest, String key) {
@@ -105,13 +109,25 @@ public class Metadata implements Serializable {
             metadataInfo+=info.get(i).toString();
         }
 
-
-
         return metadataInfo;
     }
 
     public static void load(Metadata metadata) {
         instance = metadata;
+    }
+
+    public void startChunkTransaction(String fileId, String chunkNumber) {
+        String filename = this.hashMap.get(fileId);
+        FileMetadata fileMetadata = this.fileInfoHashMap.get(filename);
+        ChunkMetadata chunkMetadata = fileMetadata.getChunk(chunkNumber);
+        chunkMetadata.startTransaction();
+    }
+
+    public void stopChunkTransaction(String fileId, String chunkNumber) {
+        String filename = this.hashMap.get(fileId);
+        FileMetadata fileMetadata = this.fileInfoHashMap.get(filename);
+        ChunkMetadata chunkMetadata = fileMetadata.getChunk(chunkNumber);
+        chunkMetadata.stopTransaction();
     }
 
     /*** Helper classes ***/

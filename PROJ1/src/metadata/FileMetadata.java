@@ -20,6 +20,16 @@ public class FileMetadata implements Serializable {
         chunksMetadata = new HashMap<>();
     }
 
+
+    public boolean isOnTransaction() {
+        for (ChunkMetadata chunkMetadata : chunksMetadata.values()) {
+            if (chunkMetadata.isOnTransaction()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public String getFilename() {
         return filename;
     }
@@ -36,9 +46,25 @@ public class FileMetadata implements Serializable {
         return repDegree;
     }
 
+    public String getPath() {
+        return path;
+    }
+
+    public HashMap<Integer, ChunkMetadata> getChunksMetadata() {
+        return chunksMetadata;
+    }
+
+    public String getHashFileId() {
+        return hashFileId;
+    }
+
+    public ChunkMetadata getChunk(String chunkNo) {
+        return chunksMetadata.get(Integer.parseInt(chunkNo));
+    }
+
     @Override
     public String toString() {
-        return "FileMetadata{" +
+        return "FileMetadata{ ontransaction= " + isOnTransaction() +
                 "path='" + path + '\'' +
                 ", hashFileId='" + hashFileId + '\'' +
                 ", replicationDegree=" + repDegree + "\'\n"+
@@ -46,16 +72,8 @@ public class FileMetadata implements Serializable {
                 "}\n";
     }
 
-    public String getHashFileId() {
-        return hashFileId;
-    }
-
     public void addChunk(ChunkMetadata chunkMetadata) {
         chunksMetadata.put(chunkMetadata.getChunkNo(), chunkMetadata);
-    }
-
-    public ChunkMetadata getChunk(String chunkNo) {
-        return chunksMetadata.get(Integer.parseInt(chunkNo));
     }
 
     public void updateChunk(int chunkNo, String serverID) {
