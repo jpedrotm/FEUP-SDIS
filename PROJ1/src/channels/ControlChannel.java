@@ -79,6 +79,7 @@ public class ControlChannel extends Channel {
                 Chunk chunk=FileManager.instance().getFile(fileID).getChunk(chunkNo);
                 chunk.subReplication(senderID);
                 if(chunk.isReplicationDegreeDown()){
+                    //falta testar esta parte agora
                     server.newRemovedTuple(new Tuplo3(fileID,chunkNo));
                     try {
                         Thread.sleep(GoodGuy.sleepTime(0,400));

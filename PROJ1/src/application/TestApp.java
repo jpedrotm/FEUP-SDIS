@@ -85,6 +85,11 @@ public class TestApp {
                 case CommandType.Restore:
                     stub.restore(filePath);
                     break;
+                case CommandType.Reclaim:
+                    stub.reclaim(filePath); //filePath neste caso é o espaço novo a ser indicado ao peer
+                    break;
+                case CommandType.State:
+                    System.out.println(stub.state());
                 default:
                     break;
             }
@@ -99,6 +104,7 @@ public class TestApp {
         public static final String Backup="BACKUP";
         public static final String Delete="DELETE";
         public static final String Restore="RESTORE";
+        public static final String Reclaim="RECLAIM";
         public static final String State="STATE";
     }
 }

@@ -73,7 +73,10 @@ public class DataChannel extends Channel {
         int replicationDegree = Integer.parseInt(headerFields[FieldIndex.ReplicationDeg]);
         String version=headerFields[FieldIndex.Version];
 
-        server.updateRemovedTuple(fileID,chunkNo); //verificação que atualiza o removedTuple que indica em caso de um comando removed ser utilizado
+        server.updateRemovedTuple(fileID,chunkNo);
+
+        if (!FileManager.instance().canStore(body.length))
+            return;
 
         if (!FileManager.instance().canStore(body.length))
             return;

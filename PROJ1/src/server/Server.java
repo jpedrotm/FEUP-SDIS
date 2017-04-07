@@ -11,9 +11,7 @@ import protocols.Restore;
 import utils.GoodGuy;
 import utils.Tuplo3;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -52,6 +50,9 @@ public class Server implements PeerInterface {
         this.serverID = commands[0]; //temporario só para testar o RMI
         this.removedTuple = null;
 
+        loadMetadata();
+        loadFileManager();
+
         this.mc = new ControlChannel(this, commands[1], commands[2]);
         this.mdb = new DataChannel(this, commands[3], commands[4]);
         this.mdr = new BackupChannel(this,commands[5],commands[6]);
@@ -61,11 +62,8 @@ public class Server implements PeerInterface {
             @Override
             public void run()
             {
-                mc.getSocket().close();
                 mc.shutdown();
-                mdb.getSocket().close();
                 mdb.shutdown();
-                mdr.getSocket().close();
                 mdr.shutdown();
                 controlThread.interrupt();
                 dataThread.interrupt();
@@ -73,8 +71,16 @@ public class Server implements PeerInterface {
 
                 try {
                     saveMetadata();
+                    System.out.println("Metadata stored!");
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    System.err.println("Error storing metadata... Please check for inconsistencies.");
+                }
+
+                try {
+                    saveFileManager();
+                    System.out.println("FileManager stored!");
+                } catch (IOException e) {
+                    System.err.println("Error storing file manager... Please check for inconsistencies.");
                 }
             }
         });
@@ -121,32 +127,34 @@ public class Server implements PeerInterface {
         }
         */
 
+
+
         if (serverID.equals("1")) {
             try {
-                Thread.sleep(10000);
+                Thread.sleep(4000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
-            backup("storage/amizade.jpg", "2");
+            backup("amizade.jpg", "2");
 
             try {
-                Thread.sleep(16000);
+                Thread.sleep(4000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
-            System.out.println(FileManager.instance());
-            System.out.println(Metadata.instance());
-
-            restore("storage/amizade.jpg");
-
-            try {
-                Thread.sleep(16000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            restore("amizade.jpg");
         }
+
+        try {
+            Thread.sleep(16000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+        System.out.println(FileManager.instance());
+        System.out.println(Metadata.instance());
     }
 
     public String getServerID() {
@@ -199,7 +207,7 @@ public class Server implements PeerInterface {
         try {
             Backup.sendFileChunks(mdb, path,"1.0", serverID, replicationDeg);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("File not found.");
         }
     }
 
@@ -208,18 +216,50 @@ public class Server implements PeerInterface {
         try {
             Delete.DeleteFile(mc, path, "1.0", serverID);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("File not found.");
         }
     }
 
-    public void restore(String path){
+    public void restore(String path) {
         try {
             Restore.receiveFileChunks(mc, mdr, path,"1.0",serverID);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Error restoring chunks.");
         }
     }
 
+    public void reclaim(String space){
+        int newMaxContentSize=Integer.parseInt(space)*1000; //porque o tamanho é dado e Kb
+        System.out.println("new content size: "+newMaxContentSize);
+        FileManager.instance().updateLimitContentSize(newMaxContentSize,mc,serverID);
+    }
+
+    public String state(){
+
+
+        String stateInfo = "Informação da metadata: \n" + Metadata.instance().toString() + "\nInformação do FileManager: \n" + FileManager.instance().toString();
+        return stateInfo;
+    }
+
+
+    private void saveFileManager() throws IOException {
+        String savePath = "storage/filemanager/" + serverID;
+        Path pathToFile = Paths.get(savePath);
+        Files.createDirectories(pathToFile.getParent());
+
+        FileOutputStream fout = new FileOutputStream(savePath);
+        ObjectOutputStream oos = new ObjectOutputStream(fout);
+        oos.writeObject(FileManager.instance());
+    }
+
+    private void loadFileManager() {
+        String loadPath = "storage/filemanager/" + serverID;
+        try {
+            FileInputStream stream = new FileInputStream(loadPath);
+            ObjectInputStream ois = new ObjectInputStream(stream);
+            FileManager.load((FileManager) ois.readObject());
+        } catch (Exception e) {}
+    }
 
     private void saveMetadata() throws IOException {
         String savePath = "storage/metadata/" + serverID;
@@ -229,5 +269,14 @@ public class Server implements PeerInterface {
         FileOutputStream fout = new FileOutputStream(savePath);
         ObjectOutputStream oos = new ObjectOutputStream(fout);
         oos.writeObject(Metadata.instance());
+    }
+
+    private void loadMetadata() {
+        String loadPath = "storage/metadata/" + serverID;
+        try {
+            FileInputStream stream = new FileInputStream(loadPath);
+            ObjectInputStream ois = new ObjectInputStream(stream);
+            Metadata.load((Metadata) ois.readObject());
+        } catch (Exception e) {}
     }
 }

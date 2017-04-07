@@ -63,8 +63,6 @@ public class BackupChannel extends Channel {
 
         String fileName = Metadata.instance().getFileName(fileID);
 
-        System.out.println("FILENAME: "+fileName);
-
         try {
             String path="storage/restored/"+fileName;
             Path pathToFile= Paths.get(path);
@@ -73,12 +71,12 @@ public class BackupChannel extends Channel {
                 Files.createDirectories(pathToFile.getParent());
             }
 
-            FileOutputStream fos = new FileOutputStream (new File(path),true);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            baos.write(body);
-            baos.writeTo(fos);
-            baos.close();
-            fos.close();
+                    FileOutputStream fos = new FileOutputStream (new File(path),true);
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    baos.write(body);
+                    baos.writeTo(fos);
+                    baos.close();
+                    fos.close();
 
         } catch (IOException e) {
             e.printStackTrace();

@@ -16,7 +16,7 @@ public class Restore extends Protocol {
 
     public static void receiveFileChunks(ControlChannel mc, BackupChannel mdr, String path, String version, String senderID) throws IOException {
         boolean repeatedChunk = false;
-        int numChunks = Metadata.instance().getFileNumChunks(path);
+        int numChunks = Metadata.instance().getFileNumChunks(path, Metadata.InfoRequest.FILEPATH);
         String hashFileId = Metadata.instance().getHashFileId(path);
 
         ServerSocket ss = new ServerSocket(mdr.getPort(), 1);

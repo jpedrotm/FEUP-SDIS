@@ -2,6 +2,7 @@ package metadata;
 
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Metadata implements Serializable {
@@ -29,8 +30,8 @@ public class Metadata implements Serializable {
         hashMap = new HashMap<>();
     }
 
-    public void addMetadata(String filename, String extension, String path, String hash) {
-        fileInfoHashMap.put(path, new FileMetadata(filename, extension, path, hash));
+    public void addMetadata(String filename, String extension, String path, String hash,int repDegree) {
+        fileInfoHashMap.put(path, new FileMetadata(filename, extension, path, hash,repDegree));
         hashMap.put(hash,path);
     }
 
@@ -45,13 +46,20 @@ public class Metadata implements Serializable {
         return fileName;
     }
 
-    public int getFileNumChunks(String path){
-        return fileInfoHashMap.get(path).getNumChunks();
+    public int getFileNumChunks(String path, InfoRequest infoRequest){
+        switch(infoRequest){
+            case FILEPATH:
+                return fileInfoHashMap.get(path).getNumChunks();
+            case HASH:
+                return fileInfoHashMap.get(hashMap.get(path)).getNumChunks();
+            default:
+                return -1;
+        }
     }
 
     public boolean contains(InfoRequest infoRequest, String key) {
         switch (infoRequest) {
-            case FILENAME:
+            case FILEPATH:
                 return fileInfoHashMap.containsKey(key);
             case HASH:
                 return hashMap.containsKey(key);
@@ -89,14 +97,25 @@ public class Metadata implements Serializable {
 
     @Override
     public String toString() {
-        return "Metadata{" +
-                "hashSet=" + hashMap +
-                ", map=" + fileInfoHashMap +
-                '}';
+
+        String metadataInfo="";
+        ArrayList<FileMetadata> info=new ArrayList<>(fileInfoHashMap.values());
+        for(int i=0;i<info.size();i++)
+        {
+            metadataInfo+=info.get(i).toString();
+        }
+
+
+
+        return metadataInfo;
+    }
+
+    public static void load(Metadata metadata) {
+        instance = metadata;
     }
 
     /*** Helper classes ***/
     public enum InfoRequest {
-        FILENAME, HASH
+        FILEPATH, HASH
     }
 }

@@ -1,9 +1,10 @@
 package metadata;
 
 
+import java.io.Serializable;
 import java.util.HashSet;
 
-public class ChunkMetadata {
+public class ChunkMetadata implements Serializable {
     private int chunkNo;
     private int repDegree;
     private HashSet<String> storeds;
@@ -33,11 +34,6 @@ public class ChunkMetadata {
 
     @Override
     public String toString() {
-        return "ChunkMetadata{" +
-                "chunkNo=" + chunkNo +
-                ", repDegree=" + repDegree +
-                ", actualRepDegree=" + storeds.size() +
-                ", storeds=" + storeds +
-                '}';
+        return "Chunk: nº"+chunkNo+" , perceivedRepDegree: "+storeds.size();
     }
 }
