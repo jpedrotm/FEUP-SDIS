@@ -7,11 +7,8 @@ import metadata.FileMetadata;
 import metadata.Metadata;
 import protocols.Protocol;
 import server.Server;
-import utils.GoodGuy;
-import utils.Limiter;
-import utils.Message;
+import utils.*;
 import utils.Message.FieldIndex;
-import utils.Tuplo3;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -92,15 +89,19 @@ public class ControlChannel extends Channel {
                 if(chunk.isReplicationDegreeDown()){
                     System.out.println("Verificou que está a baixo"); //falta testar esta parte agora
                     server.newRemovedTuple(new Tuplo3(fileID,chunkNo));
+                    GoodGuy.sleepRandomTime(0, 400);
+
+                    FileManager.instance().startChunkTransaction(fileID, chunkNo);
+                    System.out.println("Comecei transacao");
                     try {
-                        Thread.sleep(GoodGuy.sleepTime(0,400));
+                        Thread.sleep(5000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
 
                     if(!server.getRemovedTuple().receivedPutChunk()) {
                         System.out.println("Não recebeu PutChunk");
-                        server.resetRemovedTuple(); //tenho de fazer logo reset caso contrário envia o putchunk e ignora-o também (não tenho a certeza que o reserRemovedTuple() que tem em baxo chega)
+                        server.resetRemovedTuple();
                         String header = Message.buildHeader(Protocol.MessageType.Putchunk, version, server.getServerID(), fileID, Integer.toString(chunkNo), Integer.toString(chunk.getReplicationDegree()));
                         try {
                             byte[] body = FileManager.instance().getFile(fileID).getChunk(chunkNo).getContent(Message.MAX_CHUNK_SIZE - header.length() - 5);
@@ -148,7 +149,7 @@ public class ControlChannel extends Channel {
     private void restore(String[] headerFields, DatagramPacket packet){
 
         try {
-            Thread.sleep(GoodGuy.sleepTime(0,400));
+            Thread.sleep(GoodGuy.randomBetween(0,400));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -183,20 +184,17 @@ public class ControlChannel extends Channel {
         String fileID=headerFields[FieldIndex.FileId];
 
         if(Metadata.instance().hasFile(fileID)){
-            String header=Message.buildHeader(Protocol.MessageType.Lease,version,server.getServerID(),fileID,"10");
+            String header = Message.buildHeader(Protocol.MessageType.Lease, version, server.getServerID(), fileID, Long.toString(GoodGuy.randomBetween(10, 20)));
             try {
                 Message msg = new Message(header);
                 server.getControlChannel().sendLease(msg, packet);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            } catch (IOException e) {}
         }
     }
 
     private void sendLease(Message msg, DatagramPacket packet) {
-        DatagramPacket sendPacket = new DatagramPacket(msg.getMessage(), msg.getMessage().length, packet.getAddress(), port);
         try {
-            socket.send(sendPacket);
+            super.send(msg);
         } catch (IOException e) {}
     }
 
@@ -216,11 +214,9 @@ public class ControlChannel extends Channel {
 
             @Override
             public void run() {
-                boolean leaseExpired = FileManager.instance().getFile(fileId).leaseExpired();
-
                 if (limiter.limitReached()) {
                     System.out.println("1");
-                    if (leaseExpired) {
+                    if (FileManager.instance().hasPendingLease(fileId)) {
                         System.out.println("2");
                         try {
                             FileManager.instance().deleteFile(fileId);
@@ -230,7 +226,7 @@ public class ControlChannel extends Channel {
                     this.cancel();
                     return;
                 }
-                else if (!leaseExpired) {
+                else if (!FileManager.instance().hasPendingLease(fileId)) {
                     this.cancel();
                     return;
                 }
@@ -249,12 +245,11 @@ public class ControlChannel extends Channel {
     }
 
     private void restartLease(String[] headerFields){
-        String fileId=headerFields[FieldIndex.FileId];
-        String leaseTime=headerFields[FieldIndex.ChunkNo];
+        String fileId = headerFields[FieldIndex.FileId];
+        String leaseTime = headerFields[FieldIndex.ChunkNo];
 
-        if(FileManager.instance().hasFile(fileId)) {
-            System.out.println("VOU DAR RESTART");
-            FileManager.instance().getFile(fileId).loadLease(Integer.parseInt(leaseTime));
+        if (FileManager.instance().hasFile(fileId) && FileManager.instance().hasPendingLease(fileId)) {
+            FileManager.instance().updatePendingLease(fileId, Integer.parseInt(leaseTime));
         }
     }
 }

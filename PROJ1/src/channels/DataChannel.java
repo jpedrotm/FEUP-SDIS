@@ -4,11 +4,8 @@ import filesystem.Chunk;
 import filesystem.FileChunk;
 import filesystem.FileManager;
 import metadata.Metadata;
-import protocols.Backup;
 import protocols.Protocol;
-import protocols.Reclaim;
 import server.Server;
-import utils.FileChunkPair;
 import utils.GoodGuy;
 import utils.Limiter;
 import utils.Message;
@@ -70,11 +67,10 @@ public class DataChannel extends Channel {
 
 
     private void putChunk(String[] headerFields, byte[] body) {
-        String senderID = headerFields[FieldIndex.SenderId];
         String fileID = headerFields[FieldIndex.FileId];
         int chunkNo = Integer.parseInt(headerFields[FieldIndex.ChunkNo]);
         int replicationDegree = Integer.parseInt(headerFields[FieldIndex.ReplicationDeg]);
-        String version=headerFields[FieldIndex.Version];
+        String version = headerFields[FieldIndex.Version];
 
         server.updateRemovedTuple(fileID,chunkNo);
 
@@ -115,13 +111,15 @@ public class DataChannel extends Channel {
                 file.addChunk(chunk);
 
                 long r;
-                Thread.sleep( (r= GoodGuy.sleepTime(0, 800)) );
+                Thread.sleep( (r= GoodGuy.randomBetween(0, 800)) );
                 System.out.println("FREE FROM SLEEP  " + r + "  " + chunkNo);
                 if (FileManager.instance().chunkDegreeSatisfied(fileID, chunkNo)) {
+                    System.out.println("deleting");
                     file.deleteChunk(chunk.getNumber());
                 }
                 else {
                     System.out.println("GONNA STORE  " + chunkNo);
+                    System.err.println(FileManager.instance());
                     server.sendStored(fileID, chunkNo);
                     chunk.addReplication(server.getServerID());
                 }
@@ -151,7 +149,7 @@ public class DataChannel extends Channel {
         super.send(msg);
 
         Limiter limiter = new Limiter(5);
-        startTimer(msg, limiter,StartTimerType.REMOVED);
+        startTimer(msg, limiter, StartTimerType.REMOVED);
     }
 
 
@@ -172,8 +170,8 @@ public class DataChannel extends Channel {
                     }
                 }
                 else if(type==StartTimerType.REMOVED){
-                    if (limiter.limitReached() || FileManager.instance().chunkDegreeSatisfied(fileId,Integer.parseInt(chunkNumber))) {
-                        Metadata.instance().stopChunkTransaction(fileId, chunkNumber);
+                    if (limiter.limitReached() || FileManager.instance().chunkDegreeSatisfied(fileId, Integer.parseInt(chunkNumber))) {
+                        FileManager.instance().stopChunkTransaction(fileId, Integer.parseInt(chunkNumber));
                         this.cancel();
                         return;
                     }

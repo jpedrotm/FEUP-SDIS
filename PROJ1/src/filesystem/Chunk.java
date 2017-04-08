@@ -19,6 +19,7 @@ public class Chunk  implements Serializable {
     private HashSet<String> storeds;
     private String path;
     private int contentSize;
+    private boolean onTransaction;
 
     public Chunk(int number, int replicationDegree, byte[] content, String path) throws IOException {
         this.number = number;
@@ -26,8 +27,22 @@ public class Chunk  implements Serializable {
         this.path = path;
         this.contentSize = content.length;
         this.storeds = new HashSet<>();
+        onTransaction = false;
 
         storeContent(content);
+        System.err.println("content stored!!");
+    }
+
+    public boolean isOnTransaction() {
+        return onTransaction;
+    }
+
+    public void startTransaction() {
+        onTransaction = true;
+    }
+
+    public void stopTransaction() {
+        onTransaction = false;
     }
 
     public int getNumber() {
@@ -90,7 +105,7 @@ public class Chunk  implements Serializable {
 
     @Override
     public String toString() {
-        return "Chunk{" +
+        return "Chunk{ ontransaction=" + onTransaction +
                 "id: "+number+" , "+
                 "size: "+contentSize+" , "+
                 "perceived repDegree: "+storeds.size()+

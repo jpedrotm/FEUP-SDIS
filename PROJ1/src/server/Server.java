@@ -63,6 +63,7 @@ public class Server implements PeerInterface, FileChunkListener {
         this.mdr = new BackupChannel(this,commands[5],commands[6]);
 
         handleTransactions();
+        reviewFileManager();
 
         Runtime.getRuntime().addShutdownHook(new Thread()
         {
@@ -91,8 +92,6 @@ public class Server implements PeerInterface, FileChunkListener {
                 }
             }
         });
-
-        reviewFileManager();
     }
 
     public void start() {
@@ -203,7 +202,7 @@ public class Server implements PeerInterface, FileChunkListener {
                         Backup.sendStoredMessage(mc, fileID, chunkNo, serverID);
                     }
                 },
-                GoodGuy.sleepTime(0, 400)
+                GoodGuy.randomBetween(0, 400)
         );
     }
 
@@ -303,6 +302,8 @@ public class Server implements PeerInterface, FileChunkListener {
 
     @Override
     public void notify(String fileId) {
+        GoodGuy.sleepRandomTime(0, 400);
+        FileManager.instance().addPendingLease(fileId);
         LeaseProto.sendGetLease(mc, "1.0", serverID, fileId);
     }
 }

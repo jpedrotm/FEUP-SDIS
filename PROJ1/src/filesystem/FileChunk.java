@@ -27,7 +27,7 @@ public class FileChunk implements Serializable, LeaseListener {
         this.chunks = new HashMap<>();
         FileManager.instance().addFile(id, this);
         this.dirPath = dirPath;
-        this.lease = new Lease(0, this);
+        this.lease = null;
         this.refreshFileChunkListener(fileChunkListener);
     }
 
@@ -70,11 +70,12 @@ public class FileChunk implements Serializable, LeaseListener {
             it.remove(); // avoids a ConcurrentModificationException
         }
 
-
+        /*
         for (Chunk chunk : chunks.values()) {
             chunk.deleteContent();
             chunks.remove(chunk.getNumber());
         }
+        */
 
         Path dir = Paths.get(dirPath);
         Files.delete(dir);
@@ -124,18 +125,14 @@ public class FileChunk implements Serializable, LeaseListener {
         this.lease.start();
     }
 
-    public void refreshFileChunkListener(FileChunkListener fileChunkListener){
+    public void refreshFileChunkListener(FileChunkListener fileChunkListener) {
         this.fileChunkListener = fileChunkListener;
-        this.lease.expire();
         this.fileChunkListener.notify(id);
     }
 
     @Override
     public void expired() {
+        lease = null;
         fileChunkListener.notify(id);
-    }
-
-    public boolean leaseExpired() {
-        return lease.isExpired();
     }
 }

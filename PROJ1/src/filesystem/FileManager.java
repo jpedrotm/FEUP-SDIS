@@ -11,6 +11,7 @@ import java.util.*;
 
 public class FileManager implements Serializable {
     private HashMap<String, FileChunk> files;
+    private HashSet<String> pendingLeases;
     private int maxContentSize = 64000 * 100;
 
 
@@ -30,16 +31,30 @@ public class FileManager implements Serializable {
     }
 
     public void refresh(FileChunkListener fileChunkListener){
-        if(files.isEmpty())
-            return;
-
         for (FileChunk fc : files.values()){
             fc.refreshFileChunkListener(fileChunkListener);
+            fc.getLease().start();
         }
     }
 
     private FileManager() {
         files = new HashMap<>();
+        pendingLeases = new HashSet<>();
+    }
+
+
+    public void addPendingLease(String fileId) {
+        pendingLeases.add(fileId);
+    }
+
+    public boolean hasPendingLease(String fileId) {
+        return pendingLeases.contains(fileId);
+    }
+
+    public void updatePendingLease(String fileId, int maxTimestamp) {
+        FileChunk f = files.get(fileId);
+        f.loadLease(maxTimestamp);
+        pendingLeases.remove(fileId);
     }
 
     public void addFile(String fileId, FileChunk file) {
@@ -124,8 +139,19 @@ public class FileManager implements Serializable {
     public boolean chunkDegreeSatisfied(String fileId, int chunkNumber) {
         FileChunk f = files.get(fileId);
         Chunk c = f.getChunk(chunkNumber);
-
         return c.getActualReplicationDegreeSync() >= c.getReplicationDegree();
+    }
+
+    public void startChunkTransaction(String fileId, int chunkNumber) {
+        FileChunk file = this.files.get(fileId);
+        Chunk chunkMetadata = file.getChunk(chunkNumber);
+        chunkMetadata.startTransaction();
+    }
+
+    public void stopChunkTransaction(String fileId, int chunkNumber) {
+        FileChunk file = this.files.get(fileId);
+        Chunk chunkMetadata = file.getChunk(chunkNumber);
+        chunkMetadata.stopTransaction();
     }
 
     @Override

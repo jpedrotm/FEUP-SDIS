@@ -16,6 +16,7 @@ public class Backup extends Protocol {
 
         // Metadata
         Metadata.instance().addMetadata(fi.filename, fi.extension, path, hashFileId, Integer.parseInt(replicationDeg));
+        Metadata.instance().getFileMetadata(hashFileId).startTransaction();
 
         int i = 0;
         while (true) {
@@ -34,6 +35,8 @@ public class Backup extends Protocol {
             mdb.send(msg);
             i++;
         }
+
+        Metadata.instance().getFileMetadata(hashFileId).stopTransaction();
     }
 
     public static void sendStoredMessage(ControlChannel mc, String fileID, int chunkNo, String serverID) {

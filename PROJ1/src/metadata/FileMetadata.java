@@ -10,6 +10,7 @@ public class FileMetadata implements Serializable {
     private String hashFileId;
     private int repDegree;
     private HashMap<Integer, ChunkMetadata> chunksMetadata;
+    private boolean onTransaction;
 
     public FileMetadata(String filename, String extension, String path, String hashFileId,int repDegree) {
         this.filename = filename;
@@ -18,6 +19,7 @@ public class FileMetadata implements Serializable {
         this.hashFileId = hashFileId;
         this.repDegree=repDegree;
         chunksMetadata = new HashMap<>();
+        onTransaction = false;
     }
 
 
@@ -27,7 +29,15 @@ public class FileMetadata implements Serializable {
                 return true;
             }
         }
-        return false;
+        return onTransaction;
+    }
+
+    public void startTransaction() {
+        onTransaction = true;
+    }
+
+    public void stopTransaction() {
+        onTransaction = false;
     }
 
     public String getFilename() {
@@ -64,7 +74,7 @@ public class FileMetadata implements Serializable {
 
     @Override
     public String toString() {
-        return "FileMetadata{" +
+        return "FileMetadata{ onTransaction=" + onTransaction +
                 "path='" + path + '\'' +
                 ", hashFileId='" + hashFileId + '\'' +
                 ", replicationDegree=" + repDegree + "\'\n"+
