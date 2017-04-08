@@ -9,6 +9,7 @@ import metadata.Metadata;
 import protocols.Backup;
 import protocols.Delete;
 import protocols.Restore;
+import utils.FileChunkListener;
 import utils.GoodGuy;
 import utils.Tuplo3;
 
@@ -24,7 +25,7 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class Server implements PeerInterface {
+public class Server implements PeerInterface, FileChunkListener {
     private String serverID;
     private ControlChannel mc;
     private BackupChannel mdr;
@@ -291,5 +292,10 @@ public class Server implements PeerInterface {
             ObjectInputStream ois = new ObjectInputStream(stream);
             Metadata.load((Metadata) ois.readObject());
         } catch (Exception e) {}
+    }
+
+    @Override
+    public void notify(String fileId) {
+        // Chamar protocolo em backup para enviar mensagem
     }
 }

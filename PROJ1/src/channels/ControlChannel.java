@@ -12,10 +12,8 @@ import utils.Message;
 import utils.Message.FieldIndex;
 import utils.Tuplo3;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.ServerSocket;
-import java.net.Socket;
 
 public class ControlChannel extends Channel {
 

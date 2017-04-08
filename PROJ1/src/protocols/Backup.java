@@ -3,14 +3,11 @@ package protocols;
 
 import channels.ControlChannel;
 import channels.DataChannel;
-import metadata.FileMetadata;
 import metadata.Metadata;
 import utils.Message;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.Arrays;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 public class Backup extends Protocol {
     public static void sendFileChunks(DataChannel mdb, String path, String version, String senderId, String replicationDeg) throws IOException {

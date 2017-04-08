@@ -4,7 +4,6 @@ import channels.ControlChannel;
 import protocols.Reclaim;
 import utils.FileChunkPair;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;

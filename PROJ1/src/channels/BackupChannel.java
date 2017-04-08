@@ -3,7 +3,6 @@ package channels;
 import metadata.Metadata;
 import protocols.Protocol;
 import server.Server;
-import utils.GoodGuy;
 import utils.Message;
 
 import java.io.*;

@@ -1,6 +1,10 @@
 package filesystem;
 
 
+import utils.FileChunkListener;
+import utils.Lease;
+import utils.LeaseListener;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Files;
@@ -11,16 +15,19 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class FileChunk implements Serializable {
+public class FileChunk implements Serializable, LeaseListener {
     private String id;
     private HashMap<Integer, Chunk> chunks;
     private String dirPath;
+    private Lease lease;
+    private FileChunkListener fileChunkListener;
 
-    public FileChunk(String id, String dirPath) {
+    public FileChunk(String id, String dirPath, FileChunkListener fileChunkListener) {
         this.id = id;
         this.chunks = new HashMap<>();
         FileManager.instance().addFile(id, this);
         this.dirPath = dirPath;
+        this.fileChunkListener = fileChunkListener;
     }
 
     public void addChunk(Chunk chunk) {
@@ -107,5 +114,15 @@ public class FileChunk implements Serializable {
         }
 
         return size;
+    }
+
+    public void loadLease(int maxTimestamp) {
+        this.lease = new Lease(maxTimestamp, this);
+        this.lease.start();
+    }
+
+    @Override
+    public void expired() {
+        fileChunkListener.notify(id);
     }
 }

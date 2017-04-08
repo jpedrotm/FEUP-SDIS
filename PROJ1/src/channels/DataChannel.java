@@ -4,12 +4,10 @@ import filesystem.Chunk;
 import filesystem.FileChunk;
 import filesystem.FileManager;
 import metadata.Metadata;
-import protocols.Backup;
 import protocols.Protocol;
-import protocols.Reclaim;
 import server.Server;
-import utils.FileChunkPair;
 import utils.GoodGuy;
+import utils.Limiter;
 import utils.Message;
 import utils.Message.FieldIndex;
 import utils.PathHelper;
@@ -74,9 +72,6 @@ public class DataChannel extends Channel {
         String version=headerFields[FieldIndex.Version];
 
         server.updateRemovedTuple(fileID,chunkNo);
-
-        if (!FileManager.instance().canStore(body.length))
-            return;
 
         if (!FileManager.instance().canStore(body.length))
             return;
@@ -173,32 +168,5 @@ public class DataChannel extends Channel {
                 startTimer(msg, limiter);
             }
         }, limiter.getCurrentTry() * 1000);
-    }
-
-
-    private class Limiter {
-        private int maxTries;
-        private int currentTry;
-
-        public Limiter(int maxTries) {
-            this.maxTries = maxTries;
-            this.currentTry = 1;
-        }
-
-        public void tick() {
-            currentTry++;
-        }
-
-        public void untick() {
-            currentTry--;
-        }
-
-        public boolean limitReached() {
-            return currentTry >= maxTries;
-        }
-
-        public int getCurrentTry() {
-            return currentTry;
-        }
     }
 }
