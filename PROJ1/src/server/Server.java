@@ -244,7 +244,6 @@ public class Server implements PeerInterface, FileChunkListener {
 
     public void reclaim(String space){
         int newMaxContentSize=Integer.parseInt(space)*1000; //porque o tamanho é dado e Kb
-        System.out.println("new content size: "+newMaxContentSize);
         FileManager.instance().updateLimitContentSize(newMaxContentSize,mc,serverID);
     }
 

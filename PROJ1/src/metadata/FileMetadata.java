@@ -64,7 +64,7 @@ public class FileMetadata implements Serializable {
 
     @Override
     public String toString() {
-        return "FileMetadata{ ontransaction= " + isOnTransaction() +
+        return "FileMetadata{" +
                 "path='" + path + '\'' +
                 ", hashFileId='" + hashFileId + '\'' +
                 ", replicationDegree=" + repDegree + "\'\n"+

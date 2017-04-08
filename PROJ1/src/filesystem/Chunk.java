@@ -47,7 +47,7 @@ public class Chunk  implements Serializable {
         return body;
     }
 
-    public int getReplicationDegree() {
+    public synchronized int getReplicationDegree() {
         return replicationDegree;
     }
 
@@ -73,8 +73,8 @@ public class Chunk  implements Serializable {
 
     public synchronized void subReplication(String serverId) { storeds.remove(serverId); }
 
-    public boolean isReplicationDegreeDown(){
-        return replicationDegree < storeds.size();
+    public synchronized boolean isReplicationDegreeDown(){
+        return replicationDegree > storeds.size();
     }
 
     private void storeContent(byte[] content) throws IOException {

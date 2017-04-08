@@ -79,17 +79,14 @@ public class FileChunk implements Serializable, LeaseListener {
         Files.delete(dir);
     }
 
-    public ArrayList<Chunk> getChunksOverRep() {
+    public ArrayList<Chunk> getChunks() {
         ArrayList<Chunk> chunkList = new ArrayList<>();
 
         Iterator it = chunks.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
             Chunk chunk = (Chunk) pair.getValue();
-
-            if (chunk.getActualReplicationDegree() > chunk.getReplicationDegree()) {
-                chunkList.add(chunk);
-            }
+            chunkList.add(chunk);
         }
 
         return chunkList;

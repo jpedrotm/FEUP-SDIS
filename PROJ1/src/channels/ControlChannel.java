@@ -74,10 +74,12 @@ public class ControlChannel extends Channel {
         if(FileManager.instance().hasFile(fileID)){
             if(FileManager.instance().getFile(fileID).hasChunk(chunkNo))
             {
+
                 Chunk chunk=FileManager.instance().getFile(fileID).getChunk(chunkNo);
                 chunk.subReplication(senderID);
+                System.out.println("ChunkNo: "+chunkNo+" , actualRepDegree: "+chunk.getActualReplicationDegreeSync()+", RepDegree: "+chunk.getReplicationDegree());
                 if(chunk.isReplicationDegreeDown()){
-                    //falta testar esta parte agora
+                    System.out.println("Verificou que está a baixo"); //falta testar esta parte agora
                     server.newRemovedTuple(new Tuplo3(fileID,chunkNo));
                     try {
                         Thread.sleep(GoodGuy.sleepTime(0,400));
@@ -86,12 +88,13 @@ public class ControlChannel extends Channel {
                     }
 
                     if(!server.getRemovedTuple().receivedPutChunk()) {
+                        System.out.println("Não recebeu PutChunk");
                         server.resetRemovedTuple(); //tenho de fazer logo reset caso contrário envia o putchunk e ignora-o também (não tenho a certeza que o reserRemovedTuple() que tem em baxo chega)
                         String header = Message.buildHeader(Protocol.MessageType.Putchunk, version, server.getServerID(), fileID, Integer.toString(chunkNo), Integer.toString(chunk.getReplicationDegree()));
                         try {
                             byte[] body = FileManager.instance().getFile(fileID).getChunk(chunkNo).getContent(Message.MAX_CHUNK_SIZE - header.length() - 5);
                             Message message = new Message(header, body);
-                            server.getDataChannel().send(message);
+                            server.getDataChannel().sendRemoved(message);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
