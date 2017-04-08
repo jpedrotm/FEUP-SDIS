@@ -1,6 +1,8 @@
 package utils;
 
-public class Limiter {
+import java.io.Serializable;
+
+public class Limiter implements Serializable {
     private int maxTries;
     private int currentTry;
 

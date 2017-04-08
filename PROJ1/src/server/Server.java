@@ -49,6 +49,7 @@ public class Server implements PeerInterface, FileChunkListener {
     }
 
     public Server(String[] commands) {
+        
 
         this.serverID = commands[0]; //temporario só para testar o RMI
         this.removedTuple = null;

@@ -20,7 +20,7 @@ public class FileChunk implements Serializable, LeaseListener {
     private HashMap<Integer, Chunk> chunks;
     private String dirPath;
     private Lease lease;
-    private FileChunkListener fileChunkListener;
+    private transient FileChunkListener fileChunkListener;
 
     public FileChunk(String id, String dirPath, FileChunkListener fileChunkListener) {
         this.id = id;

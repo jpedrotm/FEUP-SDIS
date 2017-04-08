@@ -26,7 +26,9 @@ if len(argv) < 9:
 version = argv[1]
 channels = " ".join(argv[2:8])
 
-# ACIONAR RMIREGISTRY
+os.chdir('bin/')
+rmi_process = subprocess.Popen('rmiregistry')
+os.chdir('..')
 
 for item1, item2 in grouper(2, argv[8::]):
     cmd = " ".join(['java -cp bin/ server.Server', item1, channels])

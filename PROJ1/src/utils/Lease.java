@@ -1,9 +1,10 @@
 package utils;
 
+import java.io.Serializable;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class Lease {
+public class Lease implements Serializable {
     private Limiter limiter;
     private LeaseListener listener;
 
