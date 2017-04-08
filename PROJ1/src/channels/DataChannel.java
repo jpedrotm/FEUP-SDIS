@@ -75,7 +75,7 @@ public class DataChannel extends Channel {
 
         server.updateRemovedTuple(fileID,chunkNo);
 
-        if (!FileManager.instance().canStore(body.length))
+        if (!FileManager.instance().canStore(body.length) || Metadata.instance().hasFile(fileID))
             return;
 
         /*
@@ -136,11 +136,19 @@ public class DataChannel extends Channel {
         super.send(msg);
 
         Limiter limiter = new Limiter(5);
-        startTimer(msg, limiter);
+        startTimer(msg, limiter,StartTimerType.NORMAL);
+    }
+
+    public void sendRemoved(Message msg) throws IOException{
+        super.send(msg);
+
+        Limiter limiter = new Limiter(5);
+        startTimer(msg, limiter,StartTimerType.REMOVED);
     }
 
 
-    private void startTimer(Message msg, Limiter limiter) {
+
+    private void startTimer(Message msg, Limiter limiter,StartTimerType type) {
         new Timer().schedule(new TimerTask() {
             String[] headerFields = msg.getHeaderFields();
             String fileId = headerFields[FieldIndex.FileId];
@@ -148,9 +156,17 @@ public class DataChannel extends Channel {
 
             @Override
             public void run() {
-                if (limiter.limitReached() || Metadata.instance().chunkDegreeSatisfied(fileId, chunkNumber)) {
-                    this.cancel();
-                    return;
+                if(type==StartTimerType.NORMAL){
+                    if (limiter.limitReached() || Metadata.instance().chunkDegreeSatisfied(fileId, chunkNumber)) {
+                        this.cancel();
+                        return;
+                    }
+                }
+                else if(type==StartTimerType.REMOVED){
+                    if (limiter.limitReached() || FileManager.instance().chunkDegreeSatisfied(fileId,Integer.parseInt(chunkNumber))) {
+                        this.cancel();
+                        return;
+                    }
                 }
 
                 try {
@@ -161,7 +177,7 @@ public class DataChannel extends Channel {
 
                 limiter.tick();
                 this.cancel();
-                startTimer(msg, limiter);
+                startTimer(msg, limiter,type);
             }
         }, limiter.getCurrentTry() * 1000);
     }
@@ -191,5 +207,9 @@ public class DataChannel extends Channel {
         public int getCurrentTry() {
             return currentTry;
         }
+    }
+
+    private enum StartTimerType{
+        NORMAL,REMOVED;
     }
 }

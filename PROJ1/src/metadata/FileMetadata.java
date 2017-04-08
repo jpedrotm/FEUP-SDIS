@@ -58,6 +58,10 @@ public class FileMetadata implements Serializable {
         return chunksMetadata.get(Integer.parseInt(chunkNo));
     }
 
+    public boolean hasChunk(String chunkNo){
+        return chunksMetadata.containsKey(Integer.parseInt(chunkNo));
+    }
+
     public void updateChunk(int chunkNo, String serverID) {
         chunksMetadata.get(chunkNo).addReplication(serverID);
     }

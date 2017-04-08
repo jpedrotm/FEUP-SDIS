@@ -63,7 +63,7 @@ public class FileManager implements Serializable {
             Map.Entry pair = (Map.Entry) it.next();
             FileChunk file = (FileChunk) pair.getValue();
 
-            ArrayList<Chunk> chunks = file.getChunksOverRep();
+            ArrayList<Chunk> chunks = file.getChunks();
             for (Chunk chunk : chunks) {
                 pairs.add(new FileChunkPair(file, chunk));
             }
@@ -76,8 +76,6 @@ public class FileManager implements Serializable {
     }
 
     public void updateLimitContentSize(int newMaxContentSize, ControlChannel mc,String serverID){
-
-
 
         if(newMaxContentSize>this.maxContentSize){
             this.maxContentSize=newMaxContentSize;
