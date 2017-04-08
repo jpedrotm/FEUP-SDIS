@@ -164,12 +164,14 @@ public class DataChannel extends Channel {
             public void run() {
                 if(type==StartTimerType.NORMAL){
                     if (limiter.limitReached() || Metadata.instance().chunkDegreeSatisfied(fileId, chunkNumber)) {
+                        Metadata.instance().stopChunkTransaction(fileId, chunkNumber);
                         this.cancel();
                         return;
                     }
                 }
                 else if(type==StartTimerType.REMOVED){
                     if (limiter.limitReached() || FileManager.instance().chunkDegreeSatisfied(fileId,Integer.parseInt(chunkNumber))) {
+                        Metadata.instance().stopChunkTransaction(fileId, chunkNumber);
                         this.cancel();
                         return;
                     }
