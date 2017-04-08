@@ -17,6 +17,8 @@ public abstract class Protocol {
         public final static String Chunk="CHUNK";
         public final static String GetChunk="GETCHUNK";
         public final static String Removed="REMOVED";
+        public final static String GetLease="GETLEASE";
+        public final static String Lease="LEASE";
     }
 
 

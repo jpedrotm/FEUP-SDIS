@@ -48,6 +48,8 @@ public class BackupChannel extends Channel {
                 case Protocol.MessageType.Chunk:
                     restoreFileChunk(headerFields, body);
                     break;
+                default:
+                    break;
             }
         }
 

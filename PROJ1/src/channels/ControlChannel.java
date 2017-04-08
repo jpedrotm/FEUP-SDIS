@@ -58,7 +58,15 @@ public class ControlChannel extends Channel {
                     removed(headerFields);
                     break;
                 case "GETCHUNK":
-                    restore(headerFields, packet); //envia para o mdr a CHUNK message
+                    restore(headerFields, packet);
+                    break;
+                case "GETLEASE":
+                    lease(headerFields,packet);
+                    break;
+                case "LEASE":
+                    restartLease(headerFields);
+                    break;
+                default:
                     break;
             }
 
@@ -165,5 +173,36 @@ public class ControlChannel extends Channel {
             }
         }
 
+    }
+
+    private void lease(String[] headerFields,DatagramPacket packet){
+        String version=headerFields[FieldIndex.Version];
+        String fileID=headerFields[FieldIndex.FileId];
+
+        if(Metadata.instance().hasFile(fileID)){
+            String header=Message.buildHeader(Protocol.MessageType.Lease,version,server.getServerID(),fileID);
+            try {
+                Message msg = new Message(header);
+                server.getControlChannel().sendLease(msg, packet);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void sendLease(Message msg, DatagramPacket packet) {
+        DatagramPacket sendPacket = new DatagramPacket(msg.getMessage(), msg.getMessage().length, packet.getAddress(), port);
+        try {
+            socket.send(sendPacket);
+        } catch (IOException e) {}
+    }
+
+    private void restartLease(String[] headerFields){
+        String fileId=headerFields[FieldIndex.FileId];
+        String leaseTime=headerFields[FieldIndex.ChunkNo];
+
+        if(FileManager.instance().hasFile(fileId)) {
+            FileManager.instance().getFile(fileId).loadLease(Integer.parseInt(leaseTime));
+        }
     }
 }

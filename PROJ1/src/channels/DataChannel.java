@@ -62,6 +62,8 @@ public class DataChannel extends Channel {
                 case Protocol.MessageType.Putchunk:
                     putChunk(headerFields, body);
                     break;
+                default:
+                    break;
             }
         }
     }
