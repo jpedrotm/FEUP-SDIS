@@ -8,12 +8,15 @@ import metadata.Metadata;
 import protocols.Protocol;
 import server.Server;
 import utils.GoodGuy;
+import utils.Limiter;
 import utils.Message;
 import utils.Message.FieldIndex;
 import utils.Tuplo3;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ControlChannel extends Channel {
 
@@ -180,7 +183,7 @@ public class ControlChannel extends Channel {
         String fileID=headerFields[FieldIndex.FileId];
 
         if(Metadata.instance().hasFile(fileID)){
-            String header=Message.buildHeader(Protocol.MessageType.Lease,version,server.getServerID(),fileID);
+            String header=Message.buildHeader(Protocol.MessageType.Lease,version,server.getServerID(),fileID,"10");
             try {
                 Message msg = new Message(header);
                 server.getControlChannel().sendLease(msg, packet);
@@ -197,11 +200,60 @@ public class ControlChannel extends Channel {
         } catch (IOException e) {}
     }
 
+    public void sendGetLease(Message msg) {
+        try {
+            super.send(msg);
+        } catch (IOException e) {}
+
+        Limiter limiter = new Limiter(5);
+        startTimer(msg, limiter);
+    }
+
+    private void startTimer(Message msg, Limiter limiter) {
+        new Timer().schedule(new TimerTask() {
+            String[] headerFields = msg.getHeaderFields();
+            String fileId = headerFields[FieldIndex.FileId];
+
+            @Override
+            public void run() {
+                boolean leaseExpired = FileManager.instance().getFile(fileId).leaseExpired();
+
+                if (limiter.limitReached()) {
+                    System.out.println("1");
+                    if (leaseExpired) {
+                        System.out.println("2");
+                        try {
+                            FileManager.instance().deleteFile(fileId);
+                        } catch (IOException e) {}
+                    }
+
+                    this.cancel();
+                    return;
+                }
+                else if (!leaseExpired) {
+                    this.cancel();
+                    return;
+                }
+
+                try {
+                    ControlChannel.super.send(msg);
+                } catch (IOException e) {
+                    limiter.untick();
+                }
+
+                limiter.tick();
+                this.cancel();
+                startTimer(msg,limiter);
+            }
+        }, limiter.getCurrentTry() * 1000);
+    }
+
     private void restartLease(String[] headerFields){
         String fileId=headerFields[FieldIndex.FileId];
         String leaseTime=headerFields[FieldIndex.ChunkNo];
 
         if(FileManager.instance().hasFile(fileId)) {
+            System.out.println("VOU DAR RESTART");
             FileManager.instance().getFile(fileId).loadLease(Integer.parseInt(leaseTime));
         }
     }

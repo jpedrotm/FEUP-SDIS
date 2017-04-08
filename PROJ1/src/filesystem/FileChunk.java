@@ -27,7 +27,8 @@ public class FileChunk implements Serializable, LeaseListener {
         this.chunks = new HashMap<>();
         FileManager.instance().addFile(id, this);
         this.dirPath = dirPath;
-        this.fileChunkListener = fileChunkListener;
+        this.lease = new Lease(0, this);
+        this.refreshFileChunkListener(fileChunkListener);
     }
 
     public void addChunk(Chunk chunk) {
@@ -113,13 +114,28 @@ public class FileChunk implements Serializable, LeaseListener {
         return size;
     }
 
+    public Lease getLease(){
+        return lease;
+    }
+
     public void loadLease(int maxTimestamp) {
+        System.out.println("Novo lease");
         this.lease = new Lease(maxTimestamp, this);
         this.lease.start();
+    }
+
+    public void refreshFileChunkListener(FileChunkListener fileChunkListener){
+        this.fileChunkListener = fileChunkListener;
+        this.lease.expire();
+        this.fileChunkListener.notify(id);
     }
 
     @Override
     public void expired() {
         fileChunkListener.notify(id);
+    }
+
+    public boolean leaseExpired() {
+        return lease.isExpired();
     }
 }

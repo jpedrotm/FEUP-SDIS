@@ -2,6 +2,7 @@ package filesystem;
 
 import channels.ControlChannel;
 import protocols.Reclaim;
+import utils.FileChunkListener;
 import utils.FileChunkPair;
 
 import java.io.IOException;
@@ -26,6 +27,15 @@ public class FileManager implements Serializable {
         }
 
         return instance;
+    }
+
+    public void refresh(FileChunkListener fileChunkListener){
+        if(files.isEmpty())
+            return;
+
+        for (FileChunk fc : files.values()){
+            fc.refreshFileChunkListener(fileChunkListener);
+        }
     }
 
     private FileManager() {

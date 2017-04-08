@@ -8,6 +8,7 @@ import metadata.FileMetadata;
 import metadata.Metadata;
 import protocols.Backup;
 import protocols.Delete;
+import protocols.LeaseProto;
 import protocols.Restore;
 import utils.FileChunkListener;
 import utils.GoodGuy;
@@ -90,6 +91,8 @@ public class Server implements PeerInterface, FileChunkListener {
                 }
             }
         });
+
+        reviewFileManager();
     }
 
     public void start() {
@@ -294,8 +297,12 @@ public class Server implements PeerInterface, FileChunkListener {
         } catch (Exception e) {}
     }
 
+    private void reviewFileManager(){
+        FileManager.instance().refresh(this);
+    }
+
     @Override
     public void notify(String fileId) {
-        // Chamar protocolo em backup para enviar mensagem
+        LeaseProto.sendGetLease(mc, "1.0", serverID, fileId);
     }
 }

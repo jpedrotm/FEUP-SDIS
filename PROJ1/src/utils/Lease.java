@@ -7,10 +7,15 @@ import java.util.TimerTask;
 public class Lease implements Serializable {
     private Limiter limiter;
     private LeaseListener listener;
+    private boolean expired = false;
 
     public Lease(int maxTimestamp, LeaseListener listener) {
         limiter = new Limiter(maxTimestamp);
         this.listener = listener;
+    }
+
+    public boolean isExpired() {
+        return expired;
     }
 
     public void start() {
@@ -18,11 +23,17 @@ public class Lease implements Serializable {
             @Override
              public void run() {
                  if (limiter.limitReached()) {
+                     System.out.println("ACABOU: "+limiter.getCurrentTry());
                      listener.expired();
+                     this.cancel();
                  }
 
                  limiter.tick();
              }
         }, 1000, 1000);
+    }
+
+    public void expire() {
+        expired = true;
     }
 }
