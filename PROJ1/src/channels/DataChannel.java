@@ -5,12 +5,10 @@ import filesystem.FileChunk;
 import filesystem.FileManager;
 import metadata.Metadata;
 import protocols.Protocol;
+import protocols.Reclaim;
 import server.Server;
-import utils.GoodGuy;
-import utils.Limiter;
-import utils.Message;
+import utils.*;
 import utils.Message.FieldIndex;
-import utils.PathHelper;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -74,23 +72,19 @@ public class DataChannel extends Channel {
 
         server.updateRemovedTuple(fileID,chunkNo);
 
-        if (!FileManager.instance().canStore(body.length) || Metadata.instance().hasFile(fileID))
+        if (Metadata.instance().hasFile(fileID))
             return;
 
-        /*
         if (!FileManager.instance().canStore(body.length)) {
             FileChunkPair pair = FileManager.instance().getRemovableChunk(body.length);
             if (pair != null) {
-                if (!FileManager.instance().deleteChunk(pair))
-                {
+                if (FileManager.instance().deleteChunk(pair))
                     Reclaim.sendRemoved(server.getControlChannel(), version, server.getServerID(), fileID, Integer.toString(chunkNo));
-                    return;
-                }
+                else return;
             }
-            else
-                return;
+            else return;
         }
-        */
+
 
         FileChunk file;
         if (FileManager.instance().hasFile(fileID))
@@ -110,9 +104,7 @@ public class DataChannel extends Channel {
                 Chunk chunk = new Chunk(chunkNo, replicationDegree, body, path);
                 file.addChunk(chunk);
 
-                long r;
-                Thread.sleep( (r= GoodGuy.randomBetween(0, 800)) );
-                System.out.println("FREE FROM SLEEP  " + r + "  " + chunkNo);
+                GoodGuy.sleepRandomTime(0, 800);
                 if (FileManager.instance().chunkDegreeSatisfied(fileID, chunkNo)) {
                     System.out.println("deleting");
                     file.deleteChunk(chunk.getNumber());
@@ -125,9 +117,6 @@ public class DataChannel extends Channel {
                 }
             }
             catch (IOException e) { /* Do nothing */ }
-            catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
     }
 
