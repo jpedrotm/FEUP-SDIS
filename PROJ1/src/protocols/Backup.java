@@ -31,8 +31,8 @@ public class Backup extends Protocol {
             byte[] body = Arrays.copyOf(content, bytesRead);
             Message msg = new Message(header, body);
 
-            mdb.send(msg);
             Metadata.instance().addChunkMetadata(path, i, Integer.parseInt(replicationDeg));
+            mdb.send(msg);
             i++;
         }
     }
