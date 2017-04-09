@@ -50,7 +50,21 @@ public class FileChunk implements Serializable {
 
     @Override
     public String toString() {
-        return chunks.toString();
+        String finalPrint="";
+
+        Iterator it = chunks.entrySet().iterator();
+        while (true) {
+            Map.Entry pair = (Map.Entry)it.next();
+            finalPrint+=pair.getValue().toString();
+            if(it.hasNext()){
+                finalPrint+=",";
+            }
+            else
+                break;
+            it.remove();
+        }
+
+        return finalPrint;
     }
 
     public void delete() throws IOException {

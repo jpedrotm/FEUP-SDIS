@@ -98,11 +98,16 @@ public class Metadata implements Serializable {
     @Override
     public String toString() {
 
+        if(fileInfoHashMap.size()==0){
+            return "Metadata is empty.";
+        }
+
         String metadataInfo="";
         ArrayList<FileMetadata> info=new ArrayList<>(fileInfoHashMap.values());
         for(int i=0;i<info.size();i++)
         {
-            metadataInfo+=info.get(i).toString();
+
+            metadataInfo+="file nº"+i+": \n     "+info.get(i).toString()+"\n";
         }
 
 
