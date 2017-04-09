@@ -28,10 +28,11 @@ public class Backup extends Protocol {
                 break;
             }
 
+            Metadata.instance().addChunkMetadata(path, i, Integer.parseInt(replicationDeg));
+
             byte[] body = Arrays.copyOf(content, bytesRead);
             Message msg = new Message(header, body);
 
-            Metadata.instance().addChunkMetadata(path, i, Integer.parseInt(replicationDeg));
             mdb.send(msg);
             i++;
         }
