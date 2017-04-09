@@ -145,7 +145,7 @@ public class DataChannel extends Channel {
         startTimer(msg, limiter,StartTimerType.NORMAL);
     }
 
-    public void sendPutchunkFromRemoved(Message msg) throws IOException{
+    public void sendPutchunkFromRemoved(Message msg) throws IOException {
         super.send(msg);
 
         Limiter limiter = new Limiter(5);

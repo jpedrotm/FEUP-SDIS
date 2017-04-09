@@ -92,15 +92,8 @@ public class ControlChannel extends Channel {
                     server.newRemovedTuple(new Tuplo3(fileID,chunkNo));
                     GoodGuy.sleepRandomTime(0, 400);
 
-                    FileManager.instance().startChunkTransaction(fileID, chunkNo);
-                    System.out.println("Comecei transacao");
-                    try {
-                        Thread.sleep(6000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
                     if(!server.getRemovedTuple().receivedPutChunk()) {
+                        FileManager.instance().startChunkTransaction(fileID, chunkNo);
                         System.out.println("Não recebeu PutChunk");
                         server.resetRemovedTuple();
 
