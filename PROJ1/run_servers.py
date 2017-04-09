@@ -27,21 +27,6 @@ if len(argv) < 9:
 version = argv[1]
 channels = " ".join(argv[2:8])
 
-
-# Start RMI
-p1 = subprocess.Popen(['ps', '-ef'], stdout=subprocess.PIPE)
-p2 = subprocess.Popen(['grep', 'rmiregistry'], stdin=p1.stdout, stdout=subprocess.PIPE)
-p3 = subprocess.Popen(['awk', "{ print $2 }"], stdin=p2.stdout, stdout=subprocess.PIPE)
-output, err = p3.communicate()
-
-entries = output.count('\n')
-
-if (entries <= 1):
-    os.chdir('bin/')
-    rmi_process = subprocess.Popen('rmiregistry')
-    os.chdir('..')
-
-
 # Start servers
 for item1, item2 in grouper(2, argv[8::]):
     cmd = " ".join(['java -cp bin/ server.Server', item1, channels])
