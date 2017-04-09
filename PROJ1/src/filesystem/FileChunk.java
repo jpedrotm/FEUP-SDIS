@@ -85,6 +85,22 @@ public class FileChunk implements Serializable {
         return chunkList;
     }
 
+    public ArrayList<Chunk> getChunksOverRep() {
+        ArrayList<Chunk> chunkList = new ArrayList<>();
+
+        Iterator it = chunks.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            Chunk chunk = (Chunk) pair.getValue();
+
+            if (chunk.getActualReplicationDegree() > chunk.getReplicationDegree()) {
+                chunkList.add(chunk);
+            }
+        }
+
+        return chunkList;
+    }
+
     public boolean deleteChunk(int chunkNo) {
         try {
             Chunk chunk = chunks.get(chunkNo);

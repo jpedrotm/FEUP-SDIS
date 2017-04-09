@@ -75,6 +75,32 @@ public class FileManager implements Serializable {
         return pairs;
     }
 
+
+    public FileChunkPair getRemovableChunk(int newContentSize) {
+        ArrayList<FileChunkPair> pairs = new ArrayList<>();
+
+        Iterator it = files.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            FileChunk file = (FileChunk) pair.getValue();
+
+            ArrayList<Chunk> chunks = file.getChunksOverRep();
+            for (Chunk chunk : chunks) {
+                if (getStoredSize() - chunk.getContentSize() + newContentSize <= maxContentSize) {
+                    pairs.add(new FileChunkPair(file, chunk));
+                }
+            }
+        }
+
+        Collections.sort(pairs, (a, b) -> a.chunk.getActualReplicationDegree() - a.chunk.getReplicationDegree() < b.chunk.getActualReplicationDegree() - b.chunk.getReplicationDegree() ?
+                1 : a.chunk.getActualReplicationDegree() - a.chunk.getReplicationDegree() == b.chunk.getActualReplicationDegree() - b.chunk.getReplicationDegree() ?
+                0 : -1);
+
+        if (pairs.isEmpty()) return null;
+        else                 return pairs.get(0);
+    }
+
+
     public void updateLimitContentSize(int newMaxContentSize, ControlChannel mc,String serverID){
 
         if(newMaxContentSize>this.maxContentSize){

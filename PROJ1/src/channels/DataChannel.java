@@ -78,20 +78,17 @@ public class DataChannel extends Channel {
         if (!FileManager.instance().canStore(body.length) || Metadata.instance().hasFile(fileID))
             return;
 
-        /*
+
         if (!FileManager.instance().canStore(body.length)) {
             FileChunkPair pair = FileManager.instance().getRemovableChunk(body.length);
             if (pair != null) {
-                if (!FileManager.instance().deleteChunk(pair))
-                {
+                if (FileManager.instance().deleteChunk(pair))
                     Reclaim.sendRemoved(server.getControlChannel(), version, server.getServerID(), fileID, Integer.toString(chunkNo));
-                    return;
-                }
+                else return;
             }
-            else
-                return;
+            else return;
         }
-        */
+
 
         FileChunk file;
         if (FileManager.instance().hasFile(fileID))
