@@ -3,6 +3,8 @@ package server;
 import channels.BackupChannel;
 import channels.ControlChannel;
 import channels.DataChannel;
+import filesystem.Chunk;
+import filesystem.FileChunk;
 import filesystem.FileManager;
 import metadata.FileMetadata;
 import metadata.Metadata;
@@ -22,6 +24,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -162,6 +165,8 @@ public class Server implements PeerInterface, FileChunkListener {
     }
 
     private void handleTransactions() {
+
+        // Interrupted backups
         HashMap<String, FileMetadata> fms = Metadata.instance().getFileInfoHashMap();
         for (FileMetadata fileMetadata : fms.values()) {
             if (fileMetadata.isOnTransaction()) {
@@ -169,6 +174,17 @@ public class Server implements PeerInterface, FileChunkListener {
                     Backup.sendFileChunks(mdb, fileMetadata.getPath(), "1.0", serverID, Integer.toString(fileMetadata.getRepDegree()));
                 } catch (IOException e) {
                     e.printStackTrace();
+                }
+            }
+        }
+
+        // Interrupted putchunks (after removed)
+        HashMap<String, FileChunk> fcs = FileManager.instance().getFiles();
+        for (FileChunk fileChunk : fcs.values()) {
+            if (fileChunk.isOnTransaction()) {
+                ArrayList<Chunk> chunks = fileChunk.getChunks();
+                for (Chunk chunk : chunks) {
+                    Backup.sendPutchunkFromRemoved(mdb, serverID, fileChunk, chunk);
                 }
             }
         }

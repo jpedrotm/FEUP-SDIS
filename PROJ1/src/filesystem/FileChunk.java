@@ -31,6 +31,15 @@ public class FileChunk implements Serializable, LeaseListener {
         this.refreshFileChunkListener(fileChunkListener);
     }
 
+    public boolean isOnTransaction() {
+        for (Chunk chunk : chunks.values()) {
+            if (chunk.isOnTransaction())
+                return true;
+        }
+
+        return false;
+    }
+
     public void addChunk(Chunk chunk) {
         chunks.put(chunk.getNumber(), chunk);
     }

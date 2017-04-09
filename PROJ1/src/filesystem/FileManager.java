@@ -30,18 +30,16 @@ public class FileManager implements Serializable {
         return instance;
     }
 
-    public void refresh(FileChunkListener fileChunkListener){
-        for (FileChunk fc : files.values()){
-            fc.refreshFileChunkListener(fileChunkListener);
-            fc.getLease().start();
-        }
-    }
-
     private FileManager() {
         files = new HashMap<>();
         pendingLeases = new HashSet<>();
     }
 
+    public void refresh(FileChunkListener fileChunkListener){
+        for (FileChunk fc : files.values()){
+            fc.refreshFileChunkListener(fileChunkListener);
+        }
+    }
 
     public void addPendingLease(String fileId) {
         pendingLeases.add(fileId);
@@ -144,14 +142,14 @@ public class FileManager implements Serializable {
 
     public void startChunkTransaction(String fileId, int chunkNumber) {
         FileChunk file = this.files.get(fileId);
-        Chunk chunkMetadata = file.getChunk(chunkNumber);
-        chunkMetadata.startTransaction();
+        Chunk chunk = file.getChunk(chunkNumber);
+        chunk.startTransaction();
     }
 
     public void stopChunkTransaction(String fileId, int chunkNumber) {
         FileChunk file = this.files.get(fileId);
-        Chunk chunkMetadata = file.getChunk(chunkNumber);
-        chunkMetadata.stopTransaction();
+        Chunk chunk = file.getChunk(chunkNumber);
+        chunk.stopTransaction();
     }
 
     @Override
@@ -166,5 +164,9 @@ public class FileManager implements Serializable {
 
     public static void load(FileManager fileManager) {
         instance = fileManager;
+    }
+
+    public HashMap<String,FileChunk> getFiles() {
+        return files;
     }
 }

@@ -3,6 +3,8 @@ package protocols;
 
 import channels.ControlChannel;
 import channels.DataChannel;
+import filesystem.Chunk;
+import filesystem.FileChunk;
 import metadata.Metadata;
 import utils.Message;
 
@@ -37,6 +39,16 @@ public class Backup extends Protocol {
         }
 
         Metadata.instance().getFileMetadata(hashFileId).stopTransaction();
+    }
+
+    public static void sendPutchunkFromRemoved(DataChannel mdb, String serverID, FileChunk fileChunk, Chunk chunk) {
+        String header = Message.buildHeader(Protocol.MessageType.Putchunk, "1.0", serverID, fileChunk.getFileId(), Integer.toString(chunk.getNumber()), Integer.toString(chunk.getReplicationDegree()));
+        byte[] body = new byte[0];
+        try {
+            body = chunk.getContent(Message.MAX_CHUNK_SIZE - header.length() - 5);
+            Message message = new Message(header, body);
+            mdb.sendPutchunkFromRemoved(message);
+        } catch (IOException e) {}
     }
 
     public static void sendStoredMessage(ControlChannel mc, String fileID, int chunkNo, String serverID) {

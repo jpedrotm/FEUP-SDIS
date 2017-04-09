@@ -5,6 +5,7 @@ import filesystem.FileChunk;
 import filesystem.FileManager;
 import metadata.FileMetadata;
 import metadata.Metadata;
+import protocols.Backup;
 import protocols.Protocol;
 import server.Server;
 import utils.*;
@@ -94,7 +95,7 @@ public class ControlChannel extends Channel {
                     FileManager.instance().startChunkTransaction(fileID, chunkNo);
                     System.out.println("Comecei transacao");
                     try {
-                        Thread.sleep(5000);
+                        Thread.sleep(6000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -102,14 +103,21 @@ public class ControlChannel extends Channel {
                     if(!server.getRemovedTuple().receivedPutChunk()) {
                         System.out.println("Não recebeu PutChunk");
                         server.resetRemovedTuple();
+
+                        FileChunk fileChunk = FileManager.instance().getFile(fileID);
+                        Chunk chunkToResend = fileChunk.getChunk(chunkNo);
+                        Backup.sendPutchunkFromRemoved(server.getDataChannel(), server.getServerID(), fileChunk, chunkToResend);
+
+                        /*
                         String header = Message.buildHeader(Protocol.MessageType.Putchunk, version, server.getServerID(), fileID, Integer.toString(chunkNo), Integer.toString(chunk.getReplicationDegree()));
                         try {
                             byte[] body = FileManager.instance().getFile(fileID).getChunk(chunkNo).getContent(Message.MAX_CHUNK_SIZE - header.length() - 5);
                             Message message = new Message(header, body);
-                            server.getDataChannel().sendRemoved(message);
+                            server.getDataChannel().sendPutchunkFromRemoved(message);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
+                        */
                     }
                     else
                         server.resetRemovedTuple();
