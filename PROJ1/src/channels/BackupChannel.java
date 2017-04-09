@@ -13,10 +13,11 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 
 public class BackupChannel extends Channel {
-    private HashMap<String,ChunkRestore> filesToRead;
+    private HashMap<String, ChunkRestore> filesToRead;
+
     public BackupChannel(Server server, String addressStr, String portVar){
         super(server, addressStr,portVar);
-        filesToRead=new HashMap<>();
+        filesToRead = new HashMap<>();
     }
 
     @Override
@@ -67,13 +68,14 @@ public class BackupChannel extends Channel {
             String path="storage/restored/"+fileName;
             Path pathToFile= Paths.get(path);
 
-            if(chunkNo==0){
+            if(chunkNo == 0 && !filesToRead.containsKey(fileID)) {
                 Files.createDirectories(pathToFile.getParent());
-                filesToRead.put(fileID,new ChunkRestore());
+                filesToRead.put(fileID, new ChunkRestore());
             }
 
             if(filesToRead.containsKey(fileID)){
-                if(filesToRead.get(fileID).getCurrentChunkNo()==chunkNo){
+                if(filesToRead.get(fileID).getCurrentChunkNo() == chunkNo) {
+                    System.out.println("Escreve   "  + chunkNo + "    " + path);
                     FileOutputStream fos = new FileOutputStream (new File(path),true);
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     baos.write(body);
@@ -81,7 +83,7 @@ public class BackupChannel extends Channel {
                     filesToRead.get(fileID).verifyIfHasNextChunks(baos,fos);
                     baos.close();
                     fos.close();
-                    this.updateFilesToRead(fileID,chunkNo);
+                    this.updateFilesToRead(fileID, chunkNo);
                 }
                 else{
                     if(chunkNo>filesToRead.get(fileID).getCurrentChunkNo()){
@@ -97,7 +99,7 @@ public class BackupChannel extends Channel {
 
     }
 
-    private class ChunkRestore{
+    private class ChunkRestore {
 
         private HashMap<Integer,byte[]> chunkBody;
         private int currentChunkNo;
@@ -125,26 +127,22 @@ public class BackupChannel extends Channel {
 
         public void verifyIfHasNextChunks(ByteArrayOutputStream baos,FileOutputStream fos){
 
-            while(true){
-                if(chunkBody.containsKey(currentChunkNo)){
-                    updateChunkNo();
-                    try {
-                        baos.write(chunkBody.get(currentChunkNo));
-                        baos.writeTo(fos);
-                        deleteChunk(currentChunkNo);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                else{
-                    break;
+            while (chunkBody.containsKey(currentChunkNo)) {
+                System.out.println("VOU ESCREVER   "  + currentChunkNo);
+                updateChunkNo();
+                try {
+                    baos.write(chunkBody.get(currentChunkNo));
+                    baos.writeTo(fos);
+                    deleteChunk(currentChunkNo);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }
 
     }
 
-    private void updateFilesToRead(String fileId,int chunkNo){
+    private void updateFilesToRead(String fileId, int chunkNo){
 
         System.out.println("RECEIVED CHUNK No: "+chunkNo);
 
@@ -153,7 +151,7 @@ public class BackupChannel extends Channel {
             filesToRead.remove(fileId);
             System.out.println("Apaguei file: "+fileId+"->"+filesToRead.size());
         }
-        else{
+        else {
             filesToRead.get(fileId).updateChunkNo();
         }
 
