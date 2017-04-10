@@ -144,12 +144,13 @@ public class ControlChannel extends Channel {
             String header=Message.buildHeader(Protocol.MessageType.Chunk,version,server.getServerID(),fileID,chunkNo);
 
             try {
-                byte[] body=FileManager.instance().getFile(fileID).getChunk(Integer.parseInt(chunkNo)).getContent(Message.MAX_CHUNK_SIZE - header.length() - 5);//new byte[Message.MAX_CHUNK_SIZE];
-                if (body == null)
+                byte[] body = FileManager.instance().getFile(fileID).getChunk(Integer.parseInt(chunkNo)).getContent(Message.MAX_CHUNK_SIZE - header.length() - 5);//new byte[Message.MAX_CHUNK_SIZE];
+                if (body == null) {
                   return;
+                }
 
                 Message msg = new Message(header, body);
-                server.getBackupChannel().send(msg);
+                server.getBackupChannel().sendChunk(msg, packet);
             } catch (IOException e) {
                 System.err.println("Error: " + e.getMessage());
                 return;
