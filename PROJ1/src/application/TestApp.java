@@ -9,7 +9,7 @@ import java.rmi.registry.Registry;
 
 public class TestApp {
 
-    private int peerAccessPoint; //peer access point (não sei bem para que usar)
+    private String peerAccessPoint; //peer access point (não sei bem para que usar)
     private String protocol; //sub protocol usado
     private String filePath; //path do ficheiro para faze backup
     private String nRep; //número de replicações para fazer do ficheiro (apenas em caso do sub protocolo backup)
@@ -44,19 +44,19 @@ public class TestApp {
 
         switch(n){
             case 4: //backup
-                this.peerAccessPoint=Integer.parseInt(args[0]);
+                this.peerAccessPoint=args[0];
                 this.protocol=args[1];
                 this.filePath=args[2];
                 this.nRep=args[3];
                 break;
             case 3: //restore
-                this.peerAccessPoint=Integer.parseInt(args[0]);
+                this.peerAccessPoint=args[0];
                 this.protocol=args[1];
                 this.filePath=args[2];
                 this.nRep=null;
                 break;
             case 2: //state and delete
-                this.peerAccessPoint=Integer.parseInt(args[0]);
+                this.peerAccessPoint=args[0];
                 this.protocol=args[1];
                 this.filePath=null;
                 this.nRep=null;
@@ -72,7 +72,7 @@ public class TestApp {
     public void start(){
         try {
             Registry registry= LocateRegistry.getRegistry("localhost");
-            PeerInterface stub=(PeerInterface) registry.lookup(Integer.toString(peerAccessPoint));
+            PeerInterface stub=(PeerInterface) registry.lookup(peerAccessPoint);
 
             switch(protocol)
             {

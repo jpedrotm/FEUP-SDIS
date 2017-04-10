@@ -99,7 +99,7 @@ public class DataChannel extends Channel {
         }
 
         if (file.hasChunk(chunkNo)) {
-            server.sendStored(fileID, chunkNo);
+            server.sendStored(fileID, chunkNo,version);
             return;
         }
         else {
@@ -116,7 +116,7 @@ public class DataChannel extends Channel {
                 }
                 else {
                     System.out.println("GONNA STORE  " + chunkNo);
-                    server.sendStored(fileID, chunkNo);
+                    server.sendStored(fileID, chunkNo,version);
                     chunk.addReplication(server.getServerID());
                 }
             }

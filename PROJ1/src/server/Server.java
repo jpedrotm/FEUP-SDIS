@@ -3,11 +3,13 @@ package server;
 import channels.BackupChannel;
 import channels.ControlChannel;
 import channels.DataChannel;
+import com.sun.org.apache.xpath.internal.Arg;
 import filesystem.FileManager;
 import metadata.Metadata;
 import protocols.Backup;
 import protocols.Delete;
 import protocols.Restore;
+import sun.security.ssl.ProtocolVersion;
 import utils.GoodGuy;
 import utils.Tuplo3;
 
@@ -24,6 +26,8 @@ import java.util.TimerTask;
 
 public class Server implements PeerInterface {
     private String serverID;
+    private String version;
+    private String accessPoint;
     private ControlChannel mc;
     private BackupChannel mdr;
     private DataChannel mdb;
@@ -37,7 +41,7 @@ public class Server implements PeerInterface {
             Server server = new Server(args);
             PeerInterface stub = (PeerInterface) UnicastRemoteObject.exportObject(server,0);
             Registry registry = LocateRegistry.getRegistry();
-            registry.rebind(server.getServerID(), stub);
+            registry.rebind(server.getAccessPoint(), stub);
             server.start();
 
         } catch (RemoteException e) {
@@ -47,15 +51,20 @@ public class Server implements PeerInterface {
 
     public Server(String[] commands) {
 
-        this.serverID = commands[0]; //temporario só para testar o RMI
+        this.version=commands[Arguments.ProtocolVersion];
+        this.serverID=commands[Arguments.ServerID];
+        this.accessPoint=commands[Arguments.AccessPoint];
+
+        //----------------------------------------------------
+
         this.removedTuple = null;
 
         loadMetadata();
         loadFileManager();
 
-        this.mc = new ControlChannel(this, commands[1], commands[2]);
-        this.mdb = new DataChannel(this, commands[3], commands[4]);
-        this.mdr=new BackupChannel(this,commands[5],commands[6]);
+        this.mc = new ControlChannel(this, commands[Arguments.MC_IPAddress], commands[Arguments.MC_Port]);
+        this.mdb = new DataChannel(this, commands[Arguments.MDB_IPAddress], commands[Arguments.MDB_Port]);
+        this.mdr=new BackupChannel(this,commands[Arguments.MDR_IPAddress],commands[Arguments.MDR_Port]);
 
         Runtime.getRuntime().addShutdownHook(new Thread()
         {
@@ -94,64 +103,14 @@ public class Server implements PeerInterface {
         controlThread.start();
         dataThread.start();
         backupThread.start();
-
-        /*if(serverID.equals("1")){
-
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            System.out.println("GOOOOOOO");
-
-
-
-            try {
-                Thread.sleep(4000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            System.out.println(FileManager.instance());
-
-            restore("storage/ola.pdf");
-        }*/
-
-        //delete("storage/asdas.pdf");
-
-        /*try {
-            Thread.sleep(6000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        */
-
-
-        /*
-        if (serverID.equals("1")) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            backup("amizade.jpg", "2");
-        }
-
-        try {
-            Thread.sleep(16000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        */
-
-        System.out.println(FileManager.instance());
-        System.out.println(Metadata.instance());
     }
 
     public String getServerID() {
         return serverID;
+    }
+
+    public String getAccessPoint(){
+        return accessPoint;
     }
 
     public BackupChannel getBackupChannel(){
@@ -170,12 +129,12 @@ public class Server implements PeerInterface {
         return removedTuple;
     }
 
-    public void sendStored(String fileID, int chunkNo) {
+    public void sendStored(String fileID, int chunkNo,String version) {
         new Timer().schedule(
                 new TimerTask() {
                     @Override
                     public void run() {
-                        Backup.sendStoredMessage(mc, fileID, chunkNo, serverID);
+                        Backup.sendStoredMessage(mc, fileID, chunkNo, serverID,version);
                     }
                 },
                 GoodGuy.sleepTime(0, 400)
@@ -198,7 +157,7 @@ public class Server implements PeerInterface {
 
     public void backup(String path, String replicationDeg) {
         try {
-            Backup.sendFileChunks(mdb, path,"1.0", serverID, replicationDeg);
+            Backup.sendFileChunks(mdb, path,version, serverID, replicationDeg);
         } catch (IOException e) {
             System.out.println("File not found.");
         }
@@ -207,7 +166,7 @@ public class Server implements PeerInterface {
 
     public void delete(String path) {
         try {
-            Delete.DeleteFile(mc, path, "1.0", serverID);
+            Delete.DeleteFile(mc, path, version, serverID);
         } catch (IOException e) {
             System.out.println("File not found.");
         }
@@ -215,7 +174,7 @@ public class Server implements PeerInterface {
 
     public void restore(String path) {
         try {
-            Restore.receiveFileChunks(mc, path,"1.0",serverID);
+            Restore.receiveFileChunks(mc, path,version,serverID);
         } catch (IOException e) {
             System.out.println("Error restoring chunks.");
         }
@@ -270,5 +229,17 @@ public class Server implements PeerInterface {
             ObjectInputStream ois = new ObjectInputStream(stream);
             Metadata.load((Metadata) ois.readObject());
         } catch (Exception e) {}
+    }
+
+    private class Arguments{
+        public final static int ProtocolVersion=0;
+        public final static int ServerID=1;
+        public final static int AccessPoint=2;
+        public final static int MC_IPAddress=3;
+        public final static int MC_Port=4;
+        public final static int MDB_IPAddress=5;
+        public final static int MDB_Port=6;
+        public final static int MDR_IPAddress=7;
+        public final static int MDR_Port=8;
     }
 }
