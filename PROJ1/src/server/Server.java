@@ -136,7 +136,7 @@ public class Server implements PeerInterface {
                         Backup.sendStoredMessage(mc, fileID, chunkNo, serverID,version);
                     }
                 },
-                GoodGuy.sleepTime(0, 400)
+                GoodGuy.randomBetween(0, 400)
         );
     }
 

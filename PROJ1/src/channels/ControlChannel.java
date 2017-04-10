@@ -76,11 +76,7 @@ public class ControlChannel extends Channel {
                 if(chunk.isReplicationDegreeDown()){
                     System.out.println("Verificou que está a baixo"); //falta testar esta parte agora
                     server.newRemovedTuple(new Tuplo3(fileID,chunkNo));
-                    try {
-                        Thread.sleep(GoodGuy.sleepTime(0,400));
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    GoodGuy.sleepRandomTime(0,400);
 
                     if(!server.getRemovedTuple().receivedPutChunk()) {
                         System.out.println("Não recebeu PutChunk");
@@ -135,11 +131,7 @@ public class ControlChannel extends Channel {
 
     private void restore(String[] headerFields){
 
-        try {
-            Thread.sleep(GoodGuy.sleepTime(0,400));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        GoodGuy.sleepRandomTime(0,400);
 
         String version=headerFields[FieldIndex.Version];
         String fileID=headerFields[FieldIndex.FileId];

@@ -95,7 +95,7 @@ public class DataChannel extends Channel {
                 Chunk chunk = new Chunk(chunkNo, replicationDegree, body, path);
                 file.addChunk(chunk);
 
-                Thread.sleep(GoodGuy.sleepTime(0, 800));
+                GoodGuy.sleepRandomTime(0,800);
                 if (FileManager.instance().chunkDegreeSatisfied(fileID, chunkNo)) {
                     file.deleteChunk(chunk.getNumber());
                 }

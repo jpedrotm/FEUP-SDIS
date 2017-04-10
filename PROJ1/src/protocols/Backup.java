@@ -4,6 +4,7 @@ package protocols;
 import channels.ControlChannel;
 import channels.DataChannel;
 import metadata.Metadata;
+import utils.GoodGuy;
 import utils.Message;
 
 import java.io.*;
@@ -33,6 +34,7 @@ public class Backup extends Protocol {
             byte[] body = Arrays.copyOf(content, bytesRead);
             Message msg = new Message(header, body);
 
+            GoodGuy.sleepRandomTime(0, 200);
             mdb.send(msg);
             i++;
         }
