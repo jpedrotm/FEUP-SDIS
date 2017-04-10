@@ -94,7 +94,6 @@ public class DataChannel extends Channel {
 
                 GoodGuy.sleepRandomTime(0, 800);
                 if (FileManager.instance().chunkDegreeSatisfied(fileID, chunkNo)) {
-                    System.out.println("deleting");
                     file.deleteChunk(chunk.getNumber());
                 }
                 else {

@@ -81,15 +81,12 @@ public class ControlChannel extends Channel {
 
                 Chunk chunk=FileManager.instance().getFile(fileID).getChunk(chunkNo);
                 chunk.subReplication(senderID);
-                System.out.println("ChunkNo: "+chunkNo+" , actualRepDegree: "+chunk.getActualReplicationDegreeSync()+", RepDegree: "+chunk.getReplicationDegree());
                 if(chunk.isReplicationDegreeDown()){
-                    System.out.println("Verificou que está a baixo"); //falta testar esta parte agora
                     server.newRemovedTuple(new Tuplo3(fileID,chunkNo));
                     GoodGuy.sleepRandomTime(0, 400);
 
                     if(!server.getRemovedTuple().receivedPutChunk()) {
                         FileManager.instance().startChunkTransaction(fileID, chunkNo);
-                        System.out.println("Não recebeu PutChunk");
                         server.resetRemovedTuple();
 
                         FileChunk fileChunk = FileManager.instance().getFile(fileID);
@@ -195,9 +192,7 @@ public class ControlChannel extends Channel {
             @Override
             public void run() {
                 if (limiter.limitReached()) {
-                    System.out.println("1");
                     if (FileManager.instance().hasPendingLease(fileId)) {
-                        System.out.println("2");
                         try {
                             FileManager.instance().deleteFile(fileId);
                         } catch (IOException e) {}

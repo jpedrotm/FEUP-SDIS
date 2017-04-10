@@ -30,7 +30,6 @@ public class Chunk  implements Serializable {
         onTransaction = false;
 
         storeContent(content);
-        System.err.println("content stored!!");
     }
 
     public boolean isOnTransaction() {

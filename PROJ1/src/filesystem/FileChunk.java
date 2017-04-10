@@ -153,7 +153,6 @@ public class FileChunk implements Serializable, LeaseListener {
     }
 
     public void loadLease(int maxTimestamp) {
-        System.out.println("Novo lease");
         this.lease = new Lease(maxTimestamp, this);
         this.lease.start();
     }
