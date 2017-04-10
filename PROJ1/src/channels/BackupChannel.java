@@ -68,30 +68,17 @@ public class BackupChannel extends Channel {
             String path="storage/restored/"+fileName;
             Path pathToFile= Paths.get(path);
 
-            if(chunkNo == 0 && !filesToRead.containsKey(fileID)) {
+            if(!filesToRead.containsKey(fileID)) {
                 Files.createDirectories(pathToFile.getParent());
+                System.out.println("Criou: "+fileID);
                 filesToRead.put(fileID, new ChunkRestore());
             }
 
             if(filesToRead.containsKey(fileID)){
-                if(filesToRead.get(fileID).getCurrentChunkNo() == chunkNo) {
-                    System.out.println("Escreve   "  + chunkNo + "    " + path);
-                    FileOutputStream fos = new FileOutputStream (new File(path),true);
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    baos.write(body);
-                    baos.writeTo(fos);
-                    filesToRead.get(fileID).verifyIfHasNextChunks(baos,fos);
-                    baos.close();
-                    fos.close();
-                    this.updateFilesToRead(fileID, chunkNo);
-                }
-                else{
-                    if(chunkNo>filesToRead.get(fileID).getCurrentChunkNo()){
-                        filesToRead.get(fileID).addChunk(chunkNo,body);
-                    }
-                }
+              filesToRead.get(fileID).addChunk(chunkNo,body);
+              filesToRead.get(fileID).verifyIfHasNextChunks(path);
+              this.verifyEndOfChunks(fileID,filesToRead.get(fileID).getCurrentChunkNo());
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -110,10 +97,14 @@ public class BackupChannel extends Channel {
         }
 
         public void addChunk(int chunkNo,byte[] body){
+          if(!chunkBody.containsKey(chunkNo)){
             chunkBody.put(chunkNo,body);
+            System.out.println("SIZE: "+chunkBody.size()+", No: "+chunkNo);
+          }
         }
 
         public void deleteChunk(int chunkNo){
+          System.out.println("Vou remover: "+chunkNo);
             chunkBody.remove(chunkNo);
         }
 
@@ -125,11 +116,14 @@ public class BackupChannel extends Channel {
             return currentChunkNo;
         }
 
-        public void verifyIfHasNextChunks(ByteArrayOutputStream baos,FileOutputStream fos){
+        public void verifyIfHasNextChunks(String path){
+
+          try{
+            FileOutputStream fos = new FileOutputStream (new File(path),true);
 
             while (chunkBody.containsKey(currentChunkNo)) {
-                System.out.println("VOU ESCREVER   "  + currentChunkNo);
-                updateChunkNo();
+                System.out.println("VOU ESCREVER: "  + currentChunkNo);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 try {
                     baos.write(chunkBody.get(currentChunkNo));
                     baos.writeTo(fos);
@@ -137,22 +131,26 @@ public class BackupChannel extends Channel {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                currentChunkNo++;
+                baos.close();
             }
+            
+            fos.close();
+
+          }catch(Exception e){
+            e.printStackTrace();
+          }
         }
 
     }
 
-    private void updateFilesToRead(String fileId, int chunkNo){
-
-        System.out.println("RECEIVED CHUNK No: "+chunkNo);
+    private void verifyEndOfChunks(String fileId,int currentChunkNo){
 
         int numChunks=Metadata.instance().getFileNumChunks(fileId, Metadata.InfoRequest.HASH);
-        if(chunkNo == (numChunks-1)){
+        System.out.println(currentChunkNo+" == "+numChunks);
+        if(currentChunkNo == numChunks){
             filesToRead.remove(fileId);
             System.out.println("Apaguei file: "+fileId+"->"+filesToRead.size());
-        }
-        else {
-            filesToRead.get(fileId).updateChunkNo();
         }
 
     }
