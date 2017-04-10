@@ -22,12 +22,6 @@ public class ControlChannel extends Channel {
     }
 
     @Override
-    void handler() {
-
-
-    }
-
-    @Override
     public void run() {
 
         while (!shutdown) {
@@ -36,7 +30,8 @@ public class ControlChannel extends Channel {
             try {
                 this.socket.receive(packet);
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("Error: " + e.getMessage());
+                continue;
             }
 
             Message message = new Message(packet);
@@ -96,7 +91,8 @@ public class ControlChannel extends Channel {
                             Message message = new Message(header, body);
                             server.getDataChannel().sendRemoved(message);
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            System.err.println("Error: " + e.getMessage());
+                            return;
                         }
                     }
                     else
@@ -113,7 +109,10 @@ public class ControlChannel extends Channel {
         if (FileManager.instance().hasFile(fileID)) {
             try {
                 FileManager.instance().deleteFile(fileID);
-            } catch (IOException e) {}
+            } catch (IOException e) {
+                System.err.println("Error: " + e.getMessage());
+                return;
+            }
         }
     }
 
@@ -154,21 +153,11 @@ public class ControlChannel extends Channel {
                 if (body == null)
                   return;
 
-                Message msg = null;
-                try {
-                    msg = new Message(header, body);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                try{
-                    server.getBackupChannel().send(msg); //precisei de criar o get para aceder ao mdr
-                } catch(IOException e){
-                    e.printStackTrace();
-                }
-
+                Message msg = new Message(header, body);
+                server.getBackupChannel().send(msg);
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("Error: " + e.getMessage());
+                return;
             }
         }
 

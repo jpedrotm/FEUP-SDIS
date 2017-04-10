@@ -26,26 +26,14 @@ public class DataChannel extends Channel {
     }
 
     @Override
-    void handler() {
-
-        DatagramPacket packet = new DatagramPacket(new byte[256], 256);
-
-        try {
-            socket.receive(packet);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    @Override
     public void run() {
         while (!shutdown) {
             DatagramPacket packet = new DatagramPacket(new byte[Message.MAX_CHUNK_SIZE], Message.MAX_CHUNK_SIZE);
             try {
                 this.socket.receive(packet);
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("Error: " + e.getMessage());
+                continue;
             }
 
             Message message = new Message(packet);
@@ -108,22 +96,16 @@ public class DataChannel extends Channel {
                 Chunk chunk = new Chunk(chunkNo, replicationDegree, body, path);
                 file.addChunk(chunk);
 
-                long r;
-                Thread.sleep( (r= GoodGuy.sleepTime(0, 800)) );
-                System.out.println("FREE FROM SLEEP  " + r + "  " + chunkNo);
+                Thread.sleep(GoodGuy.sleepTime(0, 800));
                 if (FileManager.instance().chunkDegreeSatisfied(fileID, chunkNo)) {
                     file.deleteChunk(chunk.getNumber());
                 }
                 else {
-                    System.out.println("GONNA STORE  " + chunkNo);
-                    server.sendStored(fileID, chunkNo,version);
+                    server.sendStored(fileID, chunkNo, version);
                     chunk.addReplication(server.getServerID());
                 }
             }
-            catch (IOException e) { /* Do nothing */ }
-            catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            catch (Exception e) { /* Do nothing */ }
         }
     }
 

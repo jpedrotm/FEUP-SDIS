@@ -9,17 +9,12 @@ public class Reclaim extends Protocol{
     public static void sendRemoved(ControlChannel mc,String version,String senderID,String fileId,String chunkNo){
         String header= Message.buildHeader(MessageType.Removed,version,senderID,fileId,chunkNo);
 
-        Message msg=null;
         try {
-            msg=new Message(header);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
+            Message msg=new Message(header);
             mc.send(msg);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
+            return;
         }
     }
 

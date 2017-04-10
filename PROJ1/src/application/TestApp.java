@@ -1,7 +1,6 @@
 package application;
 
 import server.PeerInterface;
-
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -9,54 +8,63 @@ import java.rmi.registry.Registry;
 
 public class TestApp {
 
-    private String peerAccessPoint; //peer access point (não sei bem para que usar)
+    private String peerAccessPoint;
     private String protocol; //sub protocol usado
     private String filePath; //path do ficheiro para faze backup
     private String nRep; //número de replicações para fazer do ficheiro (apenas em caso do sub protocolo backup)
 
     public static void main(String[] args){
-
         try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            TestApp application = new TestApp(args);
+            application.start();
         }
-
-        System.out.println("VAMOOOOOS");
-
-        TestApp application=new TestApp(args);
-        application.start();
-
+        catch (IllegalArgumentException e) {
+            System.err.println("\nInicialização inválida: \n" +
+                    "\t<AP> BACKUP <File Path> <Replication Degree> \n" +
+                    "\t<AP> RESTORE <File Path> \n" +
+                    "\t<AP> DELETE <File Path> \n" +
+                    "\t<AP> STATE \n");
+        }
     }
 
     public TestApp(String[] args){
 
-        if(this.initializeVariables(args)==1){ //secalhar está confuso mas foi o que pareceu melhor porque com o switch já verifico o número de argumentos uma vez que é único para cada "comando"
-            System.out.println("Número de argumentos inválido.");
-            return;
+        if (this.initializeVariables(args) == 1) {
+            throw new IllegalArgumentException("Número de argumentos inválido.");
         }
-
     }
 
-    private int initializeVariables(String[] args){
+    private int initializeVariables(String[] args) {
 
-        int n=args.length;
+        int n = args.length;
 
-        switch(n){
+        switch(n) {
             case 4: //backup
-                this.peerAccessPoint=args[0];
-                this.protocol=args[1];
-                this.filePath=args[2];
-                this.nRep=args[3];
+                if (!args[1].equals("BACKUP")) {
+                    return 1;
+                }
+
+                this.peerAccessPoint = args[0];
+                this.protocol = args[1];
+                this.filePath = args[2];
+                this.nRep = args[3];
                 break;
-            case 3: //restore
-                this.peerAccessPoint=args[0];
+            case 3: //restore and delete
+                if (!args[1].equals("RESTORE") && !args[0].equals("DELETE")) {
+                    return 1;
+                }
+
+                this.peerAccessPoint = args[0];
                 this.protocol=args[1];
                 this.filePath=args[2];
                 this.nRep=null;
                 break;
-            case 2: //state and delete
-                this.peerAccessPoint=args[0];
+            case 2: //state
+                if (!args[1].equals("STATE")) {
+                    return 1;
+                }
+
+                this.peerAccessPoint = args[0];
                 this.protocol=args[1];
                 this.filePath=null;
                 this.nRep=null;

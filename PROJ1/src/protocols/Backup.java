@@ -38,20 +38,15 @@ public class Backup extends Protocol {
         }
     }
 
-    public static void sendStoredMessage(ControlChannel mc, String fileID, int chunkNo, String serverID,String version) {
+    public static void sendStoredMessage(ControlChannel mc, String fileID, int chunkNo, String serverID) {
         String header = Message.buildHeader(MessageType.Stored,version, serverID, fileID, Integer.toString(chunkNo));
-        Message msg = null;
 
         try {
-            msg = new Message(header);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
+            Message msg = new Message(header);
             mc.send(msg);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
+            return;
         }
     }
 

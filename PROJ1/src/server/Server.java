@@ -45,7 +45,8 @@ public class Server implements PeerInterface {
             server.start();
 
         } catch (RemoteException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
+            return;
         }
     }
 
@@ -159,7 +160,7 @@ public class Server implements PeerInterface {
         try {
             Backup.sendFileChunks(mdb, path,version, serverID, replicationDeg);
         } catch (IOException e) {
-            System.out.println("File not found.");
+            System.err.println("Error: " + e.getMessage());
         }
     }
 
@@ -168,7 +169,7 @@ public class Server implements PeerInterface {
         try {
             Delete.DeleteFile(mc, path, version, serverID);
         } catch (IOException e) {
-            System.out.println("File not found.");
+            System.err.println("Error: " + e.getMessage());
         }
     }
 
@@ -176,7 +177,7 @@ public class Server implements PeerInterface {
         try {
             Restore.receiveFileChunks(mc, path,version,serverID);
         } catch (IOException e) {
-            System.out.println("Error restoring chunks.");
+            System.err.println("Error: " + e.getMessage());
         }
     }
 
