@@ -67,9 +67,9 @@ public class Server implements PeerInterface, FileChunkListener {
         loadMetadata();
         loadFileManager();
 
-        this.mc = new ControlChannel(this, commands[1], commands[2]);
-        this.mdb = new DataChannel(this, commands[3], commands[4]);
-        this.mdr = new BackupChannel(this,commands[5],commands[6]);
+        this.mc = new ControlChannel(this, commands[Arguments.MC_IPAddress], commands[Arguments.MC_Port]);
+        this.mdb = new DataChannel(this, commands[Arguments.MDB_IPAddress], commands[Arguments.MDB_Port]);
+        this.mdr=new BackupChannel(this,commands[Arguments.MDR_IPAddress],commands[Arguments.MDR_Port]);
 
         handleTransactions();
         reviewFileManager();
