@@ -122,7 +122,8 @@ public class FileManager implements Serializable {
         else                 return pairs.get(0);
     }
 
-    public void updateLimitContentSize(int newMaxContentSize, ControlChannel mc,String serverID){
+
+    public void updateLimitContentSize(int newMaxContentSize, ControlChannel mc,String serverID, String version){
 
         if(newMaxContentSize>this.maxContentSize){
             this.maxContentSize=newMaxContentSize;
@@ -135,7 +136,7 @@ public class FileManager implements Serializable {
                 String chunkNo=Integer.toString(chunksPair.get(i).chunk.getNumber());
                 String fileId=chunksPair.get(i).file.getFileId();
                 deleteChunk(chunksPair.get(i));
-                Reclaim.sendRemoved(mc,"1.0",serverID,fileId,chunkNo);
+                Reclaim.sendRemoved(mc,version,serverID,fileId,chunkNo);
                 i++;
             }
             this.maxContentSize=newMaxContentSize;
