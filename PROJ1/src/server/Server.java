@@ -3,13 +3,11 @@ package server;
 import channels.BackupChannel;
 import channels.ControlChannel;
 import channels.DataChannel;
-import com.sun.org.apache.xpath.internal.Arg;
 import filesystem.FileManager;
 import metadata.Metadata;
 import protocols.Backup;
 import protocols.Delete;
 import protocols.Restore;
-import sun.security.ssl.ProtocolVersion;
 import utils.GoodGuy;
 import utils.Tuplo3;
 
@@ -43,10 +41,8 @@ public class Server implements PeerInterface {
             Registry registry = LocateRegistry.getRegistry();
             registry.rebind(server.getAccessPoint(), stub);
             server.start();
-
         } catch (RemoteException e) {
             System.err.println("Error: " + e.getMessage());
-            return;
         }
     }
 
@@ -94,6 +90,8 @@ public class Server implements PeerInterface {
                 }
             }
         });
+
+        System.out.println("Server " + serverID + " is now online!");
     }
 
     public void start() {
@@ -242,5 +240,10 @@ public class Server implements PeerInterface {
         public final static int MDB_Port=6;
         public final static int MDR_IPAddress=7;
         public final static int MDR_Port=8;
+    }
+
+
+    public String getVersion() {
+        return version;
     }
 }

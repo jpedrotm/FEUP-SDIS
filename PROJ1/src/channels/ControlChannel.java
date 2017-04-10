@@ -37,7 +37,7 @@ public class ControlChannel extends Channel {
             Message message = new Message(packet);
             String[] headerFields = message.getHeaderFields();
 
-            if (headerFields[FieldIndex.SenderId].equals(server.getServerID()))
+            if (headerFields[FieldIndex.SenderId].equals(server.getServerID()) || !headerFields[FieldIndex.Version].equals(server.getVersion()))
                 continue;
 
             System.out.println(message.getHeader());

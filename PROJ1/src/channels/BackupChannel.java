@@ -37,7 +37,7 @@ public class BackupChannel extends Channel {
             String[] headerFields = message.getHeaderFields();
             byte[] body = message.getBody();
 
-            if (headerFields[Message.FieldIndex.SenderId].equals(server.getServerID()))
+            if (headerFields[Message.FieldIndex.SenderId].equals(server.getServerID()) || !headerFields[Message.FieldIndex.Version].equals(server.getVersion()))
                 continue;
 
             System.out.println(message.getHeader());

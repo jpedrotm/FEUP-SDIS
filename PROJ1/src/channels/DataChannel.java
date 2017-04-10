@@ -4,7 +4,6 @@ import filesystem.Chunk;
 import filesystem.FileChunk;
 import filesystem.FileManager;
 import metadata.Metadata;
-import protocols.Backup;
 import protocols.Protocol;
 import protocols.Reclaim;
 import server.Server;
@@ -40,7 +39,7 @@ public class DataChannel extends Channel {
             String[] headerFields = message.getHeaderFields();
             byte[] body = message.getBody();
 
-            if (headerFields[FieldIndex.SenderId].equals(server.getServerID()))
+            if (headerFields[FieldIndex.SenderId].equals(server.getServerID()) || !headerFields[FieldIndex.Version].equals(server.getVersion()))
                 continue;
 
             System.out.println(message.getHeader());
