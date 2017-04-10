@@ -111,10 +111,7 @@ public class ControlChannel extends Channel {
         if (FileManager.instance().hasFile(fileID)) {
             try {
                 FileManager.instance().deleteFile(fileID);
-            } catch (IOException e) {
-                System.err.println("Error: " + e.getMessage());
-                return;
-            }
+            } catch (IOException e) {}
         }
     }
 
