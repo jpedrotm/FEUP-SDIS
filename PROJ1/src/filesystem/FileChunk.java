@@ -54,9 +54,9 @@ public class FileChunk implements Serializable {
 
         Iterator it = chunks.entrySet().iterator();
         while (true) {
-            Map.Entry pair = (Map.Entry)it.next();
-            finalPrint+=pair.getValue().toString();
             if(it.hasNext()){
+                Map.Entry pair = (Map.Entry)it.next();
+                finalPrint+=pair.getValue().toString();
                 finalPrint+=",";
             }
             else
