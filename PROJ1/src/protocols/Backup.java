@@ -38,7 +38,7 @@ public class Backup extends Protocol {
         }
     }
 
-    public static void sendStoredMessage(ControlChannel mc, String fileID, int chunkNo, String serverID) {
+    public static void sendStoredMessage(ControlChannel mc, String fileID, int chunkNo, String serverID, String version) {
         String header = Message.buildHeader(MessageType.Stored,version, serverID, fileID, Integer.toString(chunkNo));
 
         try {
