@@ -41,7 +41,9 @@ public class Chunk  implements Serializable {
         int bytesRead;
 
         FileInputStream is=new FileInputStream(chunkFile);
-        bytesRead=is.read(content, 0, byteReadSize);
+        bytesRead = is.read(content, 0, byteReadSize);
+        if (bytesRead < 0)
+          return null;
 
         byte[] body = Arrays.copyOf(content, bytesRead);
         return body;
