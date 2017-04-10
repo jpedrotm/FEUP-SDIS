@@ -67,7 +67,21 @@ public class FileChunk implements Serializable, LeaseListener {
 
     @Override
     public String toString() {
-        return chunks.toString();
+        String finalPrint="";
+
+        Iterator it = chunks.entrySet().iterator();
+        while (true) {
+            Map.Entry pair = (Map.Entry)it.next();
+            finalPrint+=pair.getValue().toString();
+            if(it.hasNext()){
+                finalPrint+=",";
+            }
+            else
+                break;
+            it.remove();
+        }
+
+        return finalPrint;
     }
 
     public void delete() throws IOException {
@@ -78,13 +92,6 @@ public class FileChunk implements Serializable, LeaseListener {
             chunk.deleteContent();
             it.remove(); // avoids a ConcurrentModificationException
         }
-
-        /*
-        for (Chunk chunk : chunks.values()) {
-            chunk.deleteContent();
-            chunks.remove(chunk.getNumber());
-        }
-        */
 
         Path dir = Paths.get(dirPath);
         Files.delete(dir);

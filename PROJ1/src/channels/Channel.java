@@ -26,13 +26,12 @@ abstract class Channel implements Runnable {
             socket = new MulticastSocket(port);
             socket.joinGroup(address);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
+            return;
         }
 
         shutdown = false;
     }
-
-    abstract void handler();
 
     public void send(Message msg) throws IOException {
         byte[] sendMsg = msg.getMessage();

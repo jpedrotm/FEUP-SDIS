@@ -48,6 +48,6 @@ public class ChunkMetadata implements Serializable {
 
     @Override
     public String toString() {
-        return "Chunk: ontransaction=" + onTransaction + "   nº"+chunkNo+" , perceivedRepDegree: "+storeds.size();
+        return "Chunk: nº"+chunkNo+", perceivedRepDegree: "+storeds.size();
     }
 }

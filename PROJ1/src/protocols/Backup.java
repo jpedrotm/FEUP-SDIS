@@ -6,6 +6,7 @@ import channels.DataChannel;
 import filesystem.Chunk;
 import filesystem.FileChunk;
 import metadata.Metadata;
+import utils.GoodGuy;
 import utils.Message;
 
 import java.io.IOException;
@@ -34,6 +35,7 @@ public class Backup extends Protocol {
             byte[] body = Arrays.copyOf(content, bytesRead);
             Message msg = new Message(header, body);
 
+            GoodGuy.sleepRandomTime(0, 200);
             mdb.send(msg);
             i++;
         }
@@ -51,20 +53,15 @@ public class Backup extends Protocol {
         } catch (IOException e) {}
     }
 
-    public static void sendStoredMessage(ControlChannel mc, String fileID, int chunkNo, String serverID) {
-        String header = Message.buildHeader(MessageType.Stored,"1.0", serverID, fileID, Integer.toString(chunkNo));
-        Message msg = null;
+    public static void sendStoredMessage(ControlChannel mc, String fileID, int chunkNo, String serverID, String version) {
+        String header = Message.buildHeader(MessageType.Stored,version, serverID, fileID, Integer.toString(chunkNo));
 
         try {
-            msg = new Message(header);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
+            Message msg = new Message(header);
             mc.send(msg);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
+            return;
         }
     }
 

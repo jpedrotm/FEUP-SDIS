@@ -29,7 +29,7 @@ channels = " ".join(argv[2:8])
 
 # Start servers
 for item1, item2 in grouper(2, argv[8::]):
-    cmd = " ".join(['java -cp bin/ server.Server', item1, channels])
+    cmd = " ".join(['java -cp bin/ server.Server', version, item1, item2, channels])
     process = subprocess.Popen(['gnome-terminal', '-e', cmd], stdout=subprocess.PIPE)
     output, error = process.communicate();
 

@@ -77,7 +77,7 @@ public class FileMetadata implements Serializable {
         return "FileMetadata{ onTransaction=" + onTransaction +
                 "path='" + path + '\'' +
                 ", hashFileId='" + hashFileId + '\'' +
-                ", replicationDegree=" + repDegree + "\'\n"+
+                ", replicationDegree=" + repDegree + "\', "+
                 chunksMetadata.toString()+
                 "}\n";
     }

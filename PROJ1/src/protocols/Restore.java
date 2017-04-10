@@ -31,9 +31,7 @@ public class Restore extends Protocol {
 
             try {
                 Thread.sleep(400);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            } catch (InterruptedException e) {}
             Socket socket = ss.accept();
 
             ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());

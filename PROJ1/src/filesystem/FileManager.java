@@ -179,12 +179,22 @@ public class FileManager implements Serializable {
 
     @Override
     public String toString() {
-        return "FileManager{" +
-                files.toString() +"\n"+
-                ", storage capacity=" + maxContentSize +
-                ", free space=" + (maxContentSize-getStoredSize()) +
-                ", space used= "+getStoredSize()+
+        String result="";
+        result="FileManager{" +"\n";
+        if(files.size()==0){
+            result+="No chunks stored."+"\n";
+        }
+        else{
+            result+=files.toString() +"\n";
+
+        }
+
+        result+="Storage capacity=" + maxContentSize +"\n"+
+                "Free space=" + (maxContentSize-getStoredSize()) +"\n"+
+                "Space used= "+getStoredSize()+"\n"+
                 '}';
+
+        return result;
     }
 
     public static void load(FileManager fileManager) {

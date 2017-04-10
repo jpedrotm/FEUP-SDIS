@@ -92,13 +92,13 @@ public class Message implements Serializable {
         try {
             hashAlgorithm = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
         byte[] hash= new byte[0];
         try {
             hash = hashAlgorithm.digest(fileId.getBytes("UTF-8"));
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
         hexString=new StringBuffer();
         for (int j = 0; j < hash.length; j++) { //verificar fiabilidade e eficiências

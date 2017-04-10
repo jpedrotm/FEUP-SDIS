@@ -22,33 +22,21 @@ public class DataChannel extends Channel {
     }
 
     @Override
-    void handler() {
-
-        DatagramPacket packet = new DatagramPacket(new byte[256], 256);
-
-        try {
-            socket.receive(packet);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    @Override
     public void run() {
         while (!shutdown) {
             DatagramPacket packet = new DatagramPacket(new byte[Message.MAX_CHUNK_SIZE], Message.MAX_CHUNK_SIZE);
             try {
                 this.socket.receive(packet);
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("Error: " + e.getMessage());
+                continue;
             }
 
             Message message = new Message(packet);
             String[] headerFields = message.getHeaderFields();
             byte[] body = message.getBody();
 
-            if (headerFields[FieldIndex.SenderId].equals(server.getServerID()))
+            if (headerFields[FieldIndex.SenderId].equals(server.getServerID()) || !headerFields[FieldIndex.Version].equals(server.getVersion()))
                 continue;
 
             System.out.println(message.getHeader());
@@ -95,7 +83,7 @@ public class DataChannel extends Channel {
         }
 
         if (file.hasChunk(chunkNo)) {
-            server.sendStored(fileID, chunkNo);
+            server.sendStored(fileID, chunkNo,version);
             return;
         }
         else {
@@ -110,13 +98,11 @@ public class DataChannel extends Channel {
                     file.deleteChunk(chunk.getNumber());
                 }
                 else {
-                    System.out.println("GONNA STORE  " + chunkNo);
-                    System.err.println(FileManager.instance());
-                    server.sendStored(fileID, chunkNo);
+                    server.sendStored(fileID, chunkNo, version);
                     chunk.addReplication(server.getServerID());
                 }
             }
-            catch (IOException e) { /* Do nothing */ }
+            catch (Exception e) { /* Do nothing */ }
         }
     }
 

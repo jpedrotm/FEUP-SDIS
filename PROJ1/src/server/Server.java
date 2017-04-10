@@ -31,6 +31,8 @@ import java.util.TimerTask;
 
 public class Server implements PeerInterface, FileChunkListener {
     private String serverID;
+    private String version;
+    private String accessPoint;
     private ControlChannel mc;
     private BackupChannel mdr;
     private DataChannel mdb;
@@ -44,18 +46,22 @@ public class Server implements PeerInterface, FileChunkListener {
             Server server = new Server(args);
             PeerInterface stub = (PeerInterface) UnicastRemoteObject.exportObject(server,0);
             Registry registry = LocateRegistry.getRegistry();
-            registry.rebind(server.getServerID(), stub);
+            registry.rebind(server.getAccessPoint(), stub);
             server.start();
-
         } catch (RemoteException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         }
     }
 
     public Server(String[] commands) {
         
 
-        this.serverID = commands[0]; //temporario só para testar o RMI
+        this.version=commands[Arguments.ProtocolVersion];
+        this.serverID=commands[Arguments.ServerID];
+        this.accessPoint=commands[Arguments.AccessPoint];
+
+        //----------------------------------------------------
+
         this.removedTuple = null;
 
         loadMetadata();
@@ -95,6 +101,8 @@ public class Server implements PeerInterface, FileChunkListener {
                 }
             }
         });
+
+        System.out.println("Server " + serverID + " is now online!");
     }
 
     public void start() {
@@ -105,63 +113,6 @@ public class Server implements PeerInterface, FileChunkListener {
         controlThread.start();
         dataThread.start();
         backupThread.start();
-
-        /*if(serverID.equals("1")){
-
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            System.out.println("GOOOOOOO");
-
-
-
-            try {
-                Thread.sleep(4000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            System.out.println(FileManager.instance());
-
-            restore("storage/ola.pdf");
-        }*/
-
-        //delete("storage/asdas.pdf");
-
-        /*try {
-            Thread.sleep(6000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        */
-
-
-        /*
-        if (serverID.equals("1")) {
-            try {
-                Thread.sleep(4000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            backup("amizade.jpg", "2");
-
-        }
-
-        try {
-            Thread.sleep(8000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        */
-
-
-
-        System.out.println(FileManager.instance());
-        System.out.println(Metadata.instance());
     }
 
     private void handleTransactions() {
@@ -194,6 +145,10 @@ public class Server implements PeerInterface, FileChunkListener {
         return serverID;
     }
 
+    public String getAccessPoint(){
+        return accessPoint;
+    }
+
     public BackupChannel getBackupChannel(){
         return mdr;
     }
@@ -210,12 +165,12 @@ public class Server implements PeerInterface, FileChunkListener {
         return removedTuple;
     }
 
-    public void sendStored(String fileID, int chunkNo) {
+    public void sendStored(String fileID, int chunkNo,String version) {
         new Timer().schedule(
                 new TimerTask() {
                     @Override
                     public void run() {
-                        Backup.sendStoredMessage(mc, fileID, chunkNo, serverID);
+                        Backup.sendStoredMessage(mc, fileID, chunkNo, serverID,version);
                     }
                 },
                 GoodGuy.randomBetween(0, 400)
@@ -238,26 +193,26 @@ public class Server implements PeerInterface, FileChunkListener {
 
     public void backup(String path, String replicationDeg) {
         try {
-            Backup.sendFileChunks(mdb, path,"1.0", serverID, replicationDeg);
+            Backup.sendFileChunks(mdb, path,version, serverID, replicationDeg);
         } catch (IOException e) {
-            System.out.println("File not found.");
+            System.err.println("Error: " + e.getMessage());
         }
     }
 
 
     public void delete(String path) {
         try {
-            Delete.DeleteFile(mc, path, "1.0", serverID);
+            Delete.DeleteFile(mc, path, version, serverID);
         } catch (IOException e) {
-            System.out.println("File not found.");
+            System.err.println("Error: " + e.getMessage());
         }
     }
 
     public void restore(String path) {
         try {
-            Restore.receiveFileChunks(mc, mdr, path,"1.0",serverID);
+            Restore.receiveFileChunks(mc, mdr, path, version, serverID);
         } catch (IOException e) {
-            System.out.println("Error restoring chunks.");
+            System.err.println("Error: " + e.getMessage());
         }
     }
 
@@ -321,5 +276,22 @@ public class Server implements PeerInterface, FileChunkListener {
         GoodGuy.sleepRandomTime(0, 400);
         FileManager.instance().addPendingLease(fileId);
         LeaseProto.sendGetLease(mc, "1.0", serverID, fileId);
+    }
+
+    private class Arguments{
+        public final static int ProtocolVersion=0;
+        public final static int ServerID=1;
+        public final static int AccessPoint=2;
+        public final static int MC_IPAddress=3;
+        public final static int MC_Port=4;
+        public final static int MDB_IPAddress=5;
+        public final static int MDB_Port=6;
+        public final static int MDR_IPAddress=7;
+        public final static int MDR_Port=8;
+    }
+
+
+    public String getVersion() {
+        return version;
     }
 }

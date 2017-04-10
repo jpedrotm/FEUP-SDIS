@@ -13,7 +13,8 @@ public class Reclaim extends Protocol{
             Message msg=new Message(header);
             mc.send(msg);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
+            return;
         }
     }
 

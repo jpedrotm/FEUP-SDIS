@@ -23,12 +23,6 @@ public class ControlChannel extends Channel {
     }
 
     @Override
-    void handler() {
-
-
-    }
-
-    @Override
     public void run() {
 
         while (!shutdown) {
@@ -37,13 +31,14 @@ public class ControlChannel extends Channel {
             try {
                 this.socket.receive(packet);
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("Error: " + e.getMessage());
+                continue;
             }
 
             Message message = new Message(packet);
             String[] headerFields = message.getHeaderFields();
 
-            if (headerFields[FieldIndex.SenderId].equals(server.getServerID()))
+            if (headerFields[FieldIndex.SenderId].equals(server.getServerID()) || !headerFields[FieldIndex.Version].equals(server.getVersion()))
                 continue;
 
             System.out.println(message.getHeader());
@@ -101,16 +96,6 @@ public class ControlChannel extends Channel {
                         Chunk chunkToResend = fileChunk.getChunk(chunkNo);
                         Backup.sendPutchunkFromRemoved(server.getDataChannel(), server.getServerID(), fileChunk, chunkToResend);
 
-                        /*
-                        String header = Message.buildHeader(Protocol.MessageType.Putchunk, version, server.getServerID(), fileID, Integer.toString(chunkNo), Integer.toString(chunk.getReplicationDegree()));
-                        try {
-                            byte[] body = FileManager.instance().getFile(fileID).getChunk(chunkNo).getContent(Message.MAX_CHUNK_SIZE - header.length() - 5);
-                            Message message = new Message(header, body);
-                            server.getDataChannel().sendPutchunkFromRemoved(message);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        */
                     }
                     else
                         server.resetRemovedTuple();
@@ -126,7 +111,10 @@ public class ControlChannel extends Channel {
         if (FileManager.instance().hasFile(fileID)) {
             try {
                 FileManager.instance().deleteFile(fileID);
-            } catch (IOException e) {}
+            } catch (IOException e) {
+                System.err.println("Error: " + e.getMessage());
+                return;
+            }
         }
     }
 
@@ -149,11 +137,7 @@ public class ControlChannel extends Channel {
 
     private void restore(String[] headerFields, DatagramPacket packet){
 
-        try {
-            Thread.sleep(GoodGuy.randomBetween(0,400));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        GoodGuy.sleepRandomTime(0,400);
 
         String version=headerFields[FieldIndex.Version];
         String fileID=headerFields[FieldIndex.FileId];
@@ -163,18 +147,15 @@ public class ControlChannel extends Channel {
             String header=Message.buildHeader(Protocol.MessageType.Chunk,version,server.getServerID(),fileID,chunkNo);
 
             try {
-                byte[] body = FileManager.instance().getFile(fileID).getChunk(Integer.parseInt(chunkNo)).getContent(Message.MAX_CHUNK_SIZE - header.length() - 5);//new byte[Message.MAX_CHUNK_SIZE];
-                Message msg = null;
-                try {
-                    msg = new Message(header, body);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                byte[] body=FileManager.instance().getFile(fileID).getChunk(Integer.parseInt(chunkNo)).getContent(Message.MAX_CHUNK_SIZE - header.length() - 5);//new byte[Message.MAX_CHUNK_SIZE];
+                if (body == null)
+                  return;
 
-                server.getBackupChannel().sendChunk(msg, packet);
-
+                Message msg = new Message(header, body);
+                server.getBackupChannel().send(msg);
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("Error: " + e.getMessage());
+                return;
             }
         }
 

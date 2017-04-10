@@ -18,11 +18,6 @@ public class BackupChannel extends Channel {
         super(server, addressStr,portVar);
     }
 
-    @Override
-    void handler() {
-
-    }
-
 
     @Override
     public void run() {
@@ -32,14 +27,15 @@ public class BackupChannel extends Channel {
             try {
                 this.socket.receive(packet);
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("Error: " + e.getMessage());
+                continue;
             }
 
             Message message = new Message(packet);
             String[] headerFields = message.getHeaderFields();
             byte[] body = message.getBody();
 
-            if (headerFields[Message.FieldIndex.SenderId].equals(server.getServerID()))
+            if (headerFields[Message.FieldIndex.SenderId].equals(server.getServerID()) || !headerFields[Message.FieldIndex.Version].equals(server.getVersion()))
                 continue;
 
             System.out.println(message.getHeader());
@@ -68,19 +64,20 @@ public class BackupChannel extends Channel {
             String path="storage/restored/"+fileName;
             Path pathToFile= Paths.get(path);
 
-            if(chunkNo==0){
+            if (chunkNo == 0) {
                 Files.createDirectories(pathToFile.getParent());
             }
 
-                    FileOutputStream fos = new FileOutputStream (new File(path),true);
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    baos.write(body);
-                    baos.writeTo(fos);
-                    baos.close();
-                    fos.close();
+            FileOutputStream fos = new FileOutputStream (new File(path),true);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            baos.write(body);
+            baos.writeTo(fos);
+            baos.close();
+            fos.close();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
+            return;
         }
 
 
