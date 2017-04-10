@@ -1,8 +1,6 @@
 package utils;
 
-/**
- * Created by jpedrotm on 31-03-2017.
- */
+
 public class Tuplo3 {
     private String fileId;
     private int chunkNo;

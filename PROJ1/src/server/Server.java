@@ -181,7 +181,7 @@ public class Server implements PeerInterface {
 
     public void reclaim(String space){
         int newMaxContentSize=Integer.parseInt(space)*1000; //porque o tamanho é dado e Kb
-        FileManager.instance().updateLimitContentSize(newMaxContentSize,mc,serverID);
+        FileManager.instance().updateLimitContentSize(newMaxContentSize, mc, serverID, version);
     }
 
     public String state(){
