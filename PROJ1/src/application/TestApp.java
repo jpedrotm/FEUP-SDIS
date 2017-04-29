@@ -23,6 +23,7 @@ public class TestApp {
                     "\t<AP> BACKUP <File Path> <Replication Degree> \n" +
                     "\t<AP> RESTORE <File Path> \n" +
                     "\t<AP> DELETE <File Path> \n" +
+                    "\t<AP> RECLAIM <New Storage Space> \n" +
                     "\t<AP> STATE \n");
         }
     }
@@ -50,7 +51,7 @@ public class TestApp {
                 this.nRep = args[3];
                 break;
             case 3: //restore and delete
-                if (!args[1].equals("RESTORE") && !args[0].equals("DELETE")) {
+                if (!args[1].equals("RESTORE") && !args[1].equals("DELETE") && !args[1].equals("RECLAIM")) {
                     return 1;
                 }
 
