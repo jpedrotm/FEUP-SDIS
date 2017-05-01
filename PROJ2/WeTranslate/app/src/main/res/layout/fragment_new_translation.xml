@@ -29,7 +29,7 @@
             android:layout_alignParentStart="true" />
 
         <EditText
-            android:id="@+id/textTranslateInput"
+            android:id="@+id/textTranslated"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:hint="Texto para traduzir"
@@ -46,9 +46,9 @@
             android:layout_height="wrap_content"
             android:text="Enviar"
             android:layout_marginTop="35dp"
-            android:layout_below="@+id/textTranslateInput"
-            android:layout_alignRight="@+id/textTranslateInput"
-            android:layout_alignEnd="@+id/textTranslateInput" />
+            android:layout_below="@+id/textTranslated"
+            android:layout_alignRight="@+id/textTranslated"
+            android:layout_alignEnd="@+id/textTranslated" />
 
         <Spinner
             android:id="@+id/spinnerTranslateFrom"
@@ -63,8 +63,8 @@
             android:id="@+id/spinnerTranslateTo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignRight="@+id/textTranslateInput"
-            android:layout_alignEnd="@+id/textTranslateInput"
+            android:layout_alignRight="@+id/textTranslated"
+            android:layout_alignEnd="@+id/textTranslated"
             android:layout_alignBottom="@+id/spinnerTranslateFrom" />
 
         <TextView
@@ -86,3 +86,4 @@
             android:text="Para:" />
     </RelativeLayout>
 </android.support.constraint.ConstraintLayout>
+

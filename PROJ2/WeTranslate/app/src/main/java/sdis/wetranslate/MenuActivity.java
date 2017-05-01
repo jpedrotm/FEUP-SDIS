@@ -1,10 +1,9 @@
 package sdis.wetranslate;
 
+import android.app.Fragment;
+import android.app.FragmentTransaction;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.util.TypedValue;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -13,13 +12,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Spinner;
 
 public class MenuActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, NewTranslationFragment.OnFragmentInteractionListener, TranslateFragment.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,37 +33,11 @@ public class MenuActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        // Decrease edit text's font size
-        final EditText editText = (EditText) findViewById(R.id.textTranslateInput);
-        editText.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                getResources().getDimension(R.dimen.result_font));
 
+        /*****************************************************************************************************************/
 
-        // Feed values to spinners
-        String[] items = new String[]{"Português", "Inglês", "Alemão"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
-
-        Spinner dropdownFrom = (Spinner) findViewById(R.id.spinnerTranslateFrom);
-        dropdownFrom.setAdapter(adapter);
-
-        Spinner dropdownTo = (Spinner) findViewById(R.id.spinnerTranslateTo);
-        dropdownTo.setMinimumWidth(dropdownFrom.getWidth());
-        dropdownTo.setAdapter(adapter);
-
-
-        // Listeners
-        Button buttonSend = (Button) findViewById(R.id.buttonTranslateSend);
-        buttonSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendToTranslate(editText);
-            }
-        });
-    }
-
-    private void sendToTranslate(EditText editText) {
-        String translateText = String.valueOf(editText.getText());
-        System.out.println(translateText);
+        TranslateFragment ntf = new TranslateFragment();
+        setFragment(ntf);
     }
 
     @Override
@@ -120,5 +89,15 @@ public class MenuActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void setFragment(Fragment fragment) {
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.add(R.id.fragment_container, fragment).commit();
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 }
