@@ -66,7 +66,7 @@ public class TranslateFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_translate, container, false);
+        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.activity_screen_slide, container, false);
 
         ViewPager viewPager = (ViewPager) rootView.findViewById(R.id.pager);
         viewPager.setAdapter(new TranslationPagerAdapter(getActivity()));
@@ -122,13 +122,26 @@ public class TranslateFragment extends Fragment {
         }
 
         @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            LayoutInflater inflater = LayoutInflater.from(context);
+            ViewGroup layout = (ViewGroup) inflater.inflate(R.layout.fragment_translate, container, false);
+            container.addView(layout);
+            return layout;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            container.removeView((View) object);
+        }
+
+        @Override
         public int getCount() {
-            return 0;
+            return 5;
         }
 
         @Override
         public boolean isViewFromObject(View view, Object object) {
-            return false;
+            return view == object;
         }
     }
 }
