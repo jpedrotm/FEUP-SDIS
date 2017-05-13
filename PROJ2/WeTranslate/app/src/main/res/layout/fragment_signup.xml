@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/SignUpLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:textSize="30dp"
+        android:textColor="black"
+        android:text="Sign Up" />
+
+    <EditText
+        android:id="@+id/usernameField"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/SignUpLabel"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="24dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Username" />
+
+    <EditText
+        android:id="@+id/passwordField"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/usernameField"
+        android:layout_alignStart="@+id/usernameField"
+        android:layout_below="@+id/passwordLabel"
+        android:layout_marginTop="11dp"
+        android:ems="10"
+        android:inputType="textPassword"
+        android:text="Password" />
+
+    <EditText
+        android:id="@+id/passwordConfirmationField"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:ems="10"
+        android:inputType="textPassword"
+        android:text="Password"
+        android:layout_below="@+id/passwordConfirmationLabel"
+        android:layout_alignLeft="@+id/passwordField"
+        android:layout_alignStart="@+id/passwordField" />
+
+    <Button
+        android:id="@+id/signUpSubmit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="54dp"
+        android:text="Sign Up"
+        android:layout_below="@+id/passwordConfirmationField"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:id="@+id/passwordLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="38dp"
+        android:textColor="black"
+        android:text="Password"
+        android:layout_below="@+id/usernameField"
+        android:layout_alignLeft="@+id/passwordField"
+        android:layout_alignStart="@+id/passwordField" />
+
+    <TextView
+        android:id="@+id/passwordConfirmationLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:textColor="black"
+        android:text="Password Confirmation"
+        android:layout_below="@+id/passwordField"
+        android:layout_alignLeft="@+id/passwordConfirmationField"
+        android:layout_alignStart="@+id/passwordConfirmationField" />
+
+    <ProgressBar
+        android:id="@+id/validUsername"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/passwordField"
+        android:layout_alignLeft="@+id/passwordField"
+        android:layout_alignRight="@+id/passwordField"
+        android:layout_alignStart="@+id/passwordField"
+        android:layout_centerVertical="true" />
+
+    <ProgressBar
+        android:id="@+id/validPassword"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/usernameField"
+        android:layout_alignLeft="@+id/passwordLabel"
+        android:layout_alignRight="@+id/usernameField"
+        android:layout_alignStart="@+id/passwordLabel"
+        android:layout_below="@+id/usernameField"
+        android:layout_marginTop="12dp" />
+
+    <TextView
+        android:id="@+id/messagesField"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/passwordConfirmationField"
+        android:layout_alignStart="@+id/passwordConfirmationField"
+        android:layout_below="@+id/passwordConfirmationField"
+        android:layout_marginTop="14dp"
+        android:text="Por favor, insira os dados pedidos." />
+
+</RelativeLayout>
