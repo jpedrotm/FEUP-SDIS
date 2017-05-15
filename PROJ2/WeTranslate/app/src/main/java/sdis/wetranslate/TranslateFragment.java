@@ -6,9 +6,18 @@ import android.os.Bundle;
 import android.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+
+import java.io.IOException;
+
+import sdis.wetranslate.logic.ServerRequest;
 
 
 /**
@@ -71,7 +80,47 @@ public class TranslateFragment extends Fragment {
         ViewPager viewPager = (ViewPager) rootView.findViewById(R.id.pager);
         viewPager.setAdapter(new TranslationPagerAdapter(getActivity()));
 
+
+
+        // Decrease edit text's font size
+        final EditText editText = (EditText) rootView.findViewById(R.id.textTranslated);
+        editText.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                getResources().getDimension(R.dimen.result_font));
+
+        // Feed values to spinners
+        String[] items = new String[]{"Portugues", "Ingles", "Alemao"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, items);
+
+
+        final Spinner dropdownFrom = (Spinner) rootView.findViewById(R.id.spinnerTranslateFrom);
+        dropdownFrom.setAdapter(adapter);
+
+        final Spinner dropdownTo = (Spinner) rootView.findViewById(R.id.spinnerTranslateTo);
+        dropdownTo.setMinimumWidth(dropdownFrom.getWidth());
+        dropdownTo.setAdapter(adapter);
+
+
+
+        // Listeners
+        Button buttonRequests = (Button) rootView.findViewById(R.id.buttonRequests);
+        buttonRequests.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                feedPager(dropdownFrom.toString(), dropdownTo.toString());
+            }
+        });
+
         return rootView;
+    }
+
+    private void feedPager(String source, String target) {
+        try {
+            String msg = ServerRequest.getRequests(source, target);
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     // TODO: Rename method, update argument and hook method into UI event
