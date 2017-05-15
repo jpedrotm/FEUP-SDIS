@@ -52,6 +52,10 @@ public class TranslateFragment extends Fragment {
 
     private TranslationPagerAdapter adapter;
     private ViewPager viewPager;
+    private Spinner dropdownFrom = null;
+    private Spinner dropdownTo = null;
+    private int dropdownFromPosition;
+    private int dropdownToPosition;
 
 
     public TranslateFragment() {
@@ -151,10 +155,11 @@ public class TranslateFragment extends Fragment {
             ViewGroup layout = (ViewGroup) inflater.inflate(R.layout.fragment_translate, container, false);
             container.addView(layout);
 
-            // Decrease edit text's font size
+
+
             TextView textView = (TextView) layout.findViewById(R.id.textToTranslate);
 
-
+            // Decrease edit text's font size
             final EditText editText = (EditText) layout.findViewById(R.id.textTranslated);
             editText.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                     getResources().getDimension(R.dimen.result_font));
@@ -164,12 +169,14 @@ public class TranslateFragment extends Fragment {
             ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, items);
 
 
-            final Spinner dropdownFrom = (Spinner) layout.findViewById(R.id.spinnerTranslateFrom);
+            dropdownFrom = (Spinner) layout.findViewById(R.id.spinnerTranslateFrom);
             dropdownFrom.setAdapter(adapter);
+            dropdownFrom.setSelection(dropdownFromPosition);
 
-            final Spinner dropdownTo = (Spinner) layout.findViewById(R.id.spinnerTranslateTo);
+            dropdownTo = (Spinner) layout.findViewById(R.id.spinnerTranslateTo);
             dropdownTo.setMinimumWidth(dropdownFrom.getWidth());
             dropdownTo.setAdapter(adapter);
+            dropdownTo.setSelection(dropdownToPosition);
 
 
             // Listeners
@@ -177,6 +184,8 @@ public class TranslateFragment extends Fragment {
             buttonRequests.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    dropdownFromPosition = dropdownFrom.getSelectedItemPosition();
+                    dropdownToPosition = dropdownTo.getSelectedItemPosition();
                     feedPager(dropdownFrom.getSelectedItem().toString(), dropdownTo.getSelectedItem().toString());
                 }
             });
@@ -219,6 +228,20 @@ public class TranslateFragment extends Fragment {
                     JSONArray response = ServerRequest.getRequests(source, target);
                     PagerFeeder.feed(response);
                     viewPager.setAdapter(adapter);
+                    viewPager.setPageTransformer(true, new ViewPager.PageTransformer() {
+                        private static final float ROT_MOD = -15f;
+
+                        @Override
+                        public void transformPage(View page, float position) {
+                            final float width = page.getWidth();
+                            final float height = page.getHeight();
+                            final float rotation = ROT_MOD * position * -1.25f;
+
+                            page.setPivotX(width * 0.5f);
+                            page.setPivotY(height);
+                            page.setRotation(rotation);
+                        }
+                    });
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (ServerRequestException e) {
