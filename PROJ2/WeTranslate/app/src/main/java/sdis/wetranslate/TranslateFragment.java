@@ -14,9 +14,17 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 
+import sdis.wetranslate.exceptions.ServerRequestException;
+import sdis.wetranslate.logic.PagerFeeder;
 import sdis.wetranslate.logic.ServerRequest;
 
 
@@ -39,6 +47,12 @@ public class TranslateFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+
+
+    private TranslationPagerAdapter adapter;
+    private ViewPager viewPager;
+
 
     public TranslateFragment() {
         // Required empty public constructor
@@ -77,50 +91,11 @@ public class TranslateFragment extends Fragment {
         // Inflate the layout for this fragment
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.activity_screen_slide, container, false);
 
-        ViewPager viewPager = (ViewPager) rootView.findViewById(R.id.pager);
-        viewPager.setAdapter(new TranslationPagerAdapter(getActivity()));
-
-
-
-        // Decrease edit text's font size
-        final EditText editText = (EditText) rootView.findViewById(R.id.textTranslated);
-        editText.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                getResources().getDimension(R.dimen.result_font));
-
-        // Feed values to spinners
-        String[] items = new String[]{"Portugues", "Ingles", "Alemao"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, items);
-
-
-        final Spinner dropdownFrom = (Spinner) rootView.findViewById(R.id.spinnerTranslateFrom);
-        dropdownFrom.setAdapter(adapter);
-
-        final Spinner dropdownTo = (Spinner) rootView.findViewById(R.id.spinnerTranslateTo);
-        dropdownTo.setMinimumWidth(dropdownFrom.getWidth());
-        dropdownTo.setAdapter(adapter);
-
-
-
-        // Listeners
-        Button buttonRequests = (Button) rootView.findViewById(R.id.buttonRequests);
-        buttonRequests.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                feedPager(dropdownFrom.toString(), dropdownTo.toString());
-            }
-        });
+        viewPager = (ViewPager) rootView.findViewById(R.id.pager);
+        adapter = new TranslationPagerAdapter(getActivity());
+        viewPager.setAdapter(adapter);
 
         return rootView;
-    }
-
-    private void feedPager(String source, String target) {
-        try {
-            String msg = ServerRequest.getRequests(source, target);
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -175,6 +150,47 @@ public class TranslateFragment extends Fragment {
             LayoutInflater inflater = LayoutInflater.from(context);
             ViewGroup layout = (ViewGroup) inflater.inflate(R.layout.fragment_translate, container, false);
             container.addView(layout);
+
+            // Decrease edit text's font size
+            TextView textView = (TextView) layout.findViewById(R.id.textToTranslate);
+
+
+            final EditText editText = (EditText) layout.findViewById(R.id.textTranslated);
+            editText.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                    getResources().getDimension(R.dimen.result_font));
+
+            // Feed values to spinners
+            String[] items = new String[]{"Portugues", "Ingles", "Alemao"};
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, items);
+
+
+            final Spinner dropdownFrom = (Spinner) layout.findViewById(R.id.spinnerTranslateFrom);
+            dropdownFrom.setAdapter(adapter);
+
+            final Spinner dropdownTo = (Spinner) layout.findViewById(R.id.spinnerTranslateTo);
+            dropdownTo.setMinimumWidth(dropdownFrom.getWidth());
+            dropdownTo.setAdapter(adapter);
+
+
+            // Listeners
+            Button buttonRequests = (Button) layout.findViewById(R.id.buttonRequests);
+            buttonRequests.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    feedPager(dropdownFrom.getSelectedItem().toString(), dropdownTo.getSelectedItem().toString());
+                }
+            });
+
+
+            JSONObject jsonObject = PagerFeeder.get(position);
+            if (jsonObject != null) {
+                try {
+                    textView.setText(jsonObject.getString("content"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
             return layout;
         }
 
@@ -185,12 +201,32 @@ public class TranslateFragment extends Fragment {
 
         @Override
         public int getCount() {
-            return 5;
+            return PagerFeeder.count();
         }
 
         @Override
         public boolean isViewFromObject(View view, Object object) {
             return view == object;
         }
+    }
+
+
+    private void feedPager(final String source, final String target) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    JSONArray response = ServerRequest.getRequests(source, target);
+                    PagerFeeder.feed(response);
+                    viewPager.setAdapter(adapter);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ServerRequestException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }

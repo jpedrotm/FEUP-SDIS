@@ -8,24 +8,12 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/textTranslateMsg"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="37dp"
-            android:layout_marginStart="37dp"
-            android:text="Traduzir"
-            android:layout_marginTop="12dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
-        <TextView
             android:id="@+id/textToTranslate"
             android:padding="5dp"
             android:layout_width="match_parent"
             android:layout_height="130dp"
             android:gravity="top"
-            android:layout_marginTop="17dp"
+            android:layout_marginTop="36dp"
             android:text="Texto exemplo"
             android:layout_below="@+id/buttonRequests"
             android:layout_alignParentLeft="true"
@@ -37,8 +25,10 @@
             android:layout_height="130dp"
             android:gravity="top"
             android:hint="Traduz aqui"
-            android:layout_marginTop="18dp"
-            android:layout_below="@+id/textToTranslate" />
+            android:layout_marginTop="22dp"
+            android:layout_below="@+id/textToTranslate"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
 
         <Button
             android:id="@+id/buttonTranslateSend"
@@ -56,20 +46,20 @@
             android:id="@+id/spinnerTranslateFrom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_below="@+id/textTranslateMsg"
-            android:layout_alignRight="@+id/textTranslateMsg"
-            android:layout_alignEnd="@+id/textTranslateMsg" />
+            android:layout_marginTop="22dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="15dp"
+            android:layout_marginStart="15dp" />
 
         <Spinner
             android:id="@+id/spinnerTranslateTo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="44dp"
-            android:layout_marginStart="44dp"
             android:layout_alignTop="@+id/spinnerTranslateFrom"
-            android:layout_toRightOf="@+id/spinnerTranslateFrom"
-            android:layout_toEndOf="@+id/spinnerTranslateFrom" />
+            android:layout_toRightOf="@+id/buttonRequests"
+            android:layout_toEndOf="@+id/buttonRequests" />
 
         <TextView
             android:id="@+id/textView11"
@@ -94,9 +84,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Ir"
-            android:layout_alignTop="@+id/textView12"
-            android:layout_marginRight="47dp"
-            android:layout_alignRight="@+id/textTranslated" />
+            android:layout_below="@+id/spinnerTranslateTo"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="15dp" />
 
     </RelativeLayout>
 </ScrollView>
