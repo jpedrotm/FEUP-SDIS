@@ -28,4 +28,8 @@ public class ServerRequest {
 
         return msg;
     }
+
+    public static boolean verifyUserIsValid(String username,String password){
+        return true;
+    }
 }
