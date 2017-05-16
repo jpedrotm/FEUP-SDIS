@@ -30,6 +30,9 @@ import java.io.IOException;
 import sdis.wetranslate.exceptions.ServerRequestException;
 import sdis.wetranslate.logic.PagerFeeder;
 import sdis.wetranslate.logic.ServerRequest;
+import sdis.wetranslate.logic.User;
+
+import static sdis.wetranslate.logic.ServerRequest.insertNewTranslation;
 
 
 /**
@@ -52,8 +55,8 @@ public class TranslateFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-
-
+    private boolean hasMadeRequest=false;//se já pediu um texto para traduzir
+    private EditText textTranslated;
     private TranslationPagerAdapter adapter;
     private ViewPager viewPager;
     private Spinner dropdownFrom = null;
@@ -191,8 +194,19 @@ public class TranslateFragment extends Fragment {
                     dropdownFromPosition = dropdownFrom.getSelectedItemPosition();
                     dropdownToPosition = dropdownTo.getSelectedItemPosition();
                     feedPager(dropdownFrom.getSelectedItem().toString(), dropdownTo.getSelectedItem().toString());
+                    hasMadeRequest=true;
                 }
             });
+
+            Button sendTranslationButton = (Button) layout.findViewById(R.id.buttonTranslateSend);
+            sendTranslationButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    sendTraslation();
+                }
+            });
+
+            textTranslated=(EditText) layout.findViewById(R.id.textTranslated);
 
 
             JSONObject jsonObject = PagerFeeder.get(position);
@@ -255,5 +269,22 @@ public class TranslateFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private void sendTraslation(){
+        String translatedText=textTranslated.getText().toString();
+        System.out.println(translatedText);
+
+        if(hasMadeRequest){
+            if(translatedText.length()!=0){
+                try {
+                    insertNewTranslation(User.getInstance().getUsername(),translatedText,"1"); //para já ainda não pomos o id do request
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ServerRequestException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

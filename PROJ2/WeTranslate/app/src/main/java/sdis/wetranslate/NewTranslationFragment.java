@@ -13,6 +13,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import java.io.IOException;
+
+import sdis.wetranslate.exceptions.ServerRequestException;
+import sdis.wetranslate.logic.User;
+
+import static sdis.wetranslate.logic.ServerRequest.insertNewRequest;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,6 +40,9 @@ public class NewTranslationFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+    private EditText textToTranslate;
+    private Spinner dropdownFrom = null;
+    private Spinner dropdownTo = null;
 
     public NewTranslationFragment() {
         // Required empty public constructor
@@ -72,28 +82,27 @@ public class NewTranslationFragment extends Fragment {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_new_translation, container, false);
 
         // Decrease edit text's font size
-        final EditText editText = (EditText) rootView.findViewById(R.id.textTranslated);
-        editText.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+        textToTranslate = (EditText) rootView.findViewById(R.id.textTranslated);
+        textToTranslate.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                 getResources().getDimension(R.dimen.result_font));
 
         // Feed values to spinners
         String[] items = new String[]{"Português", "Inglês", "Alemão"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, items);
 
-        Spinner dropdownFrom = (Spinner) rootView.findViewById(R.id.spinnerTranslateFrom);
+        dropdownFrom = (Spinner) rootView.findViewById(R.id.spinnerTranslateFrom);
         dropdownFrom.setAdapter(adapter);
 
-        Spinner dropdownTo = (Spinner) rootView.findViewById(R.id.spinnerTranslateTo);
+        dropdownTo = (Spinner) rootView.findViewById(R.id.spinnerTranslateTo);
         dropdownTo.setMinimumWidth(dropdownFrom.getWidth());
         dropdownTo.setAdapter(adapter);
-
 
         // Listeners
         Button buttonSend = (Button) rootView.findViewById(R.id.buttonTranslateSend);
         buttonSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendToTranslate(editText);
+                sendToTranslate();
             }
         });
 
@@ -139,8 +148,16 @@ public class NewTranslationFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
-    private void sendToTranslate(EditText editText) {
-        String translateText = String.valueOf(editText.getText());
-        System.out.println(translateText);
+    private void sendToTranslate() {
+        String textTranslate=textToTranslate.getText().toString();
+        if (textTranslate.length() != 0){
+            try {
+                insertNewRequest(User.getInstance().getUsername(),dropdownFrom.getSelectedItem().toString(),dropdownTo.getSelectedItem().toString(),textTranslate);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ServerRequestException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

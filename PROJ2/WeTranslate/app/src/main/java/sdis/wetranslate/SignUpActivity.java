@@ -38,8 +38,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import sdis.wetranslate.exceptions.ServerRequestException;
+import sdis.wetranslate.logic.User;
 
 import static android.Manifest.permission.READ_CONTACTS;
+import static sdis.wetranslate.logic.ServerRequest.insertNewUser;
 import static sdis.wetranslate.logic.ServerRequest.verifyUsernameAlreadyExists;
 import static sdis.wetranslate.utils.GoodGuy.changeActivity;
 
@@ -137,6 +139,14 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
         } else {
             //Entra aqui insere-se o utilizador e faz login na aplicação
             showProgress(true);
+            User.getInstance().initSession(username);
+            try {
+                insertNewUser(User.getInstance().getUsername(),password);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ServerRequestException e) {
+                e.printStackTrace();
+            }
             changeActivity(this,MenuActivity.class);
         }
     }

@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
@@ -37,9 +38,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import sdis.wetranslate.exceptions.ServerRequestException;
+import sdis.wetranslate.logic.User;
 
 import static android.Manifest.permission.READ_CONTACTS;
 import static sdis.wetranslate.logic.ServerRequest.verifyUserIsValid;
+import static sdis.wetranslate.utils.GoodGuy.changeActivity;
 
 /**
  * A login screen that offers login via email/password.
@@ -168,12 +171,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         if (cancel) { //inputs errados
             focusView.requestFocus();
         } else { //fazer login
-            System.out.println("SUCCESS");
             showProgress(true);
-            /*mAuthTask = new UserLoginTask(username, password);
-            mAuthTask.execute((Void) null);*/
+            User.getInstance().initSession(username);
+           changeActivity(this, MenuActivity.class);
         }
     }
+
+
 
     private boolean isUsernameValid(String username,String password) {
         try {
