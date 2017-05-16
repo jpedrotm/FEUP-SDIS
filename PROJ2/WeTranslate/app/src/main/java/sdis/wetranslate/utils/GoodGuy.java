@@ -18,4 +18,15 @@ public class GoodGuy {
         DrawableCompat.setTint(wrappedDrawable, color);
         return wrappedDrawable;
     }
+
+    public static void changeActivity(Context currentActivity,Class nextActivity)
+    {
+        //muda para a atividade desejada
+        Intent in =new Intent(currentActivity,nextActivity);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_MAIN);
+        filter.addCategory(Intent.CATEGORY_LAUNCHER);
+
+        currentActivity.startActivity(in);
+    }
 }

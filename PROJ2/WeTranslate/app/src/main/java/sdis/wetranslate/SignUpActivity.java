@@ -33,18 +33,17 @@ import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import sdis.wetranslate.exceptions.ServerRequestException;
+
 import static android.Manifest.permission.READ_CONTACTS;
 import static sdis.wetranslate.logic.ServerRequest.verifyUsernameAlreadyExists;
+import static sdis.wetranslate.utils.GoodGuy.changeActivity;
 
 public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
-
-    /**
-     * Id to identity READ_CONTACTS permission request.
-     */
-    private static final int REQUEST_READ_CONTACTS = 0;
 
     //private UserLoginTask mAuthTask = null;
 
@@ -61,7 +60,6 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
         setContentView(R.layout.activity_sign_up);
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
-        populateAutoComplete();
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -99,52 +97,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
         mProgressView = findViewById(R.id.login_progress);
     }
 
-    private void populateAutoComplete() {
-        if (!mayRequestContacts()) {
-            return;
-        }
-
-        getLoaderManager().initLoader(0, null, this);
-    }
-
-    private boolean mayRequestContacts() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return true;
-        }
-        if (checkSelfPermission(READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        }
-        if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
-            Snackbar.make(mEmailView, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
-                    .setAction(android.R.string.ok, new View.OnClickListener() {
-                        @Override
-                        @TargetApi(Build.VERSION_CODES.M)
-                        public void onClick(View v) {
-                            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
-                        }
-                    });
-        } else {
-            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
-        }
-        return false;
-    }
-
-    /**
-     * Callback received when a permissions request has been completed.
-     */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_READ_CONTACTS) {
-            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                populateAutoComplete();
-            }
-        }
-    }
-
     private void attemptSignUp() {
-
-        System.out.println("ESTOU");
 
         // Reset errors.
         mEmailView.setError(null);
@@ -184,18 +137,19 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
         } else {
             //Entra aqui insere-se o utilizador e faz login na aplicação
             showProgress(true);
-            //muda para a atividade desejada
-            Intent in =new Intent(this,MenuActivity.class);
-            IntentFilter filter = new IntentFilter();
-            filter.addAction(Intent.ACTION_MAIN);
-            filter.addCategory(Intent.CATEGORY_LAUNCHER);
-
-            startActivity(in);
+            changeActivity(this,MenuActivity.class);
         }
     }
 
     private boolean userAlreadyExists(String username) {
-        return verifyUsernameAlreadyExists(username);
+        try {
+            return verifyUsernameAlreadyExists(username);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ServerRequestException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     private boolean isPasswordValid(String password) {

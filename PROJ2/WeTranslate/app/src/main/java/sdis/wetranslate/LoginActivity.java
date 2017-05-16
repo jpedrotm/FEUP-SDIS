@@ -30,8 +30,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.json.JSONException;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import sdis.wetranslate.exceptions.ServerRequestException;
 
 import static android.Manifest.permission.READ_CONTACTS;
 import static sdis.wetranslate.logic.ServerRequest.verifyUserIsValid;
@@ -128,9 +133,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private void attemptLogin() {
-        /*if (mAuthTask != null) {
-            return;
-        }*/
 
         // Reset errors.
         mEmailView.setError(null);
@@ -174,7 +176,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private boolean isUsernameValid(String username,String password) {
-        return verifyUserIsValid(username,password);
+        try {
+            return verifyUserIsValid(username,password);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ServerRequestException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     private boolean isPasswordValid(String password) {
