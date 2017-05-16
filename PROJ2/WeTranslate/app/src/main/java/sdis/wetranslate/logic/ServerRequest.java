@@ -41,4 +41,8 @@ public class ServerRequest {
     public static boolean verifyUserIsValid(String username,String password){
         return true;
     }
+
+    public static boolean verifyUsernameAlreadyExists(String username){
+        return false;
+    }
 }
