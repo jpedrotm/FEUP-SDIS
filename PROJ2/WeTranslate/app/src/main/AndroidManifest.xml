@@ -32,6 +32,10 @@
             android:name=".SignUpActivity"
             android:label="@string/title_activity_sign_up">
         </activity>
+        <service
+            android:enabled="true"
+            android:name=".notifications.NotificationService"
+            android:exported="false" />
     </application>
 
 </manifest>

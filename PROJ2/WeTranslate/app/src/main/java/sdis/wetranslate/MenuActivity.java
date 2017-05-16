@@ -2,10 +2,16 @@ package sdis.wetranslate;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -13,6 +19,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import sdis.wetranslate.notifications.NotificationService;
 
 public class MenuActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, NewTranslationFragment.OnFragmentInteractionListener, TranslateFragment.OnFragmentInteractionListener {
@@ -41,6 +49,8 @@ public class MenuActivity extends AppCompatActivity
 
         TranslateFragment ntf = new TranslateFragment();
         setFragment(ntf);
+
+        startService(new Intent(this, NotificationService.class));
     }
 
     @Override
