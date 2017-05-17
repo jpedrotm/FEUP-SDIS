@@ -23,6 +23,9 @@ import android.view.View;
 import android.widget.Button;
 
 import sdis.wetranslate.notifications.NotificationService;
+import sdis.wetranslate.utils.GoodGuy;
+
+import static sdis.wetranslate.utils.GoodGuy.changeFragment;
 
 public class MenuActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, NewTranslationFragment.OnFragmentInteractionListener, TranslateFragment.OnFragmentInteractionListener {
@@ -93,11 +96,11 @@ public class MenuActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_new_translation) {
-            // Handle the camera action
+            changeFragment(GoodGuy.FragmentType.NEW_TRANSLATION,this);
         } else if (id == R.id.nav_translate) {
-
+            changeFragment(GoodGuy.FragmentType.TRANSLATE,this);
         } else if (id == R.id.nav_settings) {
-
+            System.out.println("3");
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

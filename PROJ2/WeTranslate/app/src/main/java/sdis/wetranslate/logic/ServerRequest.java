@@ -107,8 +107,10 @@ public class ServerRequest {
         StringBuilder builder = new StringBuilder();
 
         builder.append("http://wetranslate.ddns.net:7000/insertRequest?");
-        builder.append("from="); builder.append("pt");
+        builder.append("username="); builder.append(username);
+        builder.append("&from="); builder.append("pt");
         builder.append("&to="); builder.append("en");
+        builder.append("&text="); builder.append(text);
 
         System.out.println(builder.toString());
 
@@ -117,6 +119,6 @@ public class ServerRequest {
         connection.setRequestMethod(RequestMethod.POST);
 
         if (HttpConnection.getCode(connection) != HttpURLConnection.HTTP_OK)
-            throw new ServerRequestException("Failed to get requests");
+            throw new ServerRequestException("Failed to insert requests");
     }
 }

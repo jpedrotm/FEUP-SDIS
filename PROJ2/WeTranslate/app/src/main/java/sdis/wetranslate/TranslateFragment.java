@@ -282,7 +282,7 @@ public class TranslateFragment extends Fragment {
                 if(hasMadeRequest){
                     if(translatedText.length()!=0){
                         try {
-                            insertNewTranslation("manel1",translatedText,"1"); //para já ainda não pomos o id do request
+                            insertNewTranslation(User.getInstance().getUsername(),translatedText,"1"); //para já ainda não pomos o id do request
                         } catch (IOException e) {
                             e.printStackTrace();
                         } catch (ServerRequestException e) {

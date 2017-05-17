@@ -82,7 +82,7 @@ public class NewTranslationFragment extends Fragment {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_new_translation, container, false);
 
         // Decrease edit text's font size
-        textToTranslate = (EditText) rootView.findViewById(R.id.textTranslated);
+        textToTranslate = (EditText) rootView.findViewById(R.id.textToTranslate);
         textToTranslate.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                 getResources().getDimension(R.dimen.result_font));
 
