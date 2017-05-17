@@ -40,11 +40,11 @@ public class ServerRequest {
         return jsonArray;
     }
 
-    public static boolean verifyUserIsValid(String username,String password) throws IOException, ServerRequestException, JSONException {
+    public static boolean verifyUserIsValid(String username,String password) throws IOException, ServerRequestException {
         StringBuilder builder=new StringBuilder();
 
         builder.append("http://wetranslate.ddns.net:7000/login?");
-        builder.append("email="); builder.append(username);
+        builder.append("username="); builder.append(username);
         builder.append("&password="); builder.append(password);
 
         System.out.println(builder.toString());
@@ -52,41 +52,28 @@ public class ServerRequest {
         HttpURLConnection connection=(HttpURLConnection) new URL(builder.toString()).openConnection();
         connection.setRequestMethod(RequestMethod.POST);
 
-        if(HttpConnection.getCode(connection)!=HttpURLConnection.HTTP_OK)
-            throw new ServerRequestException("Failed to login.");
-
-        String msg=HttpConnection.getMessage(connection);
-
-        JSONArray jsonArray=new JSONArray(msg);
-        System.out.println(jsonArray);
-
-        return true;
+        return HttpConnection.getCode(connection)==HttpURLConnection.HTTP_OK;
     }
 
     public static boolean verifyUsernameAlreadyExists(String username) throws IOException, ServerRequestException {
         StringBuilder builder=new StringBuilder();
 
         builder.append("http://wetranslate.ddns.net:7000/api/userExists?");
-        builder.append("email="); builder.append(username);
+        builder.append("username="); builder.append(username);
 
         System.out.println(builder.toString());
 
         HttpURLConnection connection=(HttpURLConnection) new URL(builder.toString()).openConnection();
         connection.setRequestMethod(RequestMethod.GET);
 
-        if(HttpConnection.getCode(connection)!=HttpURLConnection.HTTP_OK)
-            throw new ServerRequestException("Failed to verify if user exists.");
-
-        String msg=HttpConnection.getMessage(connection);
-
-        return false;
+        return HttpConnection.getCode(connection)==HttpURLConnection.HTTP_OK;
     }
 
     public static void insertNewUser(String username,String password) throws IOException, ServerRequestException {
         StringBuilder builder=new StringBuilder();
 
         builder.append("http://wetranslate.ddns.net:7000/insertUser?");
-        builder.append("email="); builder.append(username);
+        builder.append("username="); builder.append(username);
         builder.append("&password="); builder.append(password);
 
         System.out.println(builder.toString());
@@ -96,14 +83,14 @@ public class ServerRequest {
 
         if(HttpConnection.getCode(connection)!=HttpURLConnection.HTTP_OK)
             throw new ServerRequestException("Failed to insert new user.");
-
-        String msg=HttpConnection.getMessage(connection);
     }
+
     public static void insertNewTranslation(String username,String translatedText,String requestId) throws IOException, ServerRequestException {
+        System.out.println("Vou enviar a nova tradução.");
         StringBuilder builder=new StringBuilder();
 
         builder.append("http://wetranslate.ddns.net:7000/insertUser?");
-        builder.append("email="); builder.append(username);
+        builder.append("username="); builder.append(username);
         builder.append("&text="); builder.append(translatedText);
         builder.append("&requestid="); builder.append(requestId);
 
@@ -114,16 +101,14 @@ public class ServerRequest {
 
         if(HttpConnection.getCode(connection)!=HttpURLConnection.HTTP_OK)
             throw new ServerRequestException("Failed to insert new user translation.");
-
-        String msg=HttpConnection.getMessage(connection);
     }
 
     public static void insertNewRequest(String username,String from,String to,String text) throws IOException, ServerRequestException {
         StringBuilder builder = new StringBuilder();
 
         builder.append("http://wetranslate.ddns.net:7000/insertRequest?");
-        builder.append("from="); builder.append(from);
-        builder.append("&to="); builder.append(to);
+        builder.append("from="); builder.append("pt");
+        builder.append("&to="); builder.append("en");
 
         System.out.println(builder.toString());
 
@@ -133,7 +118,5 @@ public class ServerRequest {
 
         if (HttpConnection.getCode(connection) != HttpURLConnection.HTTP_OK)
             throw new ServerRequestException("Failed to get requests");
-
-        String msg = HttpConnection.getMessage(connection);
     }
 }

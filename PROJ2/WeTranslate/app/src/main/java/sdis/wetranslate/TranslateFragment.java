@@ -185,6 +185,9 @@ public class TranslateFragment extends Fragment {
             dropdownTo.setAdapter(adapter);
             dropdownTo.setSelection(dropdownToPosition);
 
+            textTranslated=(EditText) layout.findViewById(R.id.textTranslated);
+            System.out.println("Text: "+textTranslated);
+
 
             // Listeners
             Button buttonRequests = (Button) layout.findViewById(R.id.buttonRequests);
@@ -205,8 +208,6 @@ public class TranslateFragment extends Fragment {
                     sendTraslation();
                 }
             });
-
-            textTranslated=(EditText) layout.findViewById(R.id.textTranslated);
 
 
             JSONObject jsonObject = PagerFeeder.get(position);
@@ -272,19 +273,24 @@ public class TranslateFragment extends Fragment {
     }
 
     private void sendTraslation(){
-        String translatedText=textTranslated.getText().toString();
-        System.out.println(translatedText);
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String translatedText=textTranslated.getText().toString();
+                System.out.println("Ola: "+hasMadeRequest+","+translatedText.length());
 
-        if(hasMadeRequest){
-            if(translatedText.length()!=0){
-                try {
-                    insertNewTranslation(User.getInstance().getUsername(),translatedText,"1"); //para já ainda não pomos o id do request
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (ServerRequestException e) {
-                    e.printStackTrace();
+                if(hasMadeRequest){
+                    if(translatedText.length()!=0){
+                        try {
+                            insertNewTranslation("manel1",translatedText,"1"); //para já ainda não pomos o id do request
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (ServerRequestException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }
-        }
+        });
     }
 }

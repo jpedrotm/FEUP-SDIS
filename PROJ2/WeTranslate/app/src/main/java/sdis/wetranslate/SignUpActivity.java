@@ -3,9 +3,11 @@ package sdis.wetranslate;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -31,6 +33,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.json.JSONException;
 import org.w3c.dom.Text;
 
 import java.io.IOException;
@@ -41,8 +44,7 @@ import sdis.wetranslate.exceptions.ServerRequestException;
 import sdis.wetranslate.logic.User;
 
 import static android.Manifest.permission.READ_CONTACTS;
-import static sdis.wetranslate.logic.ServerRequest.insertNewUser;
-import static sdis.wetranslate.logic.ServerRequest.verifyUsernameAlreadyExists;
+import static sdis.wetranslate.logic.ServerRequest.*;
 import static sdis.wetranslate.utils.GoodGuy.changeActivity;
 
 public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
@@ -55,6 +57,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
     private EditText mPasswordConfirmationView;
     private View mProgressView;
     private View mLoginFormView;
+    private SignUpActivity signUpActivity=this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +71,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptSignUp();
+                    attemptSignUp(signUpActivity);
                     return true;
                 }
                 return false;
@@ -80,7 +83,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptSignUp();
+                    attemptSignUp(signUpActivity);
                     return true;
                 }
                 return false;
@@ -91,64 +94,73 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptSignUp();
+                attemptSignUp(signUpActivity);
             }
         });
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        //necessário para fazer o lançamento de threads
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
     }
 
-    private void attemptSignUp() {
+    private void attemptSignUp(final Context signUpActivity) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // Reset errors.
+                mEmailView.setError(null);
+                mPasswordView.setError(null);
 
-        // Reset errors.
-        mEmailView.setError(null);
-        mPasswordView.setError(null);
+                String username = mEmailView.getText().toString();
+                String password = mPasswordView.getText().toString();
+                String password_confirmation=mPasswordConfirmationView.getText().toString();
 
-        String username = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
-        String password_confirmation=mPasswordConfirmationView.getText().toString();
+                boolean cancel = false;
+                View focusView = null;
 
-        boolean cancel = false;
-        View focusView = null;
+                if (!isPasswordValid(password) || !isPasswordValid(password_confirmation)) {
+                    mPasswordView.setError(getString(R.string.error_invalid_password));
+                    focusView = mPasswordView;
+                    cancel = true;
+                }
+                else if(password.equals(password)){
+                    if (TextUtils.isEmpty(username)) {
+                        mEmailView.setError(getString(R.string.error_field_required));
+                        focusView = mEmailView;
+                        cancel = true;
+                    } else if (userAlreadyExists(username)) {
+                        System.out.println("Já existe");
+                        mEmailView.setError(getString(R.string.error_invalid_email));
+                        focusView = mEmailView;
+                        cancel = true;
+                    }
+                }else{
+                    mEmailView.setError(getString(R.string.error_different_passwords));
+                    focusView = mEmailView;
+                    cancel = true;
+                }
 
-        if (!isPasswordValid(password) || !isPasswordValid(password_confirmation)) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
-            focusView = mPasswordView;
-            cancel = true;
-        }
-        else if(password.equals(password)){
-            System.out.println("OLA");
-            if (TextUtils.isEmpty(username)) {
-                mEmailView.setError(getString(R.string.error_field_required));
-                focusView = mEmailView;
-                cancel = true;
-            } else if (userAlreadyExists(username)) {
-                mEmailView.setError(getString(R.string.error_invalid_email));
-                focusView = mEmailView;
-                cancel = true;
+                if (cancel) {
+                    focusView.requestFocus();
+                } else {
+                    //Entra aqui insere-se o utilizador e faz login na aplicação
+                    showProgress(true);
+                    User.getInstance().initSession(username);
+                    try {
+                        insertNewUser(User.getInstance().getUsername(),password);
+                        verifyUserIsValid(username,password);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (ServerRequestException e) {
+                        e.printStackTrace();
+                    }
+                    changeActivity(signUpActivity,MenuActivity.class);
+                }
             }
-        }else{
-            mEmailView.setError(getString(R.string.error_different_passwords));
-            focusView = mEmailView;
-            cancel = true;
-        }
-
-        if (cancel) {
-            focusView.requestFocus();
-        } else {
-            //Entra aqui insere-se o utilizador e faz login na aplicação
-            showProgress(true);
-            User.getInstance().initSession(username);
-            try {
-                insertNewUser(User.getInstance().getUsername(),password);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ServerRequestException e) {
-                e.printStackTrace();
-            }
-            changeActivity(this,MenuActivity.class);
-        }
+        });
     }
 
     private boolean userAlreadyExists(String username) {

@@ -149,15 +149,20 @@ public class NewTranslationFragment extends Fragment {
     }
 
     private void sendToTranslate() {
-        String textTranslate=textToTranslate.getText().toString();
-        if (textTranslate.length() != 0){
-            try {
-                insertNewRequest(User.getInstance().getUsername(),dropdownFrom.getSelectedItem().toString(),dropdownTo.getSelectedItem().toString(),textTranslate);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ServerRequestException e) {
-                e.printStackTrace();
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String textTranslate=textToTranslate.getText().toString();
+                if (textTranslate.length() != 0){
+                    try {
+                        insertNewRequest(User.getInstance().getUsername(),dropdownFrom.getSelectedItem().toString(),dropdownTo.getSelectedItem().toString(),textTranslate);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (ServerRequestException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
-        }
+        });
     }
 }

@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.pm.PackageManager;
+import android.os.StrictMode;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -41,7 +42,7 @@ import sdis.wetranslate.exceptions.ServerRequestException;
 import sdis.wetranslate.logic.User;
 
 import static android.Manifest.permission.READ_CONTACTS;
-import static sdis.wetranslate.logic.ServerRequest.verifyUserIsValid;
+import static sdis.wetranslate.logic.ServerRequest.*;
 import static sdis.wetranslate.utils.GoodGuy.changeActivity;
 
 /**
@@ -59,6 +60,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    private LoginActivity loginActivity=this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +92,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        //necessário para fazer o lançamento de threads
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
     }
 
     private void populateAutoComplete() {
@@ -136,45 +142,49 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private void attemptLogin() {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // Reset errors.
+                mEmailView.setError(null);
+                mPasswordView.setError(null);
 
-        // Reset errors.
-        mEmailView.setError(null);
-        mPasswordView.setError(null);
+                // Store values at the time of the login attempt.
+                String username = mEmailView.getText().toString();
+                String password = mPasswordView.getText().toString();
 
-        // Store values at the time of the login attempt.
-        String username = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
+                boolean cancel = false;
+                View focusView = null;
 
-        boolean cancel = false;
-        View focusView = null;
-
-        // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
-            focusView = mPasswordView;
-            cancel = true;
-        }
-        else{
-            if(!TextUtils.isEmpty(username)){
-                if(!isUsernameValid(username,password)){
-                    mEmailView.setError(getString(R.string.error_invalid_email));
-                    focusView = mEmailView;
+                // Check for a valid password, if the user entered one.
+                if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+                    mPasswordView.setError(getString(R.string.error_invalid_password));
+                    focusView = mPasswordView;
                     cancel = true;
                 }
-            }else{
-                mEmailView.setError(getString(R.string.error_field_required));
-                focusView = mEmailView;
-                cancel = true;
-            }
-        }
+                else{
+                    if(!TextUtils.isEmpty(username)){
+                        if(!isUsernameValid(username,password)){
+                            mEmailView.setError(getString(R.string.error_invalid_email));
+                            focusView = mEmailView;
+                            cancel = true;
+                        }
+                    }else{
+                        mEmailView.setError(getString(R.string.error_field_required));
+                        focusView = mEmailView;
+                        cancel = true;
+                    }
+                }
 
-        if (cancel) { //inputs errados
-            focusView.requestFocus();
-        } else { //fazer login
-            showProgress(true);
-            User.getInstance().initSession(username);
-           changeActivity(this, MenuActivity.class);
-        }
+                if (cancel) { //inputs errados
+                    focusView.requestFocus();
+                } else { //fazer login
+                    showProgress(true);
+                    User.getInstance().initSession(username);
+                    changeActivity(loginActivity, MenuActivity.class);
+                }
+            }
+        });
     }
 
 
@@ -185,8 +195,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ServerRequestException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
             e.printStackTrace();
         }
         return false;
