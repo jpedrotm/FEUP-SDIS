@@ -56,7 +56,6 @@ public class TranslateFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 
     private boolean hasMadeRequest=false;//se já pediu um texto para traduzir
-    private EditText textTranslated;
     private TranslationPagerAdapter adapter;
     private ViewPager viewPager;
     private Spinner dropdownFrom = null;
@@ -185,9 +184,6 @@ public class TranslateFragment extends Fragment {
             dropdownTo.setAdapter(adapter);
             dropdownTo.setSelection(dropdownToPosition);
 
-            textTranslated=(EditText) layout.findViewById(R.id.textTranslated);
-            System.out.println("Text: "+textTranslated);
-
 
             // Listeners
             Button buttonRequests = (Button) layout.findViewById(R.id.buttonRequests);
@@ -205,7 +201,7 @@ public class TranslateFragment extends Fragment {
             sendTranslationButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    sendTraslation();
+                    sendTranslation(editText);
                 }
             });
 
@@ -272,12 +268,11 @@ public class TranslateFragment extends Fragment {
         });
     }
 
-    private void sendTraslation(){
+    private void sendTranslation(final EditText textTranslated){
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 String translatedText=textTranslated.getText().toString();
-                System.out.println("Ola: "+hasMadeRequest+","+translatedText.length());
 
                 if(hasMadeRequest){
                     if(translatedText.length()!=0){

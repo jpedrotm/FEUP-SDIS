@@ -14,6 +14,7 @@ import sdis.wetranslate.MenuActivity;
 import sdis.wetranslate.NewTranslationFragment;
 import sdis.wetranslate.R;
 import sdis.wetranslate.TranslateFragment;
+import sdis.wetranslate.ViewRequestsFragment;
 
 public class GoodGuy {
 
@@ -44,7 +45,8 @@ public class GoodGuy {
             case TRANSLATE:
                 newFragment=new TranslateFragment();
                 break;
-            case SETTINGS:
+            case VIEW_REQUESTS:
+                newFragment=new ViewRequestsFragment();
                 break;
             default:
                 break;
@@ -57,6 +59,6 @@ public class GoodGuy {
     }
 
     public enum FragmentType{
-        NEW_TRANSLATION,TRANSLATE,SETTINGS
+        NEW_TRANSLATION,TRANSLATE,VIEW_REQUESTS
     }
 }

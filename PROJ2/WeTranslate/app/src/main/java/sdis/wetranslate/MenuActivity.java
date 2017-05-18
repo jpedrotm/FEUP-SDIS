@@ -28,7 +28,7 @@ import sdis.wetranslate.utils.GoodGuy;
 import static sdis.wetranslate.utils.GoodGuy.changeFragment;
 
 public class MenuActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, NewTranslationFragment.OnFragmentInteractionListener, TranslateFragment.OnFragmentInteractionListener {
+        implements NavigationView.OnNavigationItemSelectedListener, NewTranslationFragment.OnFragmentInteractionListener, TranslateFragment.OnFragmentInteractionListener,ViewRequestsFragment.OnFragmentInteractionListener,ViewTranslationFragment.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,8 +99,8 @@ public class MenuActivity extends AppCompatActivity
             changeFragment(GoodGuy.FragmentType.NEW_TRANSLATION,this);
         } else if (id == R.id.nav_translate) {
             changeFragment(GoodGuy.FragmentType.TRANSLATE,this);
-        } else if (id == R.id.nav_settings) {
-            System.out.println("3");
+        } else if (id == R.id.nav_view_requests) {
+            changeFragment(GoodGuy.FragmentType.VIEW_REQUESTS,this);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

@@ -89,7 +89,7 @@ public class ServerRequest {
         System.out.println("Vou enviar a nova tradução.");
         StringBuilder builder=new StringBuilder();
 
-        builder.append("http://wetranslate.ddns.net:7000/insertUser?");
+        builder.append("http://wetranslate.ddns.net:7000/insertTranslation?");
         builder.append("username="); builder.append(username);
         builder.append("&text="); builder.append(translatedText);
         builder.append("&requestid="); builder.append(requestId);
