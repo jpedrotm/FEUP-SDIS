@@ -3,9 +3,10 @@ package sdis.wetranslate;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.StrictMode;
-import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +16,6 @@ import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 
 import android.os.Build;
 import android.os.Bundle;
@@ -31,8 +31,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -61,6 +59,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
     private LoginActivity loginActivity=this;
+
+    SharedPreferences sharedPreferences;
+
+    public static final String MyPREFERENCES = "MyPrefs";
+    public static final String Username = "userame";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +99,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         //necessário para fazer o lançamento de threads
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
+
+        sharedPreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        verifyIfHasSession();
     }
 
     private void populateAutoComplete() {
@@ -181,6 +187,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 } else { //fazer login
                     showProgress(true);
                     User.getInstance().initSession(username);
+                    saveSession(username);
                     changeActivity(loginActivity, MenuActivity.class);
                 }
             }
@@ -202,6 +209,24 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private boolean isPasswordValid(String password) {
         return password.length() >= 6;
+    }
+
+    private void saveSession(String username){
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        System.out.println("Save session: "+username);
+        editor.putString(Username,username);
+        editor.commit();
+    }
+
+    private void verifyIfHasSession(){
+        sharedPreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        String username=sharedPreferences.getString(Username,"");
+        System.out.println("Has session: "+username);
+        if(username!=""){
+            showProgress(true);
+            User.getInstance().initSession(username);
+            changeActivity(this, MenuActivity.class);
+        }
     }
 
     /**

@@ -3,6 +3,7 @@ package sdis.wetranslate;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -15,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import sdis.wetranslate.logic.User;
 import sdis.wetranslate.notifications.NotificationService;
 import sdis.wetranslate.utils.GoodGuy;
 

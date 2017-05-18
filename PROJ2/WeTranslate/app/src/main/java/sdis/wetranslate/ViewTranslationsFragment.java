@@ -130,10 +130,15 @@ public class ViewTranslationsFragment extends Fragment {
                 try {
                     JSONArray translations= ServerRequest.getTranslations(Integer.toString(User.getInstance().getCurrentRequestWatching()));
                     ArrayList<String> texts=new ArrayList<String>();
-                    for(int i=0;i<translations.length();i++){
-                        JSONObject object=translations.getJSONObject(i);
-                        String textTranslation=object.getString("translated_text");
-                        texts.add(textTranslation);
+                    if(translations.length()>0){
+                        for(int i=0;i<translations.length();i++){
+                            JSONObject object=translations.getJSONObject(i);
+                            String textTranslation=object.getString("translated_text");
+                            texts.add(textTranslation);
+                        }
+                    }
+                    else{
+                        texts.add("This request doesn't has any translation.");
                     }
 
                     ArrayAdapter<String> adapter=new ArrayAdapter<String>(getActivity(),R.layout.answers_request,texts);
