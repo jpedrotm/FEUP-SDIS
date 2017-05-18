@@ -4,31 +4,35 @@ package sdis.wetranslate.notifications;
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Intent;
-import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.util.Log;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import sdis.wetranslate.LoginActivity;
 import sdis.wetranslate.R;
 
 public class NotificationService extends IntentService {
+    private WebSocketListener wsl;
 
     public NotificationService() {
-        super("amizade");
+        super("notifier");
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        try {
+            wsl = new WebSocketListener(new URI("ws://wetranslate.ddns.net:7001"), this);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -40,24 +44,21 @@ public class NotificationService extends IntentService {
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         try {
-            ServerSocket serverSocket = new ServerSocket(9500);
+            wsl.connectBlocking();
 
-            while (true) {
-                Socket socket = serverSocket.accept();
-                DataInputStream input = new DataInputStream(socket.getInputStream());
-
-                byte[] bytes = new byte[1024];
-                input.read(bytes);
-                System.out.println(new String(bytes));
-            }
-        }
-        catch (IOException e) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("username", "jbarbosa");
+            jsonObject.put("key", "2BC5F503051821B37577943F717683B0AB0DB4253CD42D4D40270D480066DFEC");
+            wsl.send(jsonObject.toString());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
 
-    private void notifyClient() {
+    public void notifyClient() {
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this);
         notificationBuilder.setSmallIcon(R.drawable.ic_add_circle);
