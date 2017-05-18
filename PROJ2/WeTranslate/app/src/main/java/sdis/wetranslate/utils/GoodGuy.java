@@ -15,6 +15,7 @@ import sdis.wetranslate.NewTranslationFragment;
 import sdis.wetranslate.R;
 import sdis.wetranslate.TranslateFragment;
 import sdis.wetranslate.ViewRequestsFragment;
+import sdis.wetranslate.ViewTranslationsFragment;
 
 public class GoodGuy {
 
@@ -38,6 +39,7 @@ public class GoodGuy {
 
     public static void changeFragment(FragmentType type,Activity activity){
         Fragment newFragment=null;
+        boolean change=true;
         switch(type){
             case NEW_TRANSLATION:
                 newFragment = new NewTranslationFragment();
@@ -48,17 +50,23 @@ public class GoodGuy {
             case VIEW_REQUESTS:
                 newFragment=new ViewRequestsFragment();
                 break;
+            case VIEW_TRANSLATIONS:
+                newFragment=new ViewTranslationsFragment();
+                break;
             default:
+                change=false;
                 break;
         }
 
-        FragmentTransaction transaction = activity.getFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, newFragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
+        if(change){
+            FragmentTransaction transaction = activity.getFragmentManager().beginTransaction();
+            transaction.replace(R.id.fragment_container, newFragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
+        }
     }
 
     public enum FragmentType{
-        NEW_TRANSLATION,TRANSLATE,VIEW_REQUESTS
+        NEW_TRANSLATION,TRANSLATE,VIEW_REQUESTS,VIEW_TRANSLATIONS
     }
 }

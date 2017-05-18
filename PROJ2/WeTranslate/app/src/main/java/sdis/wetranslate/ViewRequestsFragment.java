@@ -7,10 +7,23 @@ import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import java.util.List;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+
+import sdis.wetranslate.exceptions.ServerRequestException;
+import sdis.wetranslate.logic.ServerRequest;
+import sdis.wetranslate.logic.User;
+import sdis.wetranslate.utils.GoodGuy;
+
+import static sdis.wetranslate.utils.GoodGuy.changeFragment;
 
 
 /**
@@ -31,6 +44,7 @@ public class ViewRequestsFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private ArrayList<Integer> requestsID=new ArrayList<>();
     private OnFragmentInteractionListener mListener;
 
     public ViewRequestsFragment() {
@@ -71,14 +85,7 @@ public class ViewRequestsFragment extends Fragment {
 
         ViewGroup viewRequests=(ViewGroup) inflater.inflate(R.layout.fragment_view_requests, container, false);
 
-        String[] FRUITS = new String[] { "Apple", "Avocado", "Banana",
-                "Blueberry", "Coconut", "Durian", "Guava", "Kiwifruit",
-                "Jackfruit", "Mango", "Olive", "Pear", "Sugar-apple" };
-
-        ArrayAdapter<String> adapter=new ArrayAdapter<String>(getActivity(),R.layout.answers_request,FRUITS);
-        ListView listView= (ListView) viewRequests.findViewById(R.id.listViewTranslations);
-        listView.setAdapter(adapter);
-
+        feedUserRequests(viewRequests);
 
         return viewRequests;
     }
@@ -120,5 +127,41 @@ public class ViewRequestsFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    private void feedUserRequests(final ViewGroup viewRequests){
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    JSONArray requests= ServerRequest.getRequestsByUsername(User.getInstance().getUsername());
+                    ArrayList<String> texts=new ArrayList<String>();
+                    for(int i=0;i<requests.length();i++){
+                        JSONObject object=requests.getJSONObject(i);
+                        String textRequest=object.getString("content");
+                        texts.add(textRequest);
+                        requestsID.add(object.getInt("id"));
+                    }
+
+                    ArrayAdapter<String> adapter=new ArrayAdapter<String>(getActivity(),R.layout.answers_request,texts);
+                    ListView listView= (ListView) viewRequests.findViewById(R.id.listViewRequests);
+                    listView.setAdapter(adapter);
+
+                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        public void onItemClick(AdapterView<?> parent, View view,
+                                                int position, long id) {
+                            User.getInstance().setCurrentRequestWatching(requestsID.get(position));
+                            changeFragment(GoodGuy.FragmentType.VIEW_TRANSLATIONS,getActivity());
+                        }
+                    });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ServerRequestException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }

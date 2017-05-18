@@ -40,6 +40,52 @@ public class ServerRequest {
         return jsonArray;
     }
 
+    public static JSONArray getRequestsByUsername(String username) throws IOException, ServerRequestException, JSONException {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("http://wetranslate.ddns.net:7000/getRequestsByUsername?");
+        builder.append("username="); builder.append(username);
+
+        System.out.println(builder.toString());
+
+        // Connect to Load Balancer
+        HttpURLConnection connection = (HttpURLConnection) new URL(builder.toString()).openConnection();
+        connection.setRequestMethod(RequestMethod.GET);
+
+        if (HttpConnection.getCode(connection) != HttpURLConnection.HTTP_OK)
+            throw new ServerRequestException("Failed to get requests");
+
+        String msg = HttpConnection.getMessage(connection);
+
+        JSONArray jsonArray = new JSONArray(msg);
+        System.out.println(jsonArray);
+
+        return jsonArray;
+    }
+
+    public static JSONArray getTranslations(String requestId) throws IOException, ServerRequestException, JSONException {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("http://wetranslate.ddns.net:7000/getTranslations?");
+        builder.append("requestid="); builder.append(requestId);
+
+        System.out.println(builder.toString());
+
+        // Connect to Load Balancer
+        HttpURLConnection connection = (HttpURLConnection) new URL(builder.toString()).openConnection();
+        connection.setRequestMethod(RequestMethod.GET);
+
+        if (HttpConnection.getCode(connection) != HttpURLConnection.HTTP_OK)
+            throw new ServerRequestException("Failed to get translations.");
+
+        String msg = HttpConnection.getMessage(connection);
+
+        JSONArray jsonArray = new JSONArray(msg);
+        System.out.println(jsonArray);
+
+        return jsonArray;
+    }
+
     public static boolean verifyUserIsValid(String username,String password) throws IOException, ServerRequestException {
         StringBuilder builder=new StringBuilder();
 

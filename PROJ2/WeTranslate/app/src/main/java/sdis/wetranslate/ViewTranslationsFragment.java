@@ -3,21 +3,34 @@ package sdis.wetranslate;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+
+import sdis.wetranslate.exceptions.ServerRequestException;
+import sdis.wetranslate.logic.ServerRequest;
+import sdis.wetranslate.logic.User;
 
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link ViewTranslationFragment.OnFragmentInteractionListener} interface
+ * {@link ViewTranslationsFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link ViewTranslationFragment#newInstance} factory method to
+ * Use the {@link ViewTranslationsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ViewTranslationFragment extends Fragment {
+public class ViewTranslationsFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -29,7 +42,7 @@ public class ViewTranslationFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public ViewTranslationFragment() {
+    public ViewTranslationsFragment() {
         // Required empty public constructor
     }
 
@@ -39,11 +52,11 @@ public class ViewTranslationFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment ViewTranslationFragment.
+     * @return A new instance of fragment ViewTranslationsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ViewTranslationFragment newInstance(String param1, String param2) {
-        ViewTranslationFragment fragment = new ViewTranslationFragment();
+    public static ViewTranslationsFragment newInstance(String param1, String param2) {
+        ViewTranslationsFragment fragment = new ViewTranslationsFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -64,7 +77,11 @@ public class ViewTranslationFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_view_translation, container, false);
+        ViewGroup viewTranslations= (ViewGroup) inflater.inflate(R.layout.fragment_view_translation, container, false);
+
+        feedUserTranslationsByRequestId(viewTranslations);
+
+        return viewTranslations;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -104,5 +121,32 @@ public class ViewTranslationFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    private void feedUserTranslationsByRequestId(final ViewGroup viewTranslations){
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    JSONArray translations= ServerRequest.getTranslations(Integer.toString(User.getInstance().getCurrentRequestWatching()));
+                    ArrayList<String> texts=new ArrayList<String>();
+                    for(int i=0;i<translations.length();i++){
+                        JSONObject object=translations.getJSONObject(i);
+                        String textTranslation=object.getString("translated_text");
+                        texts.add(textTranslation);
+                    }
+
+                    ArrayAdapter<String> adapter=new ArrayAdapter<String>(getActivity(),R.layout.answers_request,texts);
+                    ListView listView= (ListView) viewTranslations.findViewById(R.id.listViewTranslations);
+                    listView.setAdapter(adapter);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ServerRequestException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }
