@@ -26,6 +26,8 @@ import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 
 import sdis.wetranslate.exceptions.ServerRequestException;
@@ -211,7 +213,11 @@ public class TranslateFragment extends Fragment {
             JSONObject jsonObject = PagerFeeder.get(position);
             if (jsonObject != null) {
                 try {
-                    textView.setText(jsonObject.getString("content"));
+                    try {
+                        textView.setText(URLDecoder.decode(jsonObject.getString("content"),"UTF-8"));
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

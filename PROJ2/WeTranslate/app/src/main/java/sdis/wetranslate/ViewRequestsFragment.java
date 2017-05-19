@@ -16,6 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 
 import sdis.wetranslate.exceptions.ServerRequestException;
@@ -138,7 +139,7 @@ public class ViewRequestsFragment extends Fragment {
                     ArrayList<String> texts=new ArrayList<String>();
                     for(int i=0;i<requests.length();i++){
                         JSONObject object=requests.getJSONObject(i);
-                        String textRequest=object.getString("content");
+                        String textRequest= URLDecoder.decode(object.getString("content"),"UTF-8");
                         texts.add(textRequest);
                         requestsID.add(object.getInt("id"));
                     }

@@ -15,6 +15,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 
 import sdis.wetranslate.exceptions.ServerRequestException;
@@ -133,7 +134,7 @@ public class ViewTranslationsFragment extends Fragment {
                     if(translations.length()>0){
                         for(int i=0;i<translations.length();i++){
                             JSONObject object=translations.getJSONObject(i);
-                            String textTranslation=object.getString("translated_text");
+                            String textTranslation= URLDecoder.decode(object.getString("translated_text"),"UTF-8");
                             texts.add(textTranslation);
                         }
                     }

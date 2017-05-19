@@ -21,8 +21,8 @@ public class ServerRequest {
         StringBuilder builder = new StringBuilder();
 
         builder.append("http://wetranslate.ddns.net:7000/getRequests?");
-        builder.append("from="); builder.append(URLEncoder.encode(source,"UTF-8"));
-        builder.append("&to="); builder.append(URLEncoder.encode(target,"UTF-8"));
+        builder.append("from="); builder.append(source);
+        builder.append("&to="); builder.append(target);
 
         System.out.println(builder.toString());
 
@@ -31,7 +31,7 @@ public class ServerRequest {
         connection.setRequestMethod(RequestMethod.GET);
 
         if (HttpConnection.getCode(connection) != HttpURLConnection.HTTP_OK)
-            throw new ServerRequestException("Failed to get requests.");
+            throw new ServerRequestException("Failed to get requests");
 
         String msg = HttpConnection.getMessage(connection);
 
@@ -45,7 +45,7 @@ public class ServerRequest {
         StringBuilder builder = new StringBuilder();
 
         builder.append("http://wetranslate.ddns.net:7000/getRequestsByUsername?");
-        builder.append("username="); builder.append(URLEncoder.encode(username,"UTF-8"));
+        builder.append("username="); builder.append(username);
 
         System.out.println(builder.toString());
 
@@ -68,7 +68,7 @@ public class ServerRequest {
         StringBuilder builder = new StringBuilder();
 
         builder.append("http://wetranslate.ddns.net:7000/getTranslations?");
-        builder.append("requestid="); builder.append(URLEncoder.encode(requestId,"UTF-8"));
+        builder.append("requestid="); builder.append(requestId);
 
         System.out.println(builder.toString());
 
@@ -91,8 +91,8 @@ public class ServerRequest {
         StringBuilder builder=new StringBuilder();
 
         builder.append("http://wetranslate.ddns.net:7000/login?");
-        builder.append("username="); builder.append(URLEncoder.encode(username,"UTF-8"));
-        builder.append("&password="); builder.append(URLEncoder.encode(password,"UTF-8"));
+        builder.append("username="); builder.append(username);
+        builder.append("&password="); builder.append(password);
 
         System.out.println(builder.toString());
 
@@ -111,7 +111,7 @@ public class ServerRequest {
         StringBuilder builder=new StringBuilder();
 
         builder.append("http://wetranslate.ddns.net:7000/api/userExists?");
-        builder.append("username="); builder.append(URLEncoder.encode(username,"UTF-8"));
+        builder.append("username="); builder.append(username);
 
         System.out.println(builder.toString());
 
@@ -128,8 +128,8 @@ public class ServerRequest {
         StringBuilder builder=new StringBuilder();
 
         builder.append("http://wetranslate.ddns.net:7000/insertUser?");
-        builder.append("username="); builder.append(URLEncoder.encode(username,"UTF-8"));
-        builder.append("&password="); builder.append(URLEncoder.encode(password,"UTF-8"));
+        builder.append("username="); builder.append(username);
+        builder.append("&password="); builder.append(password);
 
         System.out.println(builder.toString());
 
@@ -145,9 +145,9 @@ public class ServerRequest {
         StringBuilder builder=new StringBuilder();
 
         builder.append("http://wetranslate.ddns.net:7000/insertTranslation?");
-        builder.append("username="); builder.append(URLEncoder.encode(username,"UTF-8"));
+        builder.append("username="); builder.append(username);
         builder.append("&text="); builder.append(URLEncoder.encode(translatedText,"UTF-8"));
-        builder.append("&requestid="); builder.append(URLEncoder.encode(requestId,"UTF-8"));
+        builder.append("&requestid="); builder.append(requestId);
 
         System.out.println(builder.toString());
 
@@ -165,7 +165,7 @@ public class ServerRequest {
         builder.append("username="); builder.append(username);
         builder.append("&from="); builder.append("pt");
         builder.append("&to="); builder.append("en");
-        builder.append("&text="); builder.append(text);
+        builder.append("&text="); builder.append(URLEncoder.encode(text,"UTF-8"));
 
         System.out.println(builder.toString());
 
