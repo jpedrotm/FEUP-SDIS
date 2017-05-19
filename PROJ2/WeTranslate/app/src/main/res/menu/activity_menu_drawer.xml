@@ -14,6 +14,10 @@
             android:id="@+id/nav_view_requests"
             android:icon="@drawable/ic_view_requests"
             android:title="View Requests" />
+        <item
+            android:id="@+id/log_out"
+            android:icon="@drawable/ic_log_out"
+            android:title="Log out"/>
     </group>
 
 </menu>
