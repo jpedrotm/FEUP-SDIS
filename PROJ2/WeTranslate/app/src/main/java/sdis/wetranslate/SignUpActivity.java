@@ -31,6 +31,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import org.json.JSONException;
@@ -104,6 +105,16 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
         //necessário para fazer o lançamento de threads
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
+
+        Switch switchButton = (Switch) findViewById(R.id.sign_up_switch);
+        switchButton.setChecked(true);
+
+        switchButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeActivity(signUpActivity,LoginActivity.class);
+            }
+        });
     }
 
     private void attemptSignUp(final Context signUpActivity) {

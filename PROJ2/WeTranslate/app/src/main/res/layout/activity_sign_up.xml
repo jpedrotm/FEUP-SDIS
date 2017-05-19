@@ -90,6 +90,14 @@
                 android:text="@string/action_sign_in"
                 android:textStyle="bold" />
 
+            <Switch
+                android:id="@+id/sign_up_switch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sign Up"
+                android:layout_marginTop="30dp"
+                android:layout_marginLeft="100dp"
+                android:layout_marginRight="100dp"/>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

@@ -26,10 +26,12 @@ import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import sdis.wetranslate.exceptions.ServerRequestException;
 import sdis.wetranslate.logic.PagerFeeder;
 import sdis.wetranslate.logic.ServerRequest;
+import sdis.wetranslate.logic.Translation;
 import sdis.wetranslate.logic.User;
 
 import static sdis.wetranslate.logic.ServerRequest.insertNewTranslation;
@@ -171,7 +173,7 @@ public class TranslateFragment extends Fragment {
                     getResources().getDimension(R.dimen.result_font));
 
             // Feed values to spinners
-            String[] items = new String[]{"Portugues", "Ingles", "Alemao"};
+            ArrayList<String> items = Translation.getLanguagesList();
             ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, items);
 
 
@@ -240,7 +242,7 @@ public class TranslateFragment extends Fragment {
             @Override
             public void run() {
                 try {
-                    JSONArray response = ServerRequest.getRequests(source, target);
+                    JSONArray response = ServerRequest.getRequests(Translation.getLanguage(source), Translation.getLanguage(target));
                     PagerFeeder.feed(response);
                     viewPager.setAdapter(adapter);
                     viewPager.setPageTransformer(true, new ViewPager.PageTransformer() {

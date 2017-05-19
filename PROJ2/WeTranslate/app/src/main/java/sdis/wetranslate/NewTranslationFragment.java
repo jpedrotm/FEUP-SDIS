@@ -14,8 +14,10 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import sdis.wetranslate.exceptions.ServerRequestException;
+import sdis.wetranslate.logic.Translation;
 import sdis.wetranslate.logic.User;
 
 import static sdis.wetranslate.logic.ServerRequest.insertNewRequest;
@@ -87,7 +89,7 @@ public class NewTranslationFragment extends Fragment {
                 getResources().getDimension(R.dimen.result_font));
 
         // Feed values to spinners
-        String[] items = new String[]{"Português", "Inglês", "Alemão"};
+        ArrayList<String> items = Translation.getLanguagesList();
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, items);
 
         dropdownFrom = (Spinner) rootView.findViewById(R.id.spinnerTranslateFrom);
@@ -154,8 +156,10 @@ public class NewTranslationFragment extends Fragment {
             public void run() {
                 String textTranslate=textToTranslate.getText().toString();
                 if (textTranslate.length() != 0){
+                    String from=dropdownFrom.getSelectedItem().toString();
+                    String to=dropdownTo.getSelectedItem().toString();
                     try {
-                        insertNewRequest(User.getInstance().getUsername(),dropdownFrom.getSelectedItem().toString(),dropdownTo.getSelectedItem().toString(),textTranslate);
+                        insertNewRequest(User.getInstance().getUsername(),Translation.getLanguage(from),Translation.getLanguage(to),textTranslate);
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (ServerRequestException e) {
