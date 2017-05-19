@@ -76,7 +76,7 @@ public class ServerRequest {
         connection.setRequestMethod(RequestMethod.GET);
 
         if (HttpConnection.getCode(connection) != HttpURLConnection.HTTP_OK)
-            throw new ServerRequestException("Failed to get translations.");
+            return null;
 
         String msg = HttpConnection.getMessage(connection);
 
@@ -86,7 +86,7 @@ public class ServerRequest {
         return jsonArray;
     }
 
-    public static boolean verifyUserIsValid(String username,String password) throws IOException, ServerRequestException {
+    public static String loginUser(String username,String password) throws IOException, ServerRequestException {
         StringBuilder builder=new StringBuilder();
 
         builder.append("http://wetranslate.ddns.net:7000/login?");
@@ -98,7 +98,12 @@ public class ServerRequest {
         HttpURLConnection connection=(HttpURLConnection) new URL(builder.toString()).openConnection();
         connection.setRequestMethod(RequestMethod.POST);
 
-        return HttpConnection.getCode(connection)==HttpURLConnection.HTTP_OK;
+        if(HttpConnection.getCode(connection)!=HttpURLConnection.HTTP_OK)
+            throw new ServerRequestException("Failed to login user.");
+
+        String msg=HttpConnection.getMessage(connection);
+
+        return msg;
     }
 
     public static boolean verifyUsernameAlreadyExists(String username) throws IOException, ServerRequestException {
@@ -111,6 +116,9 @@ public class ServerRequest {
 
         HttpURLConnection connection=(HttpURLConnection) new URL(builder.toString()).openConnection();
         connection.setRequestMethod(RequestMethod.GET);
+
+        String msg=HttpConnection.getMessage(connection);
+        System.out.println("Message: "+msg);
 
         return HttpConnection.getCode(connection)==HttpURLConnection.HTTP_OK;
     }

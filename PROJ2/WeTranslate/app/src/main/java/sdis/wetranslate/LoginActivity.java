@@ -58,12 +58,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
-    private LoginActivity loginActivity=this;
-
-    SharedPreferences sharedPreferences;
 
     public static final String MyPREFERENCES = "MyPrefs";
     public static final String Username = "userame";
+    public static final String KeyUser="key";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,7 +100,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         switchButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                changeActivity(loginActivity,SignUpActivity.class);
+                changeActivity(LoginActivity.this,SignUpActivity.class);
             }
         });
 
@@ -110,7 +108,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        sharedPreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         verifyIfHasSession();
     }
 
@@ -196,16 +193,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     focusView.requestFocus();
                 } else { //fazer login
                     showProgress(true);
-                    try {
-                        verifyUserIsValid(username,password);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (ServerRequestException e) {
-                        e.printStackTrace();
-                    }
-                    User.getInstance().initSession(username);
-                    saveSession(username);
-                    changeActivity(loginActivity, MenuActivity.class);
+                    changeActivity(LoginActivity.this, MenuActivity.class);
                 }
             }
         });
@@ -215,7 +203,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private boolean isUsernameValid(String username,String password) {
         try {
-            return verifyUserIsValid(username,password);
+            String key=loginUser(username,password);
+            if(key!=null){
+                User.getInstance().initSession(username);
+                User.getInstance().saveSession(username,key,this);
+                return true;
+            }
+            else
+                return false;
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ServerRequestException e) {
@@ -228,17 +223,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         return password.length() >= 6;
     }
 
-    private void saveSession(String username){
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        System.out.println("Save session: "+username);
-        editor.putString(Username,username);
-        editor.commit();
-    }
-
     private void verifyIfHasSession(){
-        sharedPreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         String username=sharedPreferences.getString(Username,"");
-        System.out.println("Has session: "+username);
         if(username!=""){
             showProgress(true);
             User.getInstance().initSession(username);

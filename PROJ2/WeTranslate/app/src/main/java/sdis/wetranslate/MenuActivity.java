@@ -2,6 +2,7 @@ package sdis.wetranslate;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -20,6 +21,7 @@ import sdis.wetranslate.logic.User;
 import sdis.wetranslate.notifications.NotificationService;
 import sdis.wetranslate.utils.GoodGuy;
 
+import static sdis.wetranslate.utils.GoodGuy.changeActivity;
 import static sdis.wetranslate.utils.GoodGuy.changeFragment;
 
 public class MenuActivity extends AppCompatActivity
@@ -92,6 +94,8 @@ public class MenuActivity extends AppCompatActivity
             changeFragment(GoodGuy.FragmentType.TRANSLATE,this);
         } else if (id == R.id.nav_view_requests) {
             changeFragment(GoodGuy.FragmentType.VIEW_REQUESTS,this);
+        } else if(id == R.id.log_out) {
+            logoutSession();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -107,5 +111,14 @@ public class MenuActivity extends AppCompatActivity
     @Override
     public void onFragmentInteraction(Uri uri) {
 
+    }
+
+    private void logoutSession(){
+        User.getInstance().resetUser();
+        SharedPreferences sharedPreferences=getSharedPreferences(LoginActivity.MyPREFERENCES, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove(LoginActivity.Username);
+        editor.commit();
+        changeActivity(this,LoginActivity.class);
     }
 }

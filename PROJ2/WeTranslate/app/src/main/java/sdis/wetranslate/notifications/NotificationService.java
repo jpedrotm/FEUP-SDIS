@@ -4,7 +4,9 @@ package sdis.wetranslate.notifications;
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
@@ -45,10 +47,13 @@ public class NotificationService extends IntentService {
     protected void onHandleIntent(@Nullable Intent intent) {
         try {
             wsl.connectBlocking();
-
+            SharedPreferences sharedPreferences=getSharedPreferences(LoginActivity.MyPREFERENCES, Context.MODE_PRIVATE);
+            String username=sharedPreferences.getString(LoginActivity.Username,"");
+            String key=sharedPreferences.getString(LoginActivity.KeyUser,"");
+            System.out.println("Username: "+username+","+key);
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("username", "jbarbosa");
-            jsonObject.put("key", "2BC5F503051821B37577943F717683B0AB0DB4253CD42D4D40270D480066DFEC");
+            jsonObject.put("username", username);
+            jsonObject.put("key", key);
             wsl.send(jsonObject.toString());
         } catch (InterruptedException e) {
             e.printStackTrace();

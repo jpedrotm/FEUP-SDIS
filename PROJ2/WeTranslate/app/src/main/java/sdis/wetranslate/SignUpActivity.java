@@ -3,6 +3,7 @@ package sdis.wetranslate;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -58,7 +59,6 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
     private EditText mPasswordConfirmationView;
     private View mProgressView;
     private View mLoginFormView;
-    private SignUpActivity signUpActivity=this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +72,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptSignUp(signUpActivity);
+                    attemptSignUp(SignUpActivity.this);
                     return true;
                 }
                 return false;
@@ -84,7 +84,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptSignUp(signUpActivity);
+                    attemptSignUp(SignUpActivity.this);
                     return true;
                 }
                 return false;
@@ -95,7 +95,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptSignUp(signUpActivity);
+                attemptSignUp(SignUpActivity.this);
             }
         });
 
@@ -112,7 +112,7 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
         switchButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                changeActivity(signUpActivity,LoginActivity.class);
+                changeActivity(SignUpActivity.this,LoginActivity.class);
             }
         });
     }
@@ -158,17 +158,18 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
                     focusView.requestFocus();
                 } else {
                     //Entra aqui insere-se o utilizador e faz login na aplicação
-                    showProgress(true);
-                    User.getInstance().initSession(username);
                     try {
-                        insertNewUser(User.getInstance().getUsername(),password);
-                        verifyUserIsValid(username,password);
+                        showProgress(true);
+                        insertNewUser(username,password);
+                        String key=loginUser(username,password);
+                        User.getInstance().initSession(username);
+                        User.getInstance().saveSession(username,key, SignUpActivity.this);
+                        changeActivity(signUpActivity,MenuActivity.class);
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (ServerRequestException e) {
                         e.printStackTrace();
                     }
-                    changeActivity(signUpActivity,MenuActivity.class);
                 }
             }
         });

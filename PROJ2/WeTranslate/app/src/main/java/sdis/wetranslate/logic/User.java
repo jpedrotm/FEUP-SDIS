@@ -1,6 +1,11 @@
 package sdis.wetranslate.logic;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
+
+import sdis.wetranslate.LoginActivity;
 
 public class User {
 
@@ -31,5 +36,19 @@ public class User {
 
     public int getCurrentRequestWatching(){
         return currentRequestWatching;
+    }
+
+    public void resetUser(){
+        instance=null;
+        username=null;
+        currentRequestWatching=-1;
+    }
+
+    public void saveSession(String username, String key, Activity activity){
+        SharedPreferences sharedPreferences = activity.getSharedPreferences(LoginActivity.MyPREFERENCES, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(LoginActivity.Username,username);
+        editor.putString(LoginActivity.KeyUser,key);
+        editor.commit();
     }
 }
