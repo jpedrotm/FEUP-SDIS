@@ -168,6 +168,7 @@ public class TranslateFragment extends Fragment {
 
 
             TextView textView = (TextView) layout.findViewById(R.id.textToTranslate);
+            final TextView contentId=(TextView) layout.findViewById(R.id.contentId);
 
             // Decrease edit text's font size
             final EditText editText = (EditText) layout.findViewById(R.id.textTranslated);
@@ -205,7 +206,7 @@ public class TranslateFragment extends Fragment {
             sendTranslationButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    sendTranslation(editText);
+                    sendTranslation(editText,contentId);
                 }
             });
 
@@ -215,6 +216,8 @@ public class TranslateFragment extends Fragment {
                 try {
                     try {
                         textView.setText(URLDecoder.decode(jsonObject.getString("content"),"UTF-8"));
+                        contentId.setTag(jsonObject.getString("id"));
+                        System.out.println("ID: "+contentId.getTag());
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
@@ -276,16 +279,16 @@ public class TranslateFragment extends Fragment {
         });
     }
 
-    private void sendTranslation(final EditText textTranslated){
+    private void sendTranslation(final EditText textTranslated,final TextView contentId){
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 String translatedText=textTranslated.getText().toString();
-
+                String id= (String) contentId.getTag();
                 if(hasMadeRequest){
                     if(translatedText.length()!=0){
                         try {
-                            insertNewTranslation(User.getInstance().getUsername(),translatedText,"10"); //para já ainda não pomos o id do request
+                            insertNewTranslation(User.getInstance().getUsername(),translatedText,id); //para já ainda não pomos o id do request
                         } catch (IOException e) {
                             e.printStackTrace();
                         } catch (ServerRequestException e) {
