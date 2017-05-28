@@ -160,8 +160,8 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
                     //Entra aqui insere-se o utilizador e faz login na aplicação
                     try {
                         showProgress(true);
-                        insertNewUser(username,password);
-                        String key=loginUser(username,password);
+                        insertNewUser(username,password,SignUpActivity.this);
+                        String key=loginUser(username,password,SignUpActivity.this);
                         User.getInstance().initSession(username);
                         User.getInstance().saveSession(username,key, SignUpActivity.this);
                         changeActivity(signUpActivity,MenuActivity.class);
@@ -177,13 +177,10 @@ public class SignUpActivity extends AppCompatActivity implements LoaderCallbacks
 
     private boolean userAlreadyExists(String username) {
         try {
-            return verifyUsernameAlreadyExists(username);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ServerRequestException e) {
-            e.printStackTrace();
+            return verifyUsernameAlreadyExists(username,this);
+        } catch (Exception e) {
+            return true;
         }
-        return false;
     }
 
     private boolean isPasswordValid(String password) {

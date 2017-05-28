@@ -129,7 +129,7 @@ public class ViewTranslationsFragment extends Fragment {
             @Override
             public void run() {
                 try {
-                    JSONArray translations= ServerRequest.getTranslations(Integer.toString(User.getInstance().getCurrentRequestWatching()));
+                    JSONArray translations= ServerRequest.getTranslations(Integer.toString(User.getInstance().getCurrentRequestWatching()),getActivity());
                     ArrayList<String> texts=new ArrayList<String>();
                     if(translations.length()>0){
                         for(int i=0;i<translations.length();i++){

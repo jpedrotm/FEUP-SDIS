@@ -203,7 +203,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private boolean isUsernameValid(String username,String password) {
         try {
-            String key=loginUser(username,password);
+            String key=loginUser(username,password,this);
             if(key!=null){
                 User.getInstance().initSession(username);
                 User.getInstance().saveSession(username,key,this);

@@ -135,7 +135,7 @@ public class ViewRequestsFragment extends Fragment {
             @Override
             public void run() {
                 try {
-                    JSONArray requests= ServerRequest.getRequestsByUsername(User.getInstance().getUsername());
+                    JSONArray requests= ServerRequest.getRequestsByUsername(User.getInstance().getUsername(),getActivity());
                     ArrayList<String> texts=new ArrayList<String>();
                     for(int i=0;i<requests.length();i++){
                         JSONObject object=requests.getJSONObject(i);

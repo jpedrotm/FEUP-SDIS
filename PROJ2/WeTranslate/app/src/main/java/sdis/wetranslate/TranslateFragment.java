@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.PagerAdapter;
@@ -36,7 +37,7 @@ import sdis.wetranslate.logic.ServerRequest;
 import sdis.wetranslate.logic.Translation;
 import sdis.wetranslate.logic.User;
 
-import static sdis.wetranslate.logic.ServerRequest.insertNewTranslation;
+import static sdis.wetranslate.logic.ServerRequest.*;
 
 
 /**
@@ -162,7 +163,7 @@ public class TranslateFragment extends Fragment {
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             LayoutInflater inflater = LayoutInflater.from(context);
-            ViewGroup layout = (ViewGroup) inflater.inflate(R.layout.fragment_translate, container, false);
+            final ViewGroup layout = (ViewGroup) inflater.inflate(R.layout.fragment_translate, container, false);
             container.addView(layout);
 
 
@@ -197,7 +198,7 @@ public class TranslateFragment extends Fragment {
                 public void onClick(View v) {
                     dropdownFromPosition = dropdownFrom.getSelectedItemPosition();
                     dropdownToPosition = dropdownTo.getSelectedItemPosition();
-                    feedPager(dropdownFrom.getSelectedItem().toString(), dropdownTo.getSelectedItem().toString());
+                    feedPager(dropdownFrom.getSelectedItem().toString(), dropdownTo.getSelectedItem().toString(),layout);
                     hasMadeRequest=true;
                 }
             });
@@ -246,12 +247,18 @@ public class TranslateFragment extends Fragment {
     }
 
 
-    private void feedPager(final String source, final String target) {
+    private void feedPager(final String source, final String target,final ViewGroup layout) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    JSONArray response = ServerRequest.getRequests(Translation.getLanguage(source), Translation.getLanguage(target));
+                    JSONArray response = ServerRequest.getRequests(Translation.getLanguage(source), Translation.getLanguage(target),getActivity());
+                    if(response.length()==0){
+                        Snackbar noRequestsBar=Snackbar.make(layout,"Não existem pedidos para estas linguagens.",Snackbar.LENGTH_LONG);
+                        noRequestsBar.show();
+                        return;
+                    }
+
                     PagerFeeder.feed(response);
                     viewPager.setAdapter(adapter);
                     viewPager.setPageTransformer(true, new ViewPager.PageTransformer() {
@@ -288,7 +295,7 @@ public class TranslateFragment extends Fragment {
                 if(hasMadeRequest){
                     if(translatedText.length()!=0){
                         try {
-                            insertNewTranslation(User.getInstance().getUsername(),translatedText,id); //para já ainda não pomos o id do request
+                            insertNewTranslation(User.getInstance().getUsername(),translatedText,id,getActivity()); //para já ainda não pomos o id do request
                         } catch (IOException e) {
                             e.printStackTrace();
                         } catch (ServerRequestException e) {

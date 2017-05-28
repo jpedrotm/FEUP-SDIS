@@ -20,7 +20,7 @@ import sdis.wetranslate.exceptions.ServerRequestException;
 import sdis.wetranslate.logic.Translation;
 import sdis.wetranslate.logic.User;
 
-import static sdis.wetranslate.logic.ServerRequest.insertNewRequest;
+import static sdis.wetranslate.logic.ServerRequest.*;
 
 
 /**
@@ -159,7 +159,7 @@ public class NewTranslationFragment extends Fragment {
                     String from=dropdownFrom.getSelectedItem().toString();
                     String to=dropdownTo.getSelectedItem().toString();
                     try {
-                        insertNewRequest(User.getInstance().getUsername(),Translation.getLanguage(from),Translation.getLanguage(to),textTranslate);
+                        insertNewRequest(User.getInstance().getUsername(),Translation.getLanguage(from),Translation.getLanguage(to),textTranslate,getActivity());
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (ServerRequestException e) {
