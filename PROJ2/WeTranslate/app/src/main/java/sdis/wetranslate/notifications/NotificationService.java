@@ -54,9 +54,7 @@ public class NotificationService extends IntentService {
             jsonObject.put("username", username);
             jsonObject.put("key", key);
             wsl.send(jsonObject.toString());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
