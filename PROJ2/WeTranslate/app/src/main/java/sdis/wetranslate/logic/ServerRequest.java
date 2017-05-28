@@ -189,7 +189,7 @@ public class ServerRequest {
             throw new ServerRequestException("Failed to insert new user.");
     }
 
-    public static void insertNewTranslation(String username,String translatedText,String requestId,Context context) throws IOException, ServerRequestException {
+    public static boolean insertNewTranslation(String username,String translatedText,String requestId,Context context) throws IOException, ServerRequestException {
         System.out.println("Vou enviar a nova tradução.");
         StringBuilder builder=new StringBuilder();
         SSLContext sslContext=initializeSSlContext(context);
@@ -210,16 +210,18 @@ public class ServerRequest {
 
         if(HttpConnection.getCode(connection)!=HttpsURLConnection.HTTP_OK)
             throw new ServerRequestException("Failed to insert new user translation.");
+
+        return HttpConnection.getCode(connection)==HttpsURLConnection.HTTP_OK;
     }
 
-    public static void insertNewRequest(String username,String from,String to,String text,Context context) throws IOException, ServerRequestException {
+    public static boolean insertNewRequest(String username,String from,String to,String text,Context context) throws IOException, ServerRequestException {
         StringBuilder builder = new StringBuilder();
         SSLContext sslContext=initializeSSlContext(context);
 
         builder.append("https://wetranslate.ddns.net:7000/insertRequest?");
         builder.append("username="); builder.append(username);
-        builder.append("&from="); builder.append("pt");
-        builder.append("&to="); builder.append("en");
+        builder.append("&from="); builder.append(from);
+        builder.append("&to="); builder.append(to);
         builder.append("&text="); builder.append(URLEncoder.encode(text,"UTF-8"));
 
         System.out.println(builder.toString());
@@ -234,13 +236,14 @@ public class ServerRequest {
 
         if (HttpConnection.getCode(connection) != HttpsURLConnection.HTTP_OK)
             throw new ServerRequestException("Failed to insert requests");
+
+        return HttpConnection.getCode(connection)==HttpsURLConnection.HTTP_OK;
     }
 
     private static SSLContext initializeSSlContext(Context context){
         SSLContext sslContext=null;
         try {
             char[] password = "123456".toCharArray();
-            InputStream fileDescriptor;
             InputStream fKeys = context.getAssets().open("client.bks");
             InputStream fStore= context.getAssets().open("truststore");
             System.out.println("key: "+fKeys);

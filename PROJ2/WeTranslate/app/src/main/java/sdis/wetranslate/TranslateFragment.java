@@ -252,7 +252,14 @@ public class TranslateFragment extends Fragment {
             @Override
             public void run() {
                 try {
-                    JSONArray response = ServerRequest.getRequests(Translation.getLanguage(source), Translation.getLanguage(target),getActivity());
+                    String from= Translation.getLanguage(source);
+                    String to= Translation.getLanguage(target);
+                    if(from.equals(to)){
+                        Snackbar languagesPopup=Snackbar.make(getView(),"Não é possível a tradução com duas linguagens iguais.",Snackbar.LENGTH_SHORT);
+                        languagesPopup.show();
+                        return;
+                    }
+                    JSONArray response = ServerRequest.getRequests(from,to,getActivity());
                     if(response.length()==0){
                         Snackbar noRequestsBar=Snackbar.make(layout,"Não existem pedidos para estas linguagens.",Snackbar.LENGTH_LONG);
                         noRequestsBar.show();
@@ -295,7 +302,10 @@ public class TranslateFragment extends Fragment {
                 if(hasMadeRequest){
                     if(translatedText.length()!=0){
                         try {
-                            insertNewTranslation(User.getInstance().getUsername(),translatedText,id,getActivity()); //para já ainda não pomos o id do request
+                            if(insertNewTranslation(User.getInstance().getUsername(),translatedText,id,getActivity())){ //para já ainda não pomos o id do request
+                                Snackbar newTranslationPopup=Snackbar.make(getView(),"Tradução enviada.",Snackbar.LENGTH_SHORT);
+                                newTranslationPopup.show();
+                            }
                         } catch (IOException e) {
                             e.printStackTrace();
                         } catch (ServerRequestException e) {

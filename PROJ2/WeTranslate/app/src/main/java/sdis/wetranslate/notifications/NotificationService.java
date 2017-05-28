@@ -50,7 +50,6 @@ public class NotificationService extends IntentService {
             SharedPreferences sharedPreferences=getSharedPreferences(LoginActivity.MyPREFERENCES, Context.MODE_PRIVATE);
             String username=sharedPreferences.getString(LoginActivity.Username,"");
             String key=sharedPreferences.getString(LoginActivity.KeyUser,"");
-            System.out.println("Username: "+username+","+key);
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("username", username);
             jsonObject.put("key", key);

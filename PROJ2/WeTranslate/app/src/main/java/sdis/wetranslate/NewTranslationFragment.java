@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.design.widget.Snackbar;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -159,7 +160,12 @@ public class NewTranslationFragment extends Fragment {
                     String from=dropdownFrom.getSelectedItem().toString();
                     String to=dropdownTo.getSelectedItem().toString();
                     try {
-                        insertNewRequest(User.getInstance().getUsername(),Translation.getLanguage(from),Translation.getLanguage(to),textTranslate,getActivity());
+                        if(insertNewRequest(User.getInstance().getUsername(),Translation.getLanguage(from),Translation.getLanguage(to),textTranslate,getActivity())){
+                            Snackbar newRequestPopup=Snackbar.make(getView(),"Pedido de tradução enviado.",Snackbar.LENGTH_SHORT);
+                            newRequestPopup.show();
+                            EditText editT= (EditText) getView().findViewById(R.id.textToTranslate);
+                            editT.setText("");
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (ServerRequestException e) {
